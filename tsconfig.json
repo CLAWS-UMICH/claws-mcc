@@ -8,10 +8,11 @@
       "rootDir": "./",
       "removeComments": true,
       "moduleResolution": "node", 
-      "resolveJsonModule": true 
+      "resolveJsonModule": true,
+      "noImplicitAny": true
     },
     "include": [
-      "api/*"
+      "api/**/*"
     ],
     "exclude": [
       "node_modules"
