@@ -1,11 +1,9 @@
 import express from "express";
 import * as path from "path";
 import * as fs from "fs";
-import Route from "./Route";
+import Route from "./Base";
 import dotenv from "dotenv";
 dotenv.config();
-
-type Method = 'get' | 'post' | 'put';
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -60,3 +58,5 @@ fs.readdir(routesDirectory, (err, files) => {
 		console.log(`Server listening on port ${port}`);
 	});
 });
+
+type Method = 'get' | 'post' | 'put';

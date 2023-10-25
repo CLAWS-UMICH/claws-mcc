@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import Route from "../Route";
+import Base from "../Base";
 
 const astronauts: { [key: string]: { name: string, heartrate: number } } = {
 	'jim': {
@@ -12,7 +12,7 @@ const astronauts: { [key: string]: { name: string, heartrate: number } } = {
 	}
 }
 
-export default class Astronauts extends Route {
+export default class Astronauts extends Base {
 	public routes = [
 		{
 			path: '/api/getAstronaut/:astronaut',
@@ -27,6 +27,7 @@ export default class Astronauts extends Route {
 			res.status(404).send('Astronaut not found');
 		}
 
+		this.db.collection
 
 		res.send(astronauts[key]);
 	}
