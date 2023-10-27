@@ -6,11 +6,11 @@ import { Redis } from "ioredis";
 export default class Base {
     routes: { path: string, method: string, handler: (...args: any[]) => any }[];
     db: Db;
-    redis: Redis;
+    // redis: Redis;
 
     constructor() {
         this.routes = [];
         this.db = db;
-        this.redis = redis;
+        // this.redis = redis;
     }
 }

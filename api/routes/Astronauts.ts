@@ -23,11 +23,12 @@ export default class Astronauts extends Base {
 
 	getAstronaut(req: Request, res: Response) {
 		const key: string = req.params.astronaut;
+		console.log(key)
 		if (!astronauts[key]) {
 			res.status(404).send('Astronaut not found');
 		}
 
-		this.db.collection
+		// this.db.collection
 
 		res.send(astronauts[key]);
 	}
