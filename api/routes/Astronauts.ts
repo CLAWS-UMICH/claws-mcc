@@ -27,8 +27,6 @@ export default class Astronauts extends Base {
 			res.status(404).send('Astronaut not found');
 		}
 
-		this.db.collection
-
 		res.send(astronauts[key]);
 	}
 }
