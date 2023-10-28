@@ -8,27 +8,26 @@ function App() {
 	// setText = function to change the state variable called 'text'
 	// useState() = function given by react to initialize a state variable
 	const [text, setText] = useState();
+	const [astronaut, setAstronaut] = useState();
 
 	function callAPI() {
 		axios.get('/api/hello').then((res) => {
 			setText(res.data);
-		})
+		});
+	}
+
+	function getAstronaut() {
+		axios.get(`/api/getAstronaut/${astronaut}`).then((res) => {
+			alert(`This astronaut's heartrate is ${res.data.heartrate}`);
+		});
 	}
 
 	return (
 		<div className="App">
 			<header className="App-header">
 				<img src={logo} className="App-logo" alt="logo" />
-				<p>
-					{text}
-				</p>
-				<a
-					className="App-link"
-					onClick={callAPI}
-					rel="noopener noreferrer"
-				>
-					Learn React
-				</a>
+				<input onChange={(e) => setAstronaut(e.target.value)} />
+				<button onClick={getAstronaut}>Get Astronaut</button>
 			</header>
 		</div>
 	);
