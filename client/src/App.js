@@ -4,17 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 
 function App() {
-	// text = state variable called text with whatever value
-	// setText = function to change the state variable called 'text'
-	// useState() = function given by react to initialize a state variable
-	const [text, setText] = useState();
 	const [astronaut, setAstronaut] = useState();
-
-	function callAPI() {
-		axios.get('/api/hello').then((res) => {
-			setText(res.data);
-		});
-	}
 
 	function getAstronaut() {
 		axios.get(`/api/getAstronaut/${astronaut}`).then((res) => {
