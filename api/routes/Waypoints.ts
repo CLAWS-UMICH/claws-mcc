@@ -5,7 +5,7 @@ import db  from "../core/mongo";
 export default class Waypoints extends Base {
 	public routes = [
 		{
-			path: '/api/getWaypoints',
+			path: '/api/Waypoints',
 			method: 'get',
 			handler: this.getWaypoints.bind(this),
 		},
