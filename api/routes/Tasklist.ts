@@ -1,42 +1,161 @@
 import { Request, Response, Router } from "express";
 import Base from "../Base";
+import { ObjectId } from "mongodb";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
-const tasks: { [key: string]: { title: string,} } = {
-	'1': {
-		title: 'Task1',
+
+
+//astronaut object
+export type Astronaut = {
+	_id: number; //replace with ObjectId eventually
+	name: string;
+
+}
+
+const astronauts: Astronaut[] = [
+	{
+		_id: 0 ,
+		name: "Astronaut 1",
+	  },
+	{
+		_id: 1,
+		name: "Astronaut 2",
 	},
-	'2': {
-		title: 'Task2',
-	}
-};
+	{
+		_id: 2,
+		name: "Astronaut 3",
+	},
+]
+export type Task = {
+	id: number;
+	title: string;
+	description: string;
+	status: number;
+	astronauts: [];
+	subtasks: [];
+}
 
-const taskObj: {
+const Task1: Task={
 	
-};
+	id: 0,
+	title: 'Task1',
+	description: 'The first task of the mock',
+	status: 1, //completed
+	astronauts: [],
+	subtasks: [],
 
-class TaskObj{
-    public task_id: number;
-    public  status;
-    public  title;
-    public <SingleAstronaut> astronauts;
-    public <Subtask> subtasks;
-};
+}
+const Task2: Task = {
+	
+	id: 1,
+	title: 'Task2',
+	description: 'The second task of the mock',
+	status: 0, //in progress
+	astronauts: [],
+	subtasks: [],
+	
+}
+
+
+//this is mock data?
+// const tasks: Task[] = [
+// 	Task1, Task2
+// ]
+
+
 
 export default class Tasklist extends Base {
+
+	//list of tasks
+	private tasks: Task[];
+	constructor(){
+		super();
+		this.db.collection('tasks').find().toArray().then((res)=>{
+			this.tasks = res as unknown as Task[];
+		});
+	}
+
+	// NOTE: we don't need to write GET
+
+	//route to add a task
 	public routes = [
 		{
-			path: '/api/getTasklist/:astronaut',
-			method: 'get',
-			handler: this.getTasklist.bind(this),
-		}
+			path: '/api/addTask/',
+			method: 'post',
+			handler: this.addTask.bind(this),
+		},
+		{
+			path: '/api/updateTask/:id',
+			method: 'put',
+			handler: this.updateTask.bind(this),
+
+		},
+		{
+			path: '/api/deleteTask/:id',
+			method: 'put',
+			handler: this.deleteTask.bind(this),
+
+		},
 	];
 
-	getTasklist(req: Request, res: Response) {
-		const key: string = req.params.task;
-		if (!tasks[key]) {
-			res.status(404).send('Astronaut not found');
-		}
+	//getting the Task list for a specific astronaut
+	addTask(req: Request, res: Response) {
+		//there is no task id for this, we have to generate it in the backend
+		const newTask = req.body as Task;
+		const length = this.tasks.length;
 
-		return res.send(tasks[key]);
+		newTask.id = length;
+		this.tasks.push(newTask);
+
+		//do we need to send the new task back?
+		res.status(201).json(newTask);
+		return;
+
 	}
+
+	//edit a task in tasks
+	updateTask(req:Request, res:Response){
+		const key: number = parseInt(req.params.task_id, 10); //convert to number
+		if (isNaN(key)){
+			//Handle the case where the conversion to number fails
+			res.status(400).send('Invalid Task ID');
+			return;
+		}
+		if(!this.tasks[key]){
+			res.status(404).send('Task not found)');
+		}
+		//Assuming the new task data is sent in the request body
+		const idx = this.tasks.findIndex(t => t.id == key); // key will be the id given to us
+		if (idx < 0) { // findIndex will return -1 if task not found
+			return res.status(404).send('Task not found');
+		}
+		const newTask  = req.body as Task;
+		this.tasks[idx] = newTask;
+		
+		//do we need to send the newTask back?
+		return res.status(200).json(newTask);
+	}
+	//delete a task from tasks
+	deleteTask(req:Request, res:Response){
+		//key should be the task id
+		const key: number = parseInt(req.params.task, 10); //convert to number
+		if (isNaN(key)){
+			//Handle the case where the conversion to number fails
+			res.status(400).send('Invalid Task ID');
+			return;
+		}
+		if(!this.tasks[key]){
+			res.status(404).send('Task not found)');
+		}
+		//find the task
+		const idx = this.tasks.findIndex(t => t.id == key); // key will be the id given to us
+		if (idx < 0) { // findIndex will return -1 if task not found
+			return res.status(404).send('Task not found');
+		}
+		this.tasks.splice(idx, 1);
+		return res.status(204).send('Task '+idx+'deleted ');
+	}
+	
+
+
 }
