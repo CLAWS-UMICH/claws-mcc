@@ -8,12 +8,24 @@ const tasks: { [key: string]: { title: string,} } = {
 	'2': {
 		title: 'Task2',
 	}
-}
+};
+
+const taskObj: {
+	
+};
+
+class TaskObj{
+    public task_id: number;
+    public  status;
+    public  title;
+    public <SingleAstronaut> astronauts;
+    public <Subtask> subtasks;
+};
 
 export default class Tasklist extends Base {
 	public routes = [
 		{
-			path: '/api/getAstronaut/:astronaut',
+			path: '/api/getTasklist/:astronaut',
 			method: 'get',
 			handler: this.getTasklist.bind(this),
 		}
