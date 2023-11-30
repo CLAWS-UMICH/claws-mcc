@@ -20,7 +20,8 @@
     "ws": "^8.14.2"
   },
   "scripts": {
-    "start": "tsc && node ./dist/api/index.js"
+    "build": "tsc",
+    "start": "npm run build && node ./dist/api/index.js"
   },
   "name": "web",
   "version": "1.0.0",
