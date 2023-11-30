@@ -115,6 +115,16 @@ export default class Tasklist extends Base {
 
 		newTask.id = length;
 		this.tasks.push(newTask);
+
+		// update mongo 
+		try {
+			this.db.collection('tasks').insertOne(newTask);
+		} catch (error) {
+			console.error(`Failed to insert new task: ${error.message}`);
+			process.exit(1);
+		}
+
+
 		//do we need to send the new task back?
 		res.status(201).json(newTask);
 		return;
