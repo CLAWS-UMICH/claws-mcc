@@ -70,9 +70,11 @@ export default class Tasklist extends Base {
 	private tasks: Task[];
 	constructor(){
 		super();
-		this.db.collection('tasks').find().toArray().then((res)=>{
-			this.tasks = res as unknown as Task[];
-		});
+		// this.db.collection('tasks').find().toArray().then((res)=>{
+		// 	this.tasks = res as unknown as Task[];
+		// });
+		// ASK SAIF Why is this code here?
+		// Christine: what if the system goes down and we reboot the system.
 	}
 
 	// NOTE: we don't need to write GET
@@ -92,7 +94,7 @@ export default class Tasklist extends Base {
 		},
 		{
 			path: '/api/deleteTask/:id',
-			method: 'put',
+			method: 'delete',
 			handler: this.deleteTask.bind(this),
 
 		},
@@ -110,40 +112,37 @@ export default class Tasklist extends Base {
 		// update mongo 
 		try {
 			this.db.collection('tasks').insertOne(newTask);
+			res.status(201).send('Task created successfully');
 		} catch (error) {
 			console.error(`Failed to insert new task: ${error.message}`);
-			process.exit(1);
+			res.status(500).send('Failed to insert new task');
 		}
-
-
-		//do we need to send the new task back?
-		res.status(201).json(newTask);
-		return;
-
 	}
 
 	//edit a task in tasks
 	updateTask(req:Request, res:Response){
-		const key: number = parseInt(req.params.task_id, 10); //convert to number
+		const key: number = parseInt(req.params.id, 10); 
 		if (isNaN(key)){
 			//Handle the case where the conversion to number fails
 			res.status(400).send('Invalid Task ID');
 			return;
 		}
-		if(!this.tasks[key]){
-			res.status(404).send('Task not found)');
+
+		const idx = this.tasks.findIndex(t => t.id == key);
+		if(idx == -1){
+			return res.status(404).send('Task not found)');
 		}
-		//Assuming the new task data is sent in the request body
-		const idx = this.tasks.findIndex(t => t.id == key); // key will be the id given to us
-		if (idx < 0) { // findIndex will return -1 if task not found
-			return res.status(404).send('Task not found');
-		}
+
 		const newTask  = req.body as Task;
 		this.tasks[idx] = newTask;
+
+		this.db.collection('tasks').updateOne({ id: newTask.id }, { $set: newTask }, { upsert: true });
+		// CHECK BACK ON THIS, NOT SURE IF IT'S CORRECT
 		
 		//do we need to send the newTask back?
 		return res.status(200).json(newTask);
 	}
+
 	//delete a task from tasks
 	deleteTask(req:Request, res:Response){
 		//key should be the task id
