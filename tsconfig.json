@@ -16,7 +16,7 @@
     },
     "include": [
       "api/**/*",
-      "client/**/*"
+      // "client/**/*"
     ],
     "exclude": [
       "node_modules"
