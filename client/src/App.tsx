@@ -8,6 +8,7 @@ import {
 } from "@fluentui/react-components";
 import { ButtonTemplate } from './components/common/Button/Button.tsx';
 import { CalendarMonthRegular } from "@fluentui/react-icons";
+import { WithIcon } from './components/layout/NavBar/NavBar.tsx';
 // import {NavBar} from
 interface AstronautData {
   heartrate: number;
@@ -28,7 +29,7 @@ function App() {
 
   return (
     <FluentProvider theme={webLightTheme}>
-      
+      <WithIcon></WithIcon>
       <ButtonTemplate icon={<CalendarMonthRegular />} iconPosition="after" text="Button From Template"/>
     </FluentProvider>
     
