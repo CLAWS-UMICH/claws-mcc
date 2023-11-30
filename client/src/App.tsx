@@ -7,8 +7,9 @@ import {
   webLightTheme,
   Button
 } from "@fluentui/react-components";
-import { ButtonTemplate } from './components/common/Button/Button.tsx';
+import { ButtonTemplate } from './components/common/Button/Button';
 import { CalendarMonthRegular } from "@fluentui/react-icons";
+import { Vitals } from './components/features/Vitals';
 
 interface AstronautData {
   heartrate: number;
@@ -29,6 +30,7 @@ function App() {
   return (
     <FluentProvider theme={webLightTheme}>
       <ButtonTemplate icon={<CalendarMonthRegular />} iconPosition="after" text="Button From Template"/>
+      <Vitals/>
     </FluentProvider>
 
     // <Button appearance="primary">Hello Fluent UI React</Button>
