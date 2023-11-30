@@ -1,12 +1,24 @@
 import redis from "./core/redis";
 import db from "./core/mongo";
-import { Db } from "mongodb";
-import { Redis } from "ioredis";
-import { WebSocket, WebSocketServer } from "ws";
+import {Db} from "mongodb";
+import {Redis} from "ioredis";
+import {WebSocket, WebSocketServer} from "ws";
+
+export interface RouteEvent {
+    type: string,
+    handler: (...args: any[]) => any
+}
+
+export interface Route {
+    path: string,
+    method: string,
+    handler: (...args: any[]) => any
+}
+
 
 export default class Base {
-    public readonly routes: { path: string, method: string, handler: (...args: any[]) => any }[];
-    public readonly events: { type: string, handler: (...args: any[]) => any }[];
+    public readonly routes: Route[];
+    public readonly events: RouteEvent[];
 
     public db: Db;
     public redis: Redis;
@@ -25,9 +37,15 @@ export default class Base {
         this.wsHoloLens = wsHoloLens;
     }
 
-    public dispatch(target: 'AR' | 'FRONTEND', data: { id?: number, astronaut?: number, requestType?: 'PUT' | 'DELETE' | 'GET' | 'POST', type: string, data: any }) {
+    public dispatch(target: 'AR' | 'FRONTEND', data: {
+        id?: number,
+        astronaut?: number,
+        requestType?: 'PUT' | 'DELETE' | 'GET' | 'POST',
+        type: string,
+        data: any
+    }) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
-        
+
         const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;
 
         clients.forEach(client => {
