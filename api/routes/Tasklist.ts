@@ -27,7 +27,7 @@ const astronauts: Astronaut[] = [
 	},
 ]
 export type Task = {
-	id: number;
+	id: number; //eventually replace with ObjectId
 	title: string;
 	description: string;
 	status: number;
@@ -66,9 +66,18 @@ const Task2: Task = {
 
 export default class Tasklist extends Base {
 
+
 	//list of tasks
 	private tasks: Task[];
+	//create th task list table inside of the database
+	mongoTask(){
+		
+			this.db.createCollection('Tasks');
+			console.log("Tasks table created");
+		
+	}
 	constructor(){
+
 		super();
 		this.db.collection('tasks').find().toArray().then((res)=>{
 			this.tasks = res as unknown as Task[];
@@ -106,16 +115,18 @@ export default class Tasklist extends Base {
 
 		newTask.id = length;
 		this.tasks.push(newTask);
-
 		//do we need to send the new task back?
 		res.status(201).json(newTask);
 		return;
+	}
 
+	addSubtask(req: Request, res: Response) {
+		
 	}
 
 	//edit a task in tasks
 	updateTask(req:Request, res:Response){
-		const key: number = parseInt(req.params.task_id, 10); //convert to number
+		const key: number = parseInt(req.params.id, 10); //convert to number
 		if (isNaN(key)){
 			//Handle the case where the conversion to number fails
 			res.status(400).send('Invalid Task ID');
@@ -155,7 +166,6 @@ export default class Tasklist extends Base {
 		this.tasks.splice(idx, 1);
 		return res.status(204).send('Task '+idx+'deleted ');
 	}
-	
 
 
 }
