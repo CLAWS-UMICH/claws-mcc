@@ -72,16 +72,21 @@ export default class Tasklist extends Base {
 	//create th task list table inside of the database
 	mongoTask(){
 		
-			this.db.createCollection('Tasks');
+			this.db.createCollection('tasks');
 			console.log("Tasks table created");
 		
 	}
 	constructor(){
 
 		super();
+		if (this.db.collection('tasks').find() == null){
+			this.mongoTask();
+		}
+		
 		this.db.collection('tasks').find().toArray().then((res)=>{
-			this.tasks = res as unknown as Task[];
+		this.tasks = res as unknown as Task[];
 		});
+		
 	}
 
 	// NOTE: we don't need to write GET
