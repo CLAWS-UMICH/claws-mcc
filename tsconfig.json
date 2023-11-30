@@ -9,13 +9,17 @@
       "removeComments": true,
       "moduleResolution": "node", 
       "resolveJsonModule": true,
-      "noImplicitAny": true
+      "noImplicitAny": true,
+      "noEmit": true,
+      "jsx": "react", // Ensure this is set to "react"
+      "allowImportingTsExtensions": true
     },
     "include": [
-      "api/**/*"
+      "api/**/*",
+      // "client/**/*"
     ],
     "exclude": [
       "node_modules"
-    ]
+    ],
   }
   
