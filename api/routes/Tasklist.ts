@@ -27,7 +27,7 @@ const astronauts: Astronaut[] = [
 	},
 ]
 export type Task = {
-	id: number;
+	id: number; //eventually replace with ObjectId
 	title: string;
 	description: string;
 	status: number;
@@ -66,15 +66,27 @@ const Task2: Task = {
 
 export default class Tasklist extends Base {
 
+
 	//list of tasks
 	private tasks: Task[];
+	//create th task list table inside of the database
+	mongoTask(){
+		
+			this.db.createCollection('tasks');
+			console.log("Tasks table created");
+		
+	}
 	constructor(){
+
 		super();
-		// this.db.collection('tasks').find().toArray().then((res)=>{
-		// 	this.tasks = res as unknown as Task[];
-		// });
-		// ASK SAIF Why is this code here?
-		// Christine: what if the system goes down and we reboot the system.
+		if (this.db.collection('tasks').find() == null){
+			this.mongoTask();
+		}
+		
+		this.db.collection('tasks').find().toArray().then((res)=>{
+		this.tasks = res as unknown as Task[];
+		});
+		
 	}
 
 	// NOTE: we don't need to write GET
@@ -163,7 +175,6 @@ export default class Tasklist extends Base {
 		this.tasks.splice(idx, 1);
 		return res.status(204).send('Task '+idx+'deleted ');
 	}
-	
 
 
 }
