@@ -163,8 +163,9 @@ export default class Tasklist extends Base {
 		return res.status(200).json(newTask);
 	}
 
+	
 	//delete a task from tasks
-	deleteTask(req:Request, res:Response){
+	async deleteTask(req:Request, res:Response){
 		//key should be the task id
 		const key: number = parseInt(req.params.task, 10); //convert to number
 		if (isNaN(key)){
@@ -172,16 +173,24 @@ export default class Tasklist extends Base {
 			res.status(400).send('Invalid Task ID');
 			return;
 		}
-		if(!this.tasks[key]){
-			res.status(404).send('Task not found)');
+
+		try {
+			const result = await this.db.collection('tasks').deleteOne({ id: key });
+			if (result.deletedCount === 0) {
+				return res.status(404).send('Task not found');
+			}
+		} catch (error) {
+			console.error(`Failed to delete task: ${error.message}`);
+			return res.status(500).send('Failed to delete task');
 		}
-		//find the task
+
+		//update local task array
 		const idx = this.tasks.findIndex(t => t.id == key); // key will be the id given to us
-		if (idx < 0) { // findIndex will return -1 if task not found
-			return res.status(404).send('Task not found');
+		if (idx !== -1) { // findIndex will return -1 if task not found
+			this.tasks.splice(idx, 1);
 		}
-		this.tasks.splice(idx, 1);
-		return res.status(204).send('Task '+idx+'deleted ');
+
+		return res.status(204).send(`Task ${key} deleted`);
 	}
 
 
