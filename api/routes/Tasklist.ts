@@ -112,6 +112,29 @@ export default class Tasklist extends Base {
 		},
 	];
 
+	/* NOTE: Using the length of the array as the ID for new tasks can lead to issues. If a task is deleted, its ID will not be in use anymore, and a new task could be assigned the same ID when it's created. This could lead to confusion and bugs, as IDs are usually expected to be unique.
+		As for async/await, it's not strictly necessary, but it can make your code cleaner and easier to understand, especially when dealing with promises. In your current addTask method, you're using promises without async/await, which is perfectly fine. However, if you have multiple asynchronous operations that depend on each other, using async/await can make your code much easier to read and maintain.
+	*/
+
+	// import { v4 as uuidv4 } from 'uuid';
+
+	// async addTask(req: Request, res: Response) {
+	// 	const newTask = req.body as Task;
+
+	// 	// Generate a unique ID for the new task
+	// 	newTask.id = uuidv4();
+	// 	this.tasks.push(newTask);
+
+	// 	try {
+	// 		// Use async/await for the MongoDB operation
+	// 		await this.db.collection('tasks').insertOne(newTask);
+	// 		res.status(201).send('Task created successfully');
+	// 	} catch (error) {
+	// 		console.error(`Failed to insert new task: ${error.message}`);
+	// 		res.status(500).send('Failed to insert new task');
+	// 	}
+	// }
+
 	//getting the Task list for a specific astronaut
 	addTask(req: Request, res: Response) {
 		//there is no task id for this, we have to generate it in the backend
