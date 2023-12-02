@@ -132,7 +132,7 @@ export default class Tasklist extends Base {
 	}
 
 	//edit a task in tasks
-	updateTask(req:Request, res:Response){
+	async updateTask(req:Request, res:Response){
 		const key: number = parseInt(req.params.id, 10); 
 		if (isNaN(key)){
 			//Handle the case where the conversion to number fails
@@ -140,18 +140,26 @@ export default class Tasklist extends Base {
 			return;
 		}
 
-		const idx = this.tasks.findIndex(t => t.id == key);
-		if(idx == -1){
-			return res.status(404).send('Task not found)');
+		const newTask = req.body as Task;
+
+		// update mongoDB
+		try {
+			const result = await this.db.collection('tasks').updateOne({ id: newTask.id }, { $set: newTask });
+			if (result.matchedCount === 0) {
+				res.status(404).send('Task not found');
+			} 
+		} catch (err) {
+			console.error(`Failed to update task: ${err.message}`);
+			return res.status(500).send('Failed to update task');
 		}
 
-		const newTask  = req.body as Task;
-		this.tasks[idx] = newTask;
-
-		this.db.collection('tasks').updateOne({ id: newTask.id }, { $set: newTask }, { upsert: true });
-		// CHECK BACK ON THIS, NOT SURE IF IT'S CORRECT
+		// update local task array (sync with mongoDB)
+		const idx = this.tasks.findIndex(task => task.id == key);
+		if(idx !== -1){
+			this.tasks[idx]= newTask;
+		}
 		
-		//do we need to send the newTask back?
+		// NOTE: do we need to send the newTask back?
 		return res.status(200).json(newTask);
 	}
 
