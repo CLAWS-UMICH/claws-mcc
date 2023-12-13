@@ -37,51 +37,71 @@ export default class Waypoints extends Base {
         }
     ]
 
-    addWaypoint(req: Request, res: Response) {
+    async addWaypoint(req: Request, res: Response) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
+        const collection = db.collection('waypoints');
         // loop through waypoints and remove from ones that are already in the database
-        for (let i = 0; i < waypoints.length; i++) {
-            const waypoint = waypoints[i];
-            // check if waypoint is already in database
-            if (db.collection('waypoints').findOne({waypoint_id: waypoint.waypoint_id})) {
-                // if it is, remove it from the array
-                waypoints.splice(i, 1);
-            }
+        // @ts-ignore
+        const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
+        const result = collection.find({waypoint_id: {$in: waypoint_ids}});
+        for await (const waypoint of result) {
+            waypoints.splice(waypoints.indexOf(waypoint), 1);
         }
-        // add the remaining waypoints to the database
-        db.collection('waypoints').insertMany(waypoints);
-        res.send("added waypoints: " + waypoints);
+        // @ts-ignore
+        const difference = waypoints.filter(waypoint => waypoint_ids.indexOf(waypoint.waypoint_id) === -1);
+        collection.insertMany(difference).then(
+            (result) => {
+                if (result.acknowledged === true && result.insertedCount === difference.length) {
+                    const allWaypoints = collection.find();
+                    this.dispatch('FRONTEND', {
+                        id: -1,
+                        type: 'WAYPOINTS',
+                        requestType: 'GET',
+                        data: allWaypoints.toArray(),
+                    })
+                    res.send("added waypoints: " + waypoints);
+                }
+            }
+        );
     }
 
-    deleteWaypoint(req: Request, res: Response) {
+    async deleteWaypoint(req: Request, res: Response) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
-        // check waypoints for difference between database and request
-        for (const deletedWaypoint of waypoints) {
-            const result = db.collection('waypoints').findOne({waypoint_id: deletedWaypoint.waypoint_id});
-            if (result) {
-                // Waypoint exists in the collection; it has not been deleted
-                waypoints.splice(waypoints.indexOf(deletedWaypoint), 1);
-            }
+        const collection = db.collection('waypoints');
+        // @ts-ignore
+        const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
+        const result = collection.find({waypoint_id: {$in: waypoint_ids}});
+        for await (const waypoint of result) {
+            waypoints.splice(waypoints.indexOf(waypoint), 1);
         }
         // delete the remaining waypoints from the database
-        db.collection('waypoints').deleteMany(waypoints);
-        res.send("deleted waypoints: " + waypoints);
+        collection.deleteMany(waypoints).then(result => {
+            if (result.acknowledged === true && result.deletedCount === waypoints.length) {
+                const allWaypoints = collection.find();
+                this.dispatch('FRONTEND', {
+                    id: -1,
+                    type: 'WAYPOINTS',
+                    requestType: 'GET',
+                    data: allWaypoints.toArray(),
+                })
+                res.send("deleted waypoints: " + waypoints);
+            }
+
+        });
     }
 
-    editWaypoint(req: Request, res: Response) {
+    async editWaypoint(req: Request, res: Response) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
+        const collection = db.collection('waypoints');
+        // @ts-ignore
+        const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
         // check waypoints for difference between database and request
-        for (const editedWaypoint of waypoints) {
-            const result = db.collection('waypoints').findOne({waypoint_id: editedWaypoint.waypoint_id});
-            if (result) {
-                // Waypoint exists in the collection; it has not been deleted
-                waypoints.splice(waypoints.indexOf(editedWaypoint), 1);
-            }
-        }
-        /// Edit the remaining waypoints in the database
+        for await (const waypoint of collection.find({waypoint_id: {$in: waypoint_ids}}))
+            waypoints.splice(waypoints.indexOf(waypoint), 1);
+        // Edit the remaining waypoints in the database
         for (const editedWaypoint of waypoints) {
             const filter = {waypoint_id: editedWaypoint.waypoint_id};
             const update = {
@@ -96,8 +116,9 @@ export default class Waypoints extends Base {
                     author: editedWaypoint.author
                 }
             }
-
-            db.collection('waypoints').updateOne(filter, update);
+            const updateResult = await collection.updateOne(filter, update);
+            if (!updateResult.acknowledged)
+                throw new Error(`Could not update waypoint ${editedWaypoint.waypoint_id}`);
         }
     }
 }
