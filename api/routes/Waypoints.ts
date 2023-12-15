@@ -2,15 +2,6 @@ import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
 import {WaypointRequestMessage, WaypointsMessage} from "../types/Waypoints";
 import {Document, WithId} from "mongodb";
-import db from "../core/mongo";
-
-const waypoint = {
-    waypoint_id: Number,
-    location: {latitude: Number, longitude: Number},
-    type: Number,
-    description: String,
-    author: String,
-}
 
 export default class Waypoints extends Base {
     public routes = [
@@ -42,7 +33,7 @@ export default class Waypoints extends Base {
     async addWaypoint(req: Request, res: Response) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
-        const collection = db.collection('waypoints');
+        const collection = this.db.collection('waypoints');
         // loop through waypoints and remove from ones that are already in the database
         // @ts-ignore
         const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
@@ -101,15 +92,16 @@ export default class Waypoints extends Base {
     async deleteWaypoint(req: Request, res: Response) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
-        const collection = db.collection('waypoints');
+        const collection = this.db.collection('waypoints');
         // @ts-ignore
-        const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
-        const result = collection.find({waypoint_id: {$in: waypoint_ids}});
+        const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
+        const result = collection.find({waypoint_id: {$in: waypointsId}});
         for await (const waypoint of result) {
-            waypoints.splice(waypoints.indexOf(waypoint), 1);
+            if (!waypointsId.includes(waypoint.waypoint_id))
+                throw new Error(`Waypoint ${waypoint.waypoint_id} not found`);
         }
         // delete the remaining waypoints from the database
-        const deleteResult = await collection.deleteMany(waypoints)
+        const deleteResult = await collection.deleteMany({waypoint_id: {$in: waypointsId}})
         if (deleteResult.acknowledged === true && deleteResult.deletedCount === waypoints.length) {
             const allWaypoints = collection.find();
             const data = await allWaypoints.toArray();
@@ -127,7 +119,7 @@ export default class Waypoints extends Base {
     async editWaypoint(req: Request, res: Response) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
-        const collection = db.collection('waypoints');
+        const collection = this.db.collection('waypoints');
         // @ts-ignore
         const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
         // check waypoints for difference between database and request
