@@ -3,6 +3,7 @@ import db from "./core/mongo";
 import {Db} from "mongodb";
 import {Redis} from "ioredis";
 import {WebSocket, WebSocketServer} from "ws";
+import Message from "./types/message";
 
 export interface RouteEvent {
     type: string,
@@ -37,13 +38,7 @@ export default class Base {
         this.wsHoloLens = wsHoloLens;
     }
 
-    public dispatch(target: 'AR' | 'FRONTEND', data: {
-        id?: number,
-        astronaut?: number,
-        requestType?: 'PUT' | 'DELETE' | 'GET' | 'POST',
-        type: string,
-        data: any
-    }) {
+    public dispatch(target: 'AR' | 'FRONTEND', data: Message) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
 
         const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;

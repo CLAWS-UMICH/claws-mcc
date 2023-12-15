@@ -1,5 +1,7 @@
 import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
+import {WaypointRequestMessage, WaypointsMessage} from "../types/Waypoints";
+import {Document, WithId} from "mongodb";
 import db from "../core/mongo";
 
 const waypoint = {
@@ -50,20 +52,50 @@ export default class Waypoints extends Base {
         }
         // @ts-ignore
         const difference = waypoints.filter(waypoint => waypoint_ids.indexOf(waypoint.waypoint_id) === -1);
-        collection.insertMany(difference).then(
-            (result) => {
-                if (result.acknowledged === true && result.insertedCount === difference.length) {
-                    const allWaypoints = collection.find();
-                    this.dispatch('FRONTEND', {
-                        id: -1,
-                        type: 'WAYPOINTS',
-                        requestType: 'GET',
-                        data: allWaypoints.toArray(),
-                    })
-                    res.send("added waypoints: " + waypoints);
-                }
+        const insertResult = await collection.insertMany(difference);
+        if (insertResult.acknowledged === true && insertResult.insertedCount === difference.length) {
+            const allWaypoints = collection.find();
+            const data = await allWaypoints.toArray();
+            const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
+            this.dispatch('FRONTEND', {
+                id: messageId,
+                type: 'WAYPOINTS',
+                use: 'GET',
+                data: data,
+            })
+            this.updateARWaypoints(messageId, data);
+            res.send("added waypoints: " + waypoints);
+        }
+        throw new Error(`Could not insert waypoints`);
+    }
+
+    // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
+    updateARWaypoints(messageId: number, data: WithId<Document>[]): void {
+        const waypoints = data.map(waypoint => ({
+            waypoint_id: waypoint.waypoint_id,
+            location: waypoint.location,
+            type: waypoint.type,
+            description: waypoint.description,
+            author: waypoint.author
+        }));
+        const newWaypointsMessage: WaypointsMessage = {
+            id: messageId,
+            type: 'Messaging',
+            use: 'PUT',
+            data: {
+                AllMessages: waypoints
             }
-        );
+        }
+        this.dispatch("AR", newWaypointsMessage)
+    }
+
+    // Requests waypoints from AR
+    fetchARWaypoints(id: number): void {
+        try {
+            this.dispatch("AR", WaypointRequestMessage(id));
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     async deleteWaypoint(req: Request, res: Response) {
@@ -77,19 +109,19 @@ export default class Waypoints extends Base {
             waypoints.splice(waypoints.indexOf(waypoint), 1);
         }
         // delete the remaining waypoints from the database
-        collection.deleteMany(waypoints).then(result => {
-            if (result.acknowledged === true && result.deletedCount === waypoints.length) {
-                const allWaypoints = collection.find();
-                this.dispatch('FRONTEND', {
-                    id: -1,
-                    type: 'WAYPOINTS',
-                    requestType: 'GET',
-                    data: allWaypoints.toArray(),
-                })
-                res.send("deleted waypoints: " + waypoints);
-            }
-
-        });
+        const deleteResult = await collection.deleteMany(waypoints)
+        if (deleteResult.acknowledged === true && deleteResult.deletedCount === waypoints.length) {
+            const allWaypoints = collection.find();
+            const data = await allWaypoints.toArray();
+            this.dispatch('FRONTEND', {
+                id: -1,
+                type: 'WAYPOINTS',
+                use: 'GET',
+                data: data
+            })
+            this.updateARWaypoints(-1, data);
+            res.send("deleted waypoints: " + waypoints);
+        }
     }
 
     async editWaypoint(req: Request, res: Response) {
@@ -120,5 +152,16 @@ export default class Waypoints extends Base {
             if (!updateResult.acknowledged)
                 throw new Error(`Could not update waypoint ${editedWaypoint.waypoint_id}`);
         }
+        const allWaypoints = collection.find();
+        const data = await allWaypoints.toArray();
+        const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
+        this.dispatch('FRONTEND', {
+            id: messageId,
+            type: 'WAYPOINTS',
+            use: 'GET',
+            data: data,
+        });
+        this.updateARWaypoints(messageId, data);
+        res.send("edited waypoints: " + waypoints);
     }
 }
