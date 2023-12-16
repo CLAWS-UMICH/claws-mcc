@@ -1,5 +1,5 @@
 import Waypoints from "../api/routes/Waypoints";
-import {Request as Req, Response as Res} from "express";
+import {Request as ExpressRequest, Response as ExpressResponse} from "express";
 import {MongoClient} from "mongodb";
 import {Server as WebSocketServer} from "ws";
 
@@ -41,10 +41,10 @@ const tearDownTests = async () => {
 
 describe('API route', () => {
     describe('Waypoints', () => {
-        beforeAll(() => {
+        beforeEach(() => {
             return initializeTests(testData);
         })
-        afterAll(() => {
+        afterEach(() => {
             return tearDownTests();
         })
         test('should delete a waypoint', async () => {
@@ -54,6 +54,7 @@ describe('API route', () => {
             const wssFrontend = new WebSocketServer({noServer: true});
             const wssHoloLens = new WebSocketServer({noServer: true});
             const server = new Waypoints(db);
+            const waypointId = 1;
             server.setWebSocketInstances(wssFrontend, wssHoloLens);
             const req = {
                 body: {
@@ -61,7 +62,7 @@ describe('API route', () => {
                         {
                             AllWaypoints:
                                 [{
-                                    waypoint_id: 1,
+                                    waypoint_id: waypointId,
                                     location: {
                                         latitude: 1,
                                         longitude: 1
@@ -71,13 +72,51 @@ describe('API route', () => {
                                 }]
                         }
                 }
-            } as Req;
+            } as ExpressRequest;
             const res = {
                 send: (data: string) => {
-                    expect(data).toBe("deleted waypoints: " + req.body.data);
+                    expect(data).toBe("deleted waypoints with ids: " + waypointId);
                 }
-            } as Res;
+            } as ExpressResponse;
             return await server.deleteWaypoint(req, res);
         })
+        test('should edit a waypoint', async () => {
+            // Test the edit waypoint function
+            const connection = await client.connect();
+            const db = connection.db();
+            const wssFrontend = new WebSocketServer({noServer: true});
+            const wssHoloLens = new WebSocketServer({noServer: true});
+            const server = new Waypoints(db);
+            const waypointId = 1;
+            server.setWebSocketInstances(wssFrontend, wssHoloLens);
+            const testWaypoint = {
+                waypoint_id: waypointId,
+                location: {
+                    latitude: 100,
+                    longitude: 100
+                },
+                type: 1,
+                description: 'Test waypoint'
+            }
+            const req = {
+                body: {
+                    data:
+                        {
+                            AllWaypoints:
+                                [testWaypoint]
+                        }
+                }
+            } as ExpressRequest;
+            const res = {
+                send: (data: string) => {
+                    expect(data).toBe("edited waypoints with ids: " + waypointId);
+                }
+            } as ExpressResponse;
+            await server.editWaypoint(req, res);
+            const waypointsCollection = db.collection('waypoints')
+            const editedWaypoint = await waypointsCollection.findOne({waypoint_id: waypointId});
+            editedWaypoint._id = undefined; // Just for testing purposes
+            expect(editedWaypoint).toEqual(testWaypoint);
+        });
     })
 })

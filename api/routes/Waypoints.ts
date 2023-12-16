@@ -36,13 +36,13 @@ export default class Waypoints extends Base {
         const collection = this.db.collection('waypoints');
         // loop through waypoints and remove from ones that are already in the database
         // @ts-ignore
-        const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
-        const result = collection.find({waypoint_id: {$in: waypoint_ids}});
+        const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
+        const result = collection.find({waypoint_id: {$in: waypointsId}});
         for await (const waypoint of result) {
             waypoints.splice(waypoints.indexOf(waypoint), 1);
         }
         // @ts-ignore
-        const difference = waypoints.filter(waypoint => waypoint_ids.indexOf(waypoint.waypoint_id) === -1);
+        const difference = waypoints.filter(waypoint => waypointsId.indexOf(waypoint.waypoint_id) === -1);
         const insertResult = await collection.insertMany(difference);
         if (insertResult.acknowledged === true && insertResult.insertedCount === difference.length) {
             const allWaypoints = collection.find();
@@ -55,7 +55,7 @@ export default class Waypoints extends Base {
                 data: data,
             })
             this.updateARWaypoints(messageId, data);
-            res.send("added waypoints: " + waypoints);
+            res.send("added waypoints with ids: " + waypointsId);
         }
         throw new Error(`Could not insert waypoints`);
     }
@@ -112,7 +112,7 @@ export default class Waypoints extends Base {
                 data: data
             })
             this.updateARWaypoints(-1, data);
-            res.send("deleted waypoints: " + waypoints);
+            res.send("deleted waypoints with ids: " + waypointsId);
         }
     }
 
@@ -121,10 +121,7 @@ export default class Waypoints extends Base {
         const waypoints = req.body.data.AllWaypoints;
         const collection = this.db.collection('waypoints');
         // @ts-ignore
-        const waypoint_ids = waypoints.map(waypoint => waypoint.waypoint_id);
-        // check waypoints for difference between database and request
-        for await (const waypoint of collection.find({waypoint_id: {$in: waypoint_ids}}))
-            waypoints.splice(waypoints.indexOf(waypoint), 1);
+        const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
         // Edit the remaining waypoints in the database
         for (const editedWaypoint of waypoints) {
             const filter = {waypoint_id: editedWaypoint.waypoint_id};
@@ -135,9 +132,8 @@ export default class Waypoints extends Base {
                         latitude: editedWaypoint.location.latitude,
                         longitude: editedWaypoint.location.longitude
                     },
-                    type: editedWaypoint,
+                    type: editedWaypoint.type,
                     description: editedWaypoint.description,
-                    author: editedWaypoint.author
                 }
             }
             const updateResult = await collection.updateOne(filter, update);
@@ -154,6 +150,6 @@ export default class Waypoints extends Base {
             data: data,
         });
         this.updateARWaypoints(messageId, data);
-        res.send("edited waypoints: " + waypoints);
+        res.send("edited waypoints with ids: " + waypointsId);
     }
 }
