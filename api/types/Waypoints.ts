@@ -12,12 +12,21 @@ enum WaypointType {
     'DANGER'
 }
 
-type ARWaypoint = {
+export type BaseWaypoint = {
     waypoint_id: number; //sequential
     location: ARLocation;
     type: WaypointType;
     description: string;
     author: number; //-1 if mission control created
+}
+
+export const isBaseWaypoint = (waypoint: any): boolean => {
+    if (typeof waypoint !== 'object') return false;
+    if (!waypoint.hasOwnProperty('waypoint_id')) return false;
+    if (!waypoint.hasOwnProperty('location')) return false;
+    if (!waypoint.hasOwnProperty('type')) return false;
+    if (!waypoint.hasOwnProperty('description')) return false;
+    return waypoint.hasOwnProperty('author');
 }
 
 export const isMessage = (message: any): boolean => {
@@ -37,7 +46,7 @@ export interface WaypointsMessage extends Message {
     id: number;
     type: string;
     data: {
-        AllMessages: ARWaypoint[];
+        AllMessages: BaseWaypoint[];
     };
 }
 

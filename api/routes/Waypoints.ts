@@ -1,7 +1,13 @@
 import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
-import {WaypointRequestMessage, WaypointsMessage} from "../types/Waypoints";
+import {BaseWaypoint, isBaseWaypoint, WaypointRequestMessage, WaypointsMessage} from "../types/Waypoints";
 import {Document, WithId} from "mongodb";
+
+interface ResponseBody {
+    error: boolean,
+    message: string,
+    data: BaseWaypoint[]
+}
 
 export default class Waypoints extends Base {
     public routes = [
@@ -30,34 +36,45 @@ export default class Waypoints extends Base {
         }
     ]
 
-    async addWaypoint(req: Request, res: Response) {
+    async addWaypoint(req: Request, res: Response<ResponseBody>): Promise<ResponseBody> {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
-        const collection = this.db.collection('waypoints');
-        // loop through waypoints and remove from ones that are already in the database
-        // @ts-ignore
-        const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
-        const result = collection.find({waypoint_id: {$in: waypointsId}});
-        for await (const waypoint of result) {
-            waypoints.splice(waypoints.indexOf(waypoint), 1);
+        if (!Array.isArray(waypoints) || !waypoints.every(isBaseWaypoint)) {
+            const message = "Invalid waypoints";
+            const response: ResponseBody = {error: true, message, data: []};
+            res.send(response);
+            return response;
         }
+        const collection = this.db.collection<BaseWaypoint>('waypoints');
         // @ts-ignore
-        const difference = waypoints.filter(waypoint => waypointsId.indexOf(waypoint.waypoint_id) === -1);
-        const insertResult = await collection.insertMany(difference);
-        if (insertResult.acknowledged === true && insertResult.insertedCount === difference.length) {
-            const allWaypoints = collection.find();
-            const data = await allWaypoints.toArray();
-            const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
-            this.dispatch('FRONTEND', {
-                id: messageId,
-                type: 'WAYPOINTS',
-                use: 'GET',
-                data: data,
-            })
-            this.updateARWaypoints(messageId, data);
-            res.send("added waypoints with ids: " + waypointsId);
+        const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id) as number[];
+        const wayPointsCursor = collection.find({waypoint_id: {$in: waypointsId}});
+        const existingWayPoints = await wayPointsCursor.toArray();
+        if (0 === existingWayPoints.length) {
+            const msg = "Waypoints already exist in the database";
+            res.send(msg);
+            return msg;
         }
-        throw new Error(`Could not insert waypoints`);
+        const insertResult = await collection.insertMany(waypoints);
+        if (!insertResult.acknowledged || insertResult.insertedCount !== waypoints.length)
+            throw new Error(`Could not insert waypoints`);
+        const allWaypoints = collection.find();
+        const data = await allWaypoints.toArray();
+        const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
+        this.dispatch('FRONTEND', {
+            id: messageId,
+            type: 'WAYPOINTS',
+            use: 'GET',
+            data: data,
+        })
+        this.updateARWaypoints(messageId, data);
+        const message = "Added waypoints with ids: " +
+            waypointsId.reduce((acc, waypointId) => {
+                return acc + waypointId.toString(10) + ', ';
+            }, '')
+        const response: ResponseBody = {error: false, message, data};
+        res.send(response);
+        return response;
     }
 
     // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
@@ -89,7 +106,7 @@ export default class Waypoints extends Base {
         }
     }
 
-    async deleteWaypoint(req: Request, res: Response) {
+    async deleteWaypoint(req: Request, res: Response<ResponseBody>) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
         const collection = this.db.collection('waypoints');
@@ -116,7 +133,7 @@ export default class Waypoints extends Base {
         }
     }
 
-    async editWaypoint(req: Request, res: Response) {
+    async editWaypoint(req: Request, res: Response<ResponseBody>) {
         // the request is the array of all the waypoints
         const waypoints = req.body.data.AllWaypoints;
         const collection = this.db.collection('waypoints');
