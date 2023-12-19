@@ -1,9 +1,84 @@
 # Mission Control API
 
-This folder contains the backend code for the mission control server. The routes are defined in the `routes` folder and
-the controllers are defined in the `controllers` folder. The file name correspond to the route name. For example, the
-`routes/Waypoints.ts` file defines the `/api/waypoints` route and the `controllers/Astrounauts.ts` file defines the
-`/api/astronauts` route.
+This folder contains the backend code for the mission control server. The routes are defined in the `routes` folder. The
+file name correspond to the route name. For example, the `routes/Waypoints.ts` file defines the `/api/waypoints` route
+and the `routes/Astrounauts.ts` file defines the `/api/astronauts` route.
+
+Table of contents:
+
+- [HTTP Endpoints](#http-endpoints)
+- [Websocket](#websocket)
+
+## HTTP Endpoints
+
+- [Astronauts](#astronauts)
+- [Waypoints](#Waypoints)
+
+### Astronauts
+
+TODO: Add documentation for astronauts
+
+### Waypoints
+
+This route accepts three methods: `PUT`, `POST`, and `DELETE`. The `PUT` method adds the given waypoints to the list of
+waypoints. The `POST` method updates the given waypoints. The `DELETE` method deletes the given waypoints. In all of
+these cases, the input waypoint should be provided in the body of the request. The waypoint should be in the following
+format:
+
+```typescript
+interface Waypoint {
+    waypoint_id: number,
+    location: { x: number, y: number },
+    type: number,
+    description: string
+}
+```
+
+Here is one example of a waypoint:
+
+```json
+{
+  "waypoint_id": 10,
+  "location": {
+    "x": 42.29294632866561,
+    "y": -83.71641286188833
+  },
+  "type": 0,
+  "description": "Bob and Betty Beyster Building",
+  "author": -1
+}
+```
+
+All of these fields are required. Whenever a waypoint is created, the server attaches an unmodifiable unique id to the
+waypoint. This id is used to more easily update and delete waypoints. It is also provided in every transaction that
+involves waypoints. For example, if the client sends a `PUT` request with the above waypoint, the server will respond
+with the following:
+
+```json
+{
+  "error": false,
+  "message": "Added waypoints with ids: [1]",
+  "data": [
+    {
+      "_id": "0xdeadbeef",
+      "waypoint_id": 10,
+      "location": {
+        "latitude": 42.29294632866561,
+        "longitude": -83.71641286188833
+      },
+      "type": 0,
+      "description": "Bob and Betty Beyster Building",
+      "author": -1
+    }
+  ]
+}
+```
+
+**Note**: The `_id` field is actually an `ObjectId` object and not a hex string. To learn more, check
+out [this](https://www.mongodb.com/developer/products/mongodb/bson-data-types-objectid/) article written by one of
+MongoDb's engineers. Additionally, the `_id` field is not the same as the `waypoint_id` field. The `_id` field is the
+unique id that the server uses to identify the waypoint. The `waypoint_id` field is the id that the client uses to
+identify the waypoint. It is up to the client to ensure that the `waypoint_id` field is unique.
 
 ## Websocket
 

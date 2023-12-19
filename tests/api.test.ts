@@ -1,7 +1,8 @@
-import Waypoints from "../api/routes/Waypoints";
+import Waypoints, {ResponseBody} from "../api/routes/Waypoints";
 import {Request as ExpressRequest, Response as ExpressResponse} from "express";
 import {MongoClient} from "mongodb";
 import {Server as WebSocketServer} from "ws";
+import {BaseWaypoint} from "../api/types/Waypoints";
 
 const MONGO_URI = process.env.MONGO_URI
 
@@ -13,7 +14,7 @@ const initializeTests = async (data: any[]) => {
     await collection.insertMany(data);
 }
 
-const testData = [
+const testData: BaseWaypoint[] = [
     {
         waypoint_id: 1,
         location: {
@@ -21,7 +22,8 @@ const testData = [
             longitude: 1
         },
         type: 1,
-        description: 'Test waypoint'
+        description: 'Test waypoint',
+        author: -1
     }, {
         waypoint_id: 2,
         location: {
@@ -29,7 +31,8 @@ const testData = [
             longitude: 2
         },
         type: 2,
-        description: 'Test waypoint 2'
+        description: 'Test waypoint 2',
+        author: -1
     }];
 
 const tearDownTests = async () => {
@@ -66,7 +69,7 @@ describe('API route', () => {
                     body: {
                         data:
                             {
-                                AllWaypoints:
+                                waypoints:
                                     [{
                                         waypoint_id: waypointId,
                                         location: {
@@ -74,16 +77,18 @@ describe('API route', () => {
                                             longitude: 1
                                         },
                                         type: 1,
-                                        description: 'Test waypoint'
+                                        description: 'Test waypoint',
+                                        author: -1
                                     }]
                             }
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (data: string) => {
-                        expect(data).toBe("deleted waypoints with ids: " + waypointId);
+                    send: (response) => {
+                        expect(response.message).toBe("Deleted waypoints with ids: [" + waypointId + "]");
+                        expect(response.data[0]).toMatchObject(testData[1]);
                     }
-                } as ExpressResponse;
+                } as ExpressResponse<ResponseBody>;
                 return await server.deleteWaypoint(req, res);
             })
             test('should edit a waypoint', async () => {
@@ -91,29 +96,30 @@ describe('API route', () => {
                 const {db, server} = await createTestConnection(
                     new WebSocketServer({noServer: true}), new WebSocketServer({noServer: true}));
                 const waypointId = 1;
-                const testWaypoint = {
+                const testWaypoint: BaseWaypoint = {
                     waypoint_id: waypointId,
                     location: {
                         latitude: 100,
                         longitude: 100
                     },
                     type: 1,
-                    description: 'Test waypoint'
+                    description: 'Test waypoint',
+                    author: -1
                 }
                 const req = {
                     body: {
                         data:
                             {
-                                AllWaypoints:
+                                waypoints:
                                     [testWaypoint]
                             }
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (data: string) => {
-                        expect(data).toBe("edited waypoints with ids: " + waypointId);
+                    send: (response) => {
+                        expect(response.message).toBe("Edited waypoints with ids: [" + waypointId + "]");
                     }
-                } as ExpressResponse;
+                } as ExpressResponse<ResponseBody>;
                 await server.editWaypoint(req, res);
                 const waypointsCollection = db.collection('waypoints')
                 const editedWaypoint = await waypointsCollection.findOne({waypoint_id: waypointId});
@@ -124,29 +130,30 @@ describe('API route', () => {
                 const {db, server} = await createTestConnection(
                     new WebSocketServer({noServer: true}), new WebSocketServer({noServer: true}));
                 const waypointId = 3;
-                const testWaypoint = {
+                const testWaypoint: BaseWaypoint = {
                     waypoint_id: waypointId,
                     location: {
                         latitude: 100,
                         longitude: 100
                     },
                     type: 1,
-                    description: 'Test waypoint'
+                    description: 'Test waypoint',
+                    author: -1
                 }
                 const req = {
                     body: {
                         data:
                             {
-                                AllWaypoints:
+                                waypoints:
                                     [testWaypoint]
                             }
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (data: string) => {
-                        expect(data).toBe("added waypoints with ids: " + waypointId);
+                    send: (response) => {
+                        expect(response.message).toBe("Added waypoints with ids: [" + waypointId + "]");
                     }
-                } as ExpressResponse;
+                } as ExpressResponse<ResponseBody>;
                 await server.addWaypoint(req, res);
                 const waypointsCollection = db.collection('waypoints')
                 const newWaypoint = await waypointsCollection.findOne({waypoint_id: waypointId});
@@ -156,29 +163,31 @@ describe('API route', () => {
                 const {db, server} = await createTestConnection(
                     new WebSocketServer({noServer: true}), new WebSocketServer({noServer: true}));
                 const waypointId = 1;
-                const testWaypoint = {
+                const testWaypoint: BaseWaypoint = {
                     waypoint_id: waypointId,
                     location: {
                         latitude: 100,
                         longitude: 100
                     },
                     type: 1,
-                    description: 'Test waypoint'
+                    description: 'Test waypoint',
+                    author: -1
                 }
                 const req = {
                     body: {
                         data:
                             {
-                                AllWaypoints:
+                                waypoints:
                                     [testWaypoint]
                             }
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (data: string) => {
-                        expect(data).toBe("Waypoint with id " + waypointId + " already exists");
+                    send: (response) => {
+                        expect(response.message).toBe("Waypoints with ids: [" + waypointId +
+                            "] already exist in the database");
                     }
-                } as ExpressResponse;
+                } as ExpressResponse<ResponseBody>;
                 await server.addWaypoint(req, res);
                 const waypointsCollection = db.collection('waypoints')
                 const newWaypoint = await waypointsCollection.findOne({waypoint_id: waypointId});

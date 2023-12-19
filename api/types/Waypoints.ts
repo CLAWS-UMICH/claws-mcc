@@ -20,7 +20,7 @@ export type BaseWaypoint = {
     author: number; //-1 if mission control created
 }
 
-export const isBaseWaypoint = (waypoint: any): boolean => {
+export const isBaseWaypoint = (waypoint: any): waypoint is BaseWaypoint => {
     if (typeof waypoint !== 'object') return false;
     if (!waypoint.hasOwnProperty('waypoint_id')) return false;
     if (!waypoint.hasOwnProperty('location')) return false;
