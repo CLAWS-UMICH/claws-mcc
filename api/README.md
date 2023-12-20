@@ -80,6 +80,47 @@ MongoDb's engineers. Additionally, the `_id` field is not the same as the `waypo
 unique id that the server uses to identify the waypoint. The `waypoint_id` field is the id that the client uses to
 identify the waypoint. It is up to the client to ensure that the `waypoint_id` field is unique.
 
+To edit a waypoint, the client should send a `POST` request with the following body:
+
+```json
+{
+  "waypoint_id": 10,
+  "location": {
+    "x": 42.292373144315256,
+    "y": -83.71310960407278
+  },
+  "type": 0,
+  "description": "Electrical & Computer Engineering",
+  "author": -1
+}
+```
+
+Equivalently, the client could include the `_id` field in the body of the request. This will result in a faster lookup
+time on the server if the `_id` is correct. If, for some reason, the client sends a nonexistent `_id`, the server will
+lookup the waypoint by the `waypoint_id` field. Regardless of which fields are being updated, the client must include
+all of the waypoint object's fields in the body of the request. The server will not update the waypoint if any of the
+fields are missing. Proceeding with our example, the server will respond with the following:
+
+```json
+{
+  "error": false,
+  "message": "Updated waypoints with ids: [10]",
+  "data": [
+    {
+      "_id": "0xdeadbeef",
+      "waypoint_id": 10,
+      "location": {
+        "latitude": 42.292373144315256,
+        "longitude": -83.71310960407278
+      },
+      "type": 0,
+      "description": "Electrical & Computer Engineering",
+      "author": -1
+    }
+  ]
+}
+```
+
 ## Websocket
 
 There are two connections that we expect to be made to the server. The first is the connection from the client to the

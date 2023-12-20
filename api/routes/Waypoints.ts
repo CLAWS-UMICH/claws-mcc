@@ -192,6 +192,7 @@ export default class Waypoints extends Base {
         let message = "";
         let error = false;
         const errors: number[] = [];
+        const notFound: number[] = [];
         // the request is the array of all the waypoints
         const waypoints = req.body.data['waypoints'];
         if (!this.isValidRequest(waypoints)) {
@@ -217,10 +218,12 @@ export default class Waypoints extends Base {
                 }
             }
             const updateResult = await this.collection.updateOne(filter, update);
-            if (!updateResult.acknowledged && updateResult.matchedCount === 0 && updateResult.modifiedCount === 0) {
+            if (!updateResult.acknowledged) {
                 errors.push(editedWaypoint.waypoint_id);
                 error = true;
             }
+            if (updateResult.modifiedCount !== 1)
+                notFound.push(editedWaypoint.waypoint_id);
         }
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
@@ -231,22 +234,28 @@ export default class Waypoints extends Base {
             use: 'GET',
             data: data,
         });
-        if (error) {
-            const modified = waypointsId.filter(waypointId => !errors.includes(waypointId));
-            message = "Could not edit waypoints with ids: [" +
-                errors.reduce((acc, waypointId) => {
-                    return acc + waypointId.toString(10) + ', ';
-                }, '').slice(0, -2) + "]. Edited waypoints with ids: [" +
-                modified.reduce((acc, waypointId) => {
-                    return acc + waypointId.toString(10) + ', ';
-                }, '').slice(0, -2) + "]";
-            console.error(message);
-        }
-        const noErrorMessage = "Edited waypoints with ids: [" +
-            waypointsId.reduce((acc, waypointId) => {
+        const successfullyEdited = waypointsId.filter(waypointId => !errors.includes(waypointId) && !notFound.includes(waypointId));
+        message = "Edited waypoints with ids: [" +
+            successfullyEdited.reduce((acc, waypointId) => {
                 return acc + waypointId.toString(10) + ', ';
             }, '').slice(0, -2) + "]";
-        const response: ResponseBody = error ? {error, message, data} : {error, message: noErrorMessage, data};
+        if (error) {
+            message += "Could not edit waypoints with ids: [" +
+                errors.reduce((acc, waypointId) => {
+                    return acc + waypointId.toString(10) + ', ';
+                }, '').slice(0, -2) + "]";
+            error = true;
+            console.error(message);
+        }
+        if (notFound.length) {
+            message += ". Could not find waypoints with ids: [" +
+                notFound.reduce((acc, waypointId) => {
+                    return acc + waypointId.toString(10) + ', ';
+                }, '').slice(0, -2) + "]";
+            error = true;
+            console.error(message);
+        }
+        const response: ResponseBody = {error, message, data};
         this.updateARWaypoints(messageId, data);
         res.send(response);
         return response;
