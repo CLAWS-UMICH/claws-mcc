@@ -78,7 +78,7 @@ function WaypointMap(props) {
     });
 
     map.mapTypes.set('moon', moonMapType);
-    // map.setMapTypeId('moon');
+    map.setMapTypeId('moon');
     
   
     setMap(map)
