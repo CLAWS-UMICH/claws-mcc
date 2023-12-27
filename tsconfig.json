@@ -1,25 +1,25 @@
 {
-    "compilerOptions": {
-      "target": "ES2020",
-      "module": "CommonJS",
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
-      "outDir": "./dist",
-      "rootDir": "./",
-      "removeComments": true,
-      "moduleResolution": "node", 
-      "resolveJsonModule": true,
-      "noImplicitAny": true,
-      "noEmit": true,
-      "jsx": "react", // Ensure this is set to "react"
-      "allowImportingTsExtensions": true
-    },
-    "include": [
-      "api/**/*",
-      // "client/**/*"
-    ],
-    "exclude": [
-      "node_modules"
-    ],
-  }
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "removeComments": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    // Ensure this is set to "react"
+    "jsx": "react"
+  },
+  "include": [
+    "api/**/*"
+    // "client/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
   
