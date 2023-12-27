@@ -27,10 +27,36 @@ function App() {
     }
   }
 
+  // Waypoint list
+  //
+  const waypoint_list = [
+    {
+      waypoint_id: 1,
+      location: [29.00,-95.00],
+      type: 'geo',
+      description: 'first waypoint',
+      author: 0      
+    },
+    {
+      waypoint_id: 2,
+      location: [39.00,-105.00],
+      type: 'danger',
+      description: 'second waypoint',
+      author: 1    
+    },
+    {
+      waypoint_id: 3,
+      location: [49.00,-205.00],
+      type: 'geo',
+      description: 'third waypoint',
+      author: 2      
+    },
+  ]
+
   return (
     <FluentProvider theme={webLightTheme}>
       <ButtonTemplate icon={<CalendarMonthRegular />} iconPosition="after" text="Button From Template"/>
-      <WaypointMap />
+      <WaypointMap waypoints = {waypoint_list}/>
     </FluentProvider>
 
     // <Button appearance="primary">Hello Fluent UI React</Button>
