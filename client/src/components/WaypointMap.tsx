@@ -78,7 +78,7 @@ function WaypointMap(props) {
     });
 
     map.mapTypes.set('moon', moonMapType);
-    map.setMapTypeId('moon');
+    // map.setMapTypeId('moon');
     
   
     setMap(map)
@@ -108,8 +108,14 @@ function WaypointMap(props) {
         })}
 
         {selectedMarker  && (
-            <InfoWindow position ={new google.maps.LatLng(selectedMarker.location[0], selectedMarker.location[1])} options={{pixelOffset: new window.google.maps.Size(0,-40),}}>
-              <h1>waypoint {selectedMarker.waypoint_id}</h1>
+            <InfoWindow position = {new google.maps.LatLng(selectedMarker.location[0], selectedMarker.location[1])} 
+                        options = {{pixelOffset: new window.google.maps.Size(0,-40),}}>
+              <div>
+                <h1>Waypoint {selectedMarker.waypoint_id}</h1>
+                <p>Type: {selectedMarker.type}</p>
+                <p>Description: {selectedMarker.description}</p>
+                <p>Author: {selectedMarker.author}</p>
+              </div>
             </InfoWindow>
         )}
 
@@ -124,3 +130,4 @@ export default WaypointMap;
 // type: waypoint.type,
 // description: waypoint.description,
 // author: waypoint.author
+
