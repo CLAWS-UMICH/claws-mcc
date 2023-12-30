@@ -49,7 +49,6 @@ export default class Waypoints extends Base {
         let error = false;
         // the request is the array of all the waypoints
         const waypoints = req.body.data["waypoints"];
-        console.log(waypoints);
         if (!this.isValidRequest(waypoints)) {
             const response: ResponseBody = {error: true, message: "Invalid request", data: []};
             res.send(response);
