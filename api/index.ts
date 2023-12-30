@@ -27,7 +27,8 @@ fs.readdir(routesDirectory, (err, files) => {
 	});
 
 	const routeInstances: Route[] = [];
-	const eventRegistry: { [key: string]: (data: any) => void } = {};
+	const frontendEventRegistry: { [key: string]: (data: any) => void } = {};
+	const arEventRegistry: { [key: string]: (data: any) => void } = {};
 
 	for (const file of files) {
 		if (path.extname(file) === '.js') {
@@ -46,7 +47,11 @@ fs.readdir(routesDirectory, (err, files) => {
 				// Register events defined in the routeInstance
 				for (const event of routeInstance.events) {
 					// e.g. eventMap['VITALS'] = handlerFunction
-					eventRegistry[event.type.toUpperCase()] = event.handler;
+					if (event.platform == 'FRONTEND') {
+						frontendEventRegistry[event.type.toUpperCase()] = event.handler;
+					} else {
+						arEventRegistry[event.type.toUpperCase()] = event.handler;
+					}
 				}
 			} catch (err) {
 				console.error(`Failed to load route ${file}: ${err.message}`);
@@ -93,7 +98,16 @@ fs.readdir(routesDirectory, (err, files) => {
 	wssFrontend.on('connection', (ws) => {
 		console.log('Frontend WebSocket connection established');
 	});
-	// Frontend doesn't dispatch events to the backend, so we don't need to register any event handlers
+	wssFrontend.on('message', (message) => {
+		const data = JSON.parse(message.toString());
+
+		console.log(`Received message from frontend: ${data.type || JSON.stringify(data)}`);
+
+		// call the handler for the event type
+		if (frontendEventRegistry[data.type.toUpperCase()]) {
+			frontendEventRegistry[data.type](data.data);
+		}
+	});
 
 	// Initialize HoloLens WS server
 	wssHoloLens.on('connection', (ws) => {
@@ -105,8 +119,8 @@ fs.readdir(routesDirectory, (err, files) => {
 		console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
 
 		// call the handler for the event type
-		if (eventRegistry[data.type.toUpperCase()]) {
-			eventRegistry[data.type](data.data);
+		if (arEventRegistry[data.type.toUpperCase()]) {
+			arEventRegistry[data.type](data.data);
 		}
 	});
 

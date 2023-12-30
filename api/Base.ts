@@ -4,9 +4,14 @@ import { Db } from "mongodb";
 import { Redis } from "ioredis";
 import { WebSocket, WebSocketServer } from "ws";
 
+export enum Platform {
+    FRONTEND = 'FRONTEND',
+    AR = 'AR'
+}
+
 export default class Base {
     public readonly routes: { path: string, method: string, handler: (...args: any[]) => any }[];
-    public readonly events: { type: string, handler: (...args: any[]) => any }[];
+    public readonly events: { platform: Platform, type: string, handler: (...args: any[]) => any }[];
 
     public db: Db;
     public redis: Redis;
@@ -25,7 +30,7 @@ export default class Base {
         this.wsHoloLens = wsHoloLens;
     }
 
-    public dispatch(target: 'AR' | 'FRONTEND', data: { id?: number, astronaut?: number, requestType?: 'PUT' | 'DELETE' | 'GET' | 'POST', type: string, data: any }) {
+    public dispatch(target: 'AR' | 'FRONTEND', data: { id?: number, use?: 'PUT' | 'DELETE' | 'GET' | 'POST', type?: string, data: any }) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
         
         const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;

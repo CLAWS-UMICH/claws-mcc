@@ -2,59 +2,62 @@ import { Request, Response, Router } from "express";
 import Base from "../Base";
 import { ObjectId } from "mongodb";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
+import { Platform } from "../Base";
 
 
 
 //astronaut object
 export type Astronaut = {
-	_id: number; //replace with ObjectId eventually
-	name: string;
-
+	astronaut_id: number; //replace with ObjectId eventually
+	ready: boolean;
 }
 
-const astronauts: Astronaut[] = [
-	{
-		_id: 0 ,
-		name: "Astronaut 1",
-	  },
-	{
-		_id: 1,
-		name: "Astronaut 2",
-	},
-	{
-		_id: 2,
-		name: "Astronaut 3",
-	},
-]
+// const astronauts: Astronaut[] = [
+// 	{
+// 		_id: 0 ,
+// 		name: "Astronaut 1",
+// 	  },
+// 	{
+// 		_id: 1,
+// 		name: "Astronaut 2",
+// 	},
+// 	{
+// 		_id: 2,
+// 		name: "Astronaut 3",
+// 	},
+// ]
+
 export type Task = {
-	id: number; //eventually replace with ObjectId
+	id: number;
+	subtask: boolean;
 	title: string;
 	description: string;
-	status: number;
-	astronauts: [];
-	subtasks: [];
+	// TODO: make this an enum 
+	status: number;	// in progress, todo, emergency, completed --> enum
+	astronauts: Astronaut[];
+	subtasks?: Task[];
 }
 
-const Task1: Task={
+// const Task1: Task={
 	
-	id: 0,
-	title: 'Task1',
-	description: 'The first task of the mock',
-	status: 1, //completed
-	astronauts: [],
-	subtasks: [],
+// 	id: 0,
+// 	title: 'Task1',
+// 	description: 'The first task of the mock',
+// 	status: 1, //completed
+// 	astronauts: [],
+// 	subtasks: [],
 
-}
-const Task2: Task = {
+// }
+// const Task2: Task = {
 	
-	id: 1,
-	title: 'Task2',
-	description: 'The second task of the mock',
-	status: 0, //in progress
-	astronauts: [],
-	subtasks: [],
+// 	id: 1,
+// 	title: 'Task2',
+// 	description: 'The second task of the mock',
+// 	status: 0, //in progress
+// 	astronauts: [],
+// 	subtasks: [],
 	
-}
+// }
 
 
 //this is mock data?
@@ -70,28 +73,30 @@ export default class Tasklist extends Base {
 	//list of tasks
 	private tasks: Task[];
 	//create th task list table inside of the database
-	mongoTask(){
-		
-			this.db.createCollection('tasks');
-			console.log("Tasks table created");
-		
-	}
+	
 	constructor(){
 
 		super();
-		if (this.db.collection('tasks').find() == null){
-			this.mongoTask();
-		}
 		
-		this.db.collection('tasks').find().toArray().then((res)=>{
+		// if we restart the application, the collection tasks will be storing values 
+		this.refreshTasks();
+		
+	}
+
+	async refreshTasks() {
+		const res = await this.db.collection('tasks').find().toArray();
+			
 		this.tasks = res as unknown as Task[];
-		});
-		
 	}
 
 	// NOTE: we don't need to write GET
 
 	//route to add a task
+	// TODO: Use PUT for dispatch() 
+	/*
+		When sending data (even if you are deleting, editing, or creating 
+			a new task for this example) always use PUT as the use
+	*/
 	public routes = [
 		{
 			path: '/api/addTask/',
@@ -111,38 +116,60 @@ export default class Tasklist extends Base {
 
 		},
 	];
+	public events = [
+		{ // usage on frontend: https://www.npmjs.com/package/ws#usage-examples
+			platform: Platform.FRONTEND,
+			type: 'TASK_LIST',
+			handler: this.getTasks.bind(this),
+		}
+	]
+	// TODO: frontend code 
+	// const ws = new WebSocket('ws://localhost:8000/frontend');
+
+	// ws.on('error', console.error);
+
+	// ws.on('open', function open() {
+	// 	ws.send({ type: 'TASK_LIST' });
+	// });
+
+	// ws.on('message', function message(data) {
+	// 	data = JSON.parse(data);
+
+	//  if (data.type == 'TASK_LIST') {
+	// 		setTasks(data.data);	
+	// 	}
+	// });
 
 	/* NOTE: Using the length of the array as the ID for new tasks can lead to issues. If a task is deleted, its ID will not be in use anymore, and a new task could be assigned the same ID when it's created. This could lead to confusion and bugs, as IDs are usually expected to be unique.
 		As for async/await, it's not strictly necessary, but it can make your code cleaner and easier to understand, especially when dealing with promises. In your current addTask method, you're using promises without async/await, which is perfectly fine. However, if you have multiple asynchronous operations that depend on each other, using async/await can make your code much easier to read and maintain.
 	*/
 
-	// import { v4 as uuidv4 } from 'uuid';
-
-	// async addTask(req: Request, res: Response) {
-	// 	const newTask = req.body as Task;
-
-	// 	// Generate a unique ID for the new task
-	// 	newTask.id = uuidv4();
-	// 	this.tasks.push(newTask);
-
-	// 	try {
-	// 		// Use async/await for the MongoDB operation
-	// 		await this.db.collection('tasks').insertOne(newTask);
-	// 		res.status(201).send('Task created successfully');
-	// 	} catch (error) {
-	// 		console.error(`Failed to insert new task: ${error.message}`);
-	// 		res.status(500).send('Failed to insert new task');
-	// 	}
-	// }
+	getTasks() {
+		this.dispatch("FRONTEND", {
+			data: this.tasks,
+			type: 'TASK_LIST',
+		});
+	}
 
 	//getting the Task list for a specific astronaut
+	// TODO: add emergency property
+	// TODO: add code to send to AR frontend 
 	addTask(req: Request, res: Response) {
-		//there is no task id for this, we have to generate it in the backend
 		const newTask = req.body as Task;
 		const length = this.tasks.length;
 
+		// TODO: add code to assign values to undefined properties 
 		newTask.id = length;
 		this.tasks.push(newTask);
+
+		this.dispatch('AR', { 
+			id: -1,
+			use: 'PUT',
+			type: "TaskList",
+			data: {
+				"AllTasks": this.tasks
+			}
+		})
 
 		// update mongo 
 		try {
@@ -155,6 +182,7 @@ export default class Tasklist extends Base {
 	}
 
 	//edit a task in tasks
+	// TODO: add functionality to add subtask 
 	async updateTask(req:Request, res:Response){
 		const key: number = parseInt(req.params.id, 10); 
 		if (isNaN(key)){
@@ -180,7 +208,19 @@ export default class Tasklist extends Base {
 		const idx = this.tasks.findIndex(task => task.id == key);
 		if(idx !== -1){
 			this.tasks[idx]= newTask;
+		} else {
+			console.log("Task not found in local array (update), performing hard refresh")
+			await this.refreshTasks();
 		}
+
+		this.dispatch('AR', { 
+			id: -1,
+			use: 'PUT',
+			type: "TaskList",
+			data: {
+				"AllTasks": this.tasks
+			}
+		})
 		
 		// NOTE: do we need to send the newTask back?
 		return res.status(200).json(newTask);
@@ -211,6 +251,9 @@ export default class Tasklist extends Base {
 		const idx = this.tasks.findIndex(t => t.id == key); // key will be the id given to us
 		if (idx !== -1) { // findIndex will return -1 if task not found
 			this.tasks.splice(idx, 1);
+		} else {
+			console.log("Task not found in local array (delete), performing hard refresh")
+			await this.refreshTasks();
 		}
 
 		return res.status(204).send(`Task ${key} deleted`);
