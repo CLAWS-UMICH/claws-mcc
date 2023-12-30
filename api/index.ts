@@ -11,6 +11,8 @@ import {MongoClient} from "mongodb";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 const port = process.env.PORT || 8000;
 
 // serve the files for our built React app
