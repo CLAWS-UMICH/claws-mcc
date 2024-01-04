@@ -233,7 +233,7 @@ export default class Waypoints extends Base {
                 errors.push(editedWaypoint.waypoint_id);
                 error = true;
             }
-            if (updateResult.modifiedCount !== 1)
+            if (updateResult.matchedCount !== 1)
                 notFound.push(editedWaypoint.waypoint_id);
         }
         const allWaypoints = this.collection.find();
