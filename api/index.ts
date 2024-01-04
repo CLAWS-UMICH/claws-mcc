@@ -99,9 +99,20 @@ client.connect().then(() => {
             });
 
             // Initialize frontend WS server
-            wssFrontend.on('connection', () => {
+            wssFrontend.on('connection', (sock, request) => {
                 console.log('Frontend WebSocket connection established');
+                sock.on("message", (message) => {
+                    const data = JSON.parse(message.toString());
+
+                    console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
+
+                    // call the handler for the event type
+                    if (eventRegistry[data.type.toUpperCase()]) {
+                        eventRegistry[data.type](data.data);
+                    }
+                });
             });
+
             // Frontend doesn't dispatch events to the backend, so we don't need to register any event handlers
 
             // Initialize HoloLens WS server
