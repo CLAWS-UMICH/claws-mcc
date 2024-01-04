@@ -29,7 +29,7 @@ export type ManagerAction =
 export type BaseWaypoint = {
     _id?: number; // server generated
     waypoint_id: number; //sequential
-    location: { x: number, y: number };
+    location: { latitude: number, longitude: number };
     type: WaypointType;
     description: string;
     author: number; //-1 if mission control created

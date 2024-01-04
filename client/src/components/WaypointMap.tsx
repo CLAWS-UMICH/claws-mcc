@@ -136,7 +136,8 @@ const Info: React.FC<InfoProps> = props => {
 export const WaypointMap: React.FC<WaypointMapProps> = props => {
     const [infoWindow, setInfoWindow] = useState<React.JSX.Element>(
         props.selected === null ? null :
-            <Info position={{lat: props.selected.location.x, lng: props.selected.location.y}} dispatch={props.dispatch}
+            <Info position={{lat: props.selected.location.latitude, lng: props.selected.location.longitude}}
+                  dispatch={props.dispatch}
                   onCloseClick={() => {
                       props.dispatch({type: "deselect", payload: props.selected})
                   }}>
@@ -181,7 +182,7 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                                                 waypoint_id: -1,
                                                 type: WaypointType.STATION,
                                                 description: "",
-                                                location: {x: e.latLng.lat(), y: e.latLng.lng()},
+                                                location: {latitude: e.latLng.lat(), longitude: e.latLng.lng()},
                                                 author: -1
                                             }
                                         })
@@ -200,11 +201,14 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                 {props.waypoints.map(marker => {
                     return (
                         <div key={marker.waypoint_id}>
-                            <Marker position={{lat: marker.location.x, lng: marker.location.y}}
+                            <Marker position={{lat: marker.location.latitude, lng: marker.location.longitude}}
                                     onClick={() => {
                                         props.dispatch({type: 'select', payload: marker});
                                         setInfoWindow(
-                                            <Info position={{lat: marker.location.x, lng: marker.location.y}}
+                                            <Info position={{
+                                                lat: marker.location.latitude,
+                                                lng: marker.location.longitude
+                                            }}
                                                   dispatch={props.dispatch}
                                                   onCloseClick={() => {
                                                       props.dispatch({type: 'deselect', payload: marker});

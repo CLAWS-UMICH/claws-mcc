@@ -42,7 +42,7 @@ format:
 ```typescript
 interface Waypoint {
     waypoint_id: number,
-    location: { x: number, y: number },
+    location: { latitude: number, longitude: number },
     type: number,
     description: string
 }
