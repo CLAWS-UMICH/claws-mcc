@@ -22,7 +22,21 @@ TODO: Add documentation for astronauts
 
 This route accepts three methods: `PUT`, `POST`, and `DELETE`. The `PUT` method adds the given waypoints to the list of
 waypoints. The `POST` method updates the given waypoints. The `DELETE` method deletes the given waypoints. In all of
-these cases, the input waypoint should be provided in the body of the request. The waypoint should be in the following
+these cases, the input waypoint should be provided in the body of the request.
+
+The request should be in the following format:
+
+```typescript
+interface Request {
+    waypoints: [
+        {
+            // Waypoint object
+        }
+    ]
+}
+```
+
+The waypoint object should be in the following
 format:
 
 ```typescript
