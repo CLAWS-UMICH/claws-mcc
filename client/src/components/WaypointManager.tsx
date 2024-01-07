@@ -1,6 +1,7 @@
 import React, {CSSProperties, useEffect, useReducer, useState} from "react";
 import {WaypointMap} from "./WaypointMap.tsx";
 import {WaypointList} from "./WaypointList.tsx";
+import {isNil} from "lodash";
 
 export enum WaypointType {
     STATION,
@@ -60,6 +61,23 @@ const ServerListener: React.FC<ServerListenerProps> = props => {
     }, [dispatch, setLoading]);
 
     return null
+}
+
+export interface Astronaut {
+    id: number,
+    name: string
+}
+
+export const useAstronaut = (idOrName: string | number) => {
+    const [astronaut, setAstronaut] = useState<Astronaut | null>(null);
+    useEffect(() => {
+        fetch(`/api/astronaut/${idOrName}`, {
+                method: "GET",
+                headers: {"Content-Type": "application/json", "Accept": "application/json"}
+            }
+        ).then(res => res.json()).then(setAstronaut);
+    }, [idOrName]);
+    return astronaut;
 }
 
 const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerState => {

@@ -16,7 +16,7 @@ import {
     Label,
     makeStyles,
     Option,
-    shorthands
+    shorthands, Tooltip
 } from "@fluentui/react-components"
 import {
     BuildingFilled,
@@ -29,7 +29,8 @@ import {
     PersonFilled,
     TextboxFilled,
 } from "@fluentui/react-icons";
-import {BaseWaypoint, ManagerAction as ListAction, WaypointType} from "./WaypointManager.tsx";
+import {isEqual, isNil} from "lodash";
+import {BaseWaypoint, ManagerAction as ListAction, WaypointType, useAstronaut, Astronaut} from "./WaypointManager.tsx";
 
 type WaypointListProps = {
     temp?: BaseWaypoint; // Temporary waypoint for adding a new waypoint after clicking on the map
@@ -83,6 +84,7 @@ const iconFromWaypointType = (type: WaypointType) => {
 const WaypointListItem: React.FC<WaypointListItemProps> = props => {
     const [selectedType, setSelectedType] = React.useState<WaypointType>(props.waypoint.type)
     const [tooltipVisible, setTooltipVisible] = React.useState(false);
+    const author = useAstronaut(props.waypoint.author);
     const styles = listStyles();
     // Icon, Label, Data
     const metadata = [
@@ -91,7 +93,8 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
             // Only first letter capitalized
             WaypointType[props.waypoint.type].charAt(0) + WaypointType[props.waypoint.type].substring(1).toLowerCase()],
         [<TextboxFilled/>, "Description", props.waypoint.description],
-        [<PersonFilled/>, "Author ID", props.waypoint.author]
+        [
+            <PersonFilled/>, "Author ID", isNil(author) ? props.waypoint.author : `${author.name} (${author.id})`]
     ]
     const dropDownOptions = Object.keys(WaypointType).filter(key => isNaN(Number(key)));
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
@@ -111,12 +114,13 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
             waypoint_id: parseInt(form["waypoint-id"].value),
             type: selectedType,
             description: form["waypoint-description"].value,
-            author: form["waypoint-author"].value,
+            author: parseInt(form["waypoint-author"].value, 10),
             location: {
                 latitude: parseFloat(matches[1]),
                 longitude: parseFloat(matches[2])
             }
         }
+        if (isEqual(updated, props.waypoint)) return;
         const res = await fetch("/api/waypoint", {
             method: "POST",
             headers: {
@@ -133,7 +137,6 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
             alert("Failed to update waypoint");
             return;
         }
-        console.log(await res.json())
         props.updateWaypoint(updated);
     }
     return (
@@ -172,7 +175,7 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
                                               placeholder={"Select a waypoint type"}
                                               id={"waypoint-type"}
                                               onOptionSelect={(_, data) =>
-                                                  setSelectedType(parseInt(data.optionValue))}>
+                                                  setSelectedType(parseInt(data.optionValue as string))}>
                                         {dropDownOptions.map(option =>
                                             (<Option key={option}
                                                      value={String(Object.entries(WaypointType).filter(
@@ -290,7 +293,7 @@ const AddWaypointDialog: React.FC<{ dispatch: WaypointListProps['dispatch'], tem
                                           placeholder={"Select a waypoint type"}
                                           id={"waypoint-type"}
                                           onOptionSelect={(_, data) =>
-                                              setSelectedType(parseInt(data.optionValue))}>
+                                              setSelectedType(parseInt(data.optionValue as string))}>
                                     {dropDownOptions.map(option =>
                                         (<Option key={option}
                                                  value={String(Object.entries(WaypointType).filter(
@@ -311,13 +314,16 @@ const AddWaypointDialog: React.FC<{ dispatch: WaypointListProps['dispatch'], tem
                                     Waypoint Coordinates
                                 </Label>
                                 <div className={styles.wide}>
-                                    <Input
-                                        defaultValue={props.temp === undefined ? undefined :
-                                            `${props.temp.location.latitude.toString()},${props.temp.location.longitude.toString()}`}
-                                        onFocus={() => setTooltipVisible(true)}
-                                        onBlur={() => setTooltipVisible(false)}
-                                        type="text"
-                                        id={"waypoint-coords"}/>
+                                    <Tooltip visible={tooltipVisible} content={"Latitude, Longitude"}
+                                             relationship={"label"}>
+                                        <Input
+                                            defaultValue={props.temp === undefined ? undefined :
+                                                `${props.temp.location.latitude.toString(10)},${props.temp.location.longitude.toString(10)}`}
+                                            onFocus={() => setTooltipVisible(true)}
+                                            onBlur={() => setTooltipVisible(false)}
+                                            type="text"
+                                            id={"waypoint-coords"}/>
+                                    </Tooltip>
                                 </div>
                             </DialogContent>
                             <DialogActions>
