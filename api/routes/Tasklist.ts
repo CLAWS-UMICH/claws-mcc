@@ -21,19 +21,21 @@ export type Astronaut = {
 // 		_id: 1,
 // 		name: "Astronaut 2",
 // 	},
-// 	{
-// 		_id: 2,
-// 		name: "Astronaut 3",
-// 	},
 // ]
+
+export enum TaskStatus {
+    INPROGRESS = 0,
+	TODO = 1,
+	EMERGENCY = 2,
+	COMPLETED = 3, 
+}
 
 export type Task = {
 	id: number;
 	subtask: boolean;
 	title: string;
-	description: string;
-	// TODO: make this an enum 
-	status: number;	// in progress, todo, emergency, completed --> enum
+	description: string; 
+	status: TaskStatus;
 	astronauts: Astronaut[];
 	subtasks?: Task[];
 }
@@ -48,22 +50,7 @@ export type Task = {
 // 	subtasks: [],
 
 // }
-// const Task2: Task = {
-	
-// 	id: 1,
-// 	title: 'Task2',
-// 	description: 'The second task of the mock',
-// 	status: 0, //in progress
-// 	astronauts: [],
-// 	subtasks: [],
-	
-// }
 
-
-//this is mock data?
-// const tasks: Task[] = [
-// 	Task1, Task2
-// ]
 
 
 
@@ -88,8 +75,6 @@ export default class Tasklist extends Base {
 			
 		this.tasks = res as unknown as Task[];
 	}
-
-	// NOTE: we don't need to write GET
 
 	//route to add a task
 	// TODO: Use PUT for dispatch() 
@@ -116,12 +101,17 @@ export default class Tasklist extends Base {
 
 		},
 	];
+
+	/* Unlike HTTP, which requires a new request for every server response, 
+	WebSockets maintain a persistent connection, making them ideal for realtime applications */
+	/* usage on frontend: https://www.npmjs.com/package/ws#usage-examples
+	github: https://github.com/websockets/ws */ 
 	public events = [
-		{ // usage on frontend: https://www.npmjs.com/package/ws#usage-examples
+		{ 
 			platform: Platform.FRONTEND,
 			type: 'TASK_LIST',
 			handler: this.getTasks.bind(this),
-		}
+		},
 	]
 	// TODO: frontend code 
 	// const ws = new WebSocket('ws://localhost:8000/frontend');
@@ -140,10 +130,17 @@ export default class Tasklist extends Base {
 	// 	}
 	// });
 
-	/* NOTE: Using the length of the array as the ID for new tasks can lead to issues. If a task is deleted, its ID will not be in use anymore, and a new task could be assigned the same ID when it's created. This could lead to confusion and bugs, as IDs are usually expected to be unique.
-		As for async/await, it's not strictly necessary, but it can make your code cleaner and easier to understand, especially when dealing with promises. In your current addTask method, you're using promises without async/await, which is perfectly fine. However, if you have multiple asynchronous operations that depend on each other, using async/await can make your code much easier to read and maintain.
+	/* NOTE: 
+		Using the length of the array as the ID for new tasks can lead to issues. 
+			If a task is deleted, its ID will not be in use anymore, and a new task could be assigned the same ID when it's created. 
+			This could lead to confusion and bugs, as IDs are usually expected to be unique.
+		As for async/await, it's not strictly necessary, but it can make your code cleaner and easier to understand, especially when dealing with promises. 
+			In your current addTask method, you're using promises without async/await, which is perfectly fine. 
+			However, if you have multiple asynchronous operations that depend on each other, using async/await can make your code much easier to read and maintain.
 	*/
+		
 
+	// GET for web frontend
 	getTasks() {
 		this.dispatch("FRONTEND", {
 			data: this.tasks,
@@ -151,7 +148,7 @@ export default class Tasklist extends Base {
 		});
 	}
 
-	//getting the Task list for a specific astronaut
+	
 	// TODO: add emergency property
 	// TODO: add code to send to AR frontend 
 	addTask(req: Request, res: Response) {
