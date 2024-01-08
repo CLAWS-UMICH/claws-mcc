@@ -1,7 +1,6 @@
 import React, {CSSProperties, useEffect, useReducer, useState} from "react";
 import {WaypointMap} from "./WaypointMap.tsx";
 import {WaypointList} from "./WaypointList.tsx";
-import {isNil} from "lodash";
 
 export enum WaypointType {
     STATION,
@@ -111,7 +110,7 @@ const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerSt
         case 'deselect':
             return {
                 ...state,
-                selected: state.selected === action.payload ? null : state.selected
+                selected: null
             };
         case 'set':
             return {
@@ -148,7 +147,8 @@ const WaypointManager: React.FC = () => {
         <div>
             <h1 style={{textAlign: "center"}}>{loading ? "Loading waypoints" : "Waypoints"}</h1>
             <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", justifyItems: "center", margin: "0 2em"}}>
-                <WaypointMap style={containerStyle} waypoints={state.waypoints} selected={state.selected}
+                <WaypointMap temp={state.temp} style={containerStyle} waypoints={state.waypoints}
+                             selected={state.selected}
                              dispatch={dispatch}/>
                 <WaypointList temp={state.temp} waypoints={state.waypoints} selected={state.selected}
                               dispatch={dispatch}/>
