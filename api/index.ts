@@ -83,7 +83,7 @@ client.connect().then(() => {
 
             // so anything can now connect to us via ws://localhost:8000/frontend or ws://localhost:8000/hololens
             server.on('upgrade', (request, socket, head) => {
-                const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
+                const pathname = new URL(request.url as string, `http://${request.headers.host}`).pathname;
 
                 if (pathname === '/frontend') {
                     wssFrontend.handleUpgrade(request, socket, head, (ws) => {

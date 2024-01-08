@@ -88,6 +88,10 @@ export default class Astronauts extends Base {
         const astronaut = req.body;
         try {
             const currentAstronaut: Astronaut = await this.fetchAstronaut(astronaut.id);
+            await this.collection.replaceOne({id: astronaut.id}, astronaut);
+            const msg = 'Updated astronaut';
+            res.status(200).send(msg);
+            return msg;
         } catch (e) {
             if (e.message === 'Astronaut not found') {
                 await this.collection.insertOne(astronaut);
