@@ -113,7 +113,8 @@ export default class Tasklist extends Base {
 			handler: this.getTasks.bind(this),
 		},
 	]
-	// TODO: frontend code 
+	// **PLEASE IGNORE ** 
+	//Code reference for frontend 
 	// const ws = new WebSocket('ws://localhost:8000/frontend');
 
 	// ws.on('error', console.error);
