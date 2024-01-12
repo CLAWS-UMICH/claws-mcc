@@ -40,6 +40,7 @@ export type Task = {
 	subtasks?: Task[];
 }
 
+
 // const Task1: Task={
 	
 // 	id: 0,
@@ -55,6 +56,8 @@ export type Task = {
 
 
 export default class Tasklist extends Base {
+	//individual task id number generator, only increases, never decreases even if tasks are completed
+	private idgen: number =  0;
 
 
 	//list of tasks
@@ -100,6 +103,13 @@ export default class Tasklist extends Base {
 			handler: this.deleteTask.bind(this),
 
 		},
+		{
+			path: '/api/addSubtask/:id',
+			method:'put',
+			handler: this.addSubtask.bind(this),
+
+		},
+		
 	];
 
 	/* Unlike HTTP, which requires a new request for every server response, 
@@ -154,12 +164,13 @@ export default class Tasklist extends Base {
 	// TODO: add code to send to AR frontend 
 	addTask(req: Request, res: Response) {
 		const newTask = req.body as Task;
-		const length = this.tasks.length;
 
 		// TODO: add code to assign values to undefined properties 
-		newTask.id = length;
+		newTask.id = this.idgen;
+		this.idgen +=1;
 		this.tasks.push(newTask);
 
+		//what is this doing??
 		this.dispatch('AR', { 
 			id: -1,
 			use: 'PUT',
@@ -179,9 +190,9 @@ export default class Tasklist extends Base {
 		}
 	}
 
-	//edit a task in tasks
-	// TODO: add functionality to add subtask 
+	
 	async updateTask(req:Request, res:Response){
+		//key = convert task id to a number (id stays consistent)
 		const key: number = parseInt(req.params.id, 10); 
 		if (isNaN(key)){
 			//Handle the case where the conversion to number fails
@@ -222,6 +233,52 @@ export default class Tasklist extends Base {
 		
 		// NOTE: do we need to send the newTask back?
 		return res.status(200).json(newTask);
+	}
+
+	//CHECK OVER
+	async addSubtask(req:Request, res:Response){
+		//ARE WE ASSUMING THAT A SUBTASK IS THE SAME AS A TASK?
+		const subTask = req.body as Task;
+		//generating id for the subtask
+		subTask.id = this.idgen;
+		this.idgen +=1;
+		//change subtask bool to true
+		subTask.subtask = true;
+		//store id of parent task in key
+		//should this already be a number?
+		const key: number = parseInt(req.params.id, 10); 
+		
+		//find the parent task in the Tasks[] array
+		try{
+			const parent = this.tasks.find(task => task.id === key);
+			if (parent == null){
+				console.log("Parent task not found in array Tasks");
+			}
+			else{
+				//push the subtask onto the parent task's subtask array
+				parent.subtasks.push(subTask);
+			}
+		}
+		catch(err){
+			console.error(`Failed to find task: ${err.message}`);
+			return res.status(500).send('Failed to find task');
+		}
+		//HOW TO ADD THIS TASK TO MONGODB?
+
+		//TODO: socket stuff
+
+		// update mongo 
+		try {
+			//find the parent task in mongodb with key
+			await this.db.collection('tasks').updateOne(
+				{ id: key }, 
+				{ $push: { subtasks: subTask } }
+			);
+			res.status(200).send('Task updated successfully in mongodb');
+		} catch (error) {
+			console.error(`Failed to update task in mongodb: ${error.message}`);
+			res.status(500).send('Failed to update task in mongodb');
+		}
 	}
 
 	
