@@ -109,6 +109,11 @@ export default class Tasklist extends Base {
 			handler: this.addSubtask.bind(this),
 
 		},
+		{
+			path:'/api/deleteSubtask/:parent_id/:child_id',
+			method: 'delete',
+			handler: this.deleteSubtask.bind(this),
+		},
 		
 	];
 
@@ -285,7 +290,7 @@ export default class Tasklist extends Base {
 	//delete a task from tasks
 	async deleteTask(req:Request, res:Response){
 		//key should be the task id
-		const key: number = parseInt(req.params.task, 10); //convert to number
+		const key: number = parseInt(req.params.id, 10); //convert to number
 		if (isNaN(key)){
 			//Handle the case where the conversion to number fails
 			res.status(400).send('Invalid Task ID');
@@ -312,6 +317,39 @@ export default class Tasklist extends Base {
 		}
 
 		return res.status(204).send(`Task ${key} deleted`);
+	}
+	async deleteSubtask(req:Request, res:Response){
+		//key should be the task id
+		const parent: number = parseInt(req.params.parent_id, 10); //convert to number
+		const child: number = parseInt(req.params.child_id, 10);
+		if (isNaN(parent) || isNaN(child)){
+			//Handle the case where the conversion to number fails
+			res.status(400).send('Invalid Task ID');
+			return;
+		}
+
+		//TODO: socket stuff
+		try {
+			await this.db.collection('tasks').updateOne(
+				{ id: parent },
+				{ $pull: { subtasks: { id: child } } }
+			);
+			res.status(200).send('Subtask deleted successfully in MongoDB');
+		} catch (error) {
+			console.error(`Failed to delete subtask: ${error.message}`);
+			return res.status(500).send('Failed to delete subtask');
+		}
+
+		// Update local task array
+		const parentTask = this.tasks.find(task => task.id === parent);
+		if (parentTask == null){
+			console.log("Parent task not found in array Tasks");
+		} else {
+			if (parentTask.subtasks) {
+				// Remove the subtask with the specified child id
+				parentTask.subtasks = parentTask.subtasks.filter(subtask => subtask.id !== child);
+			}
+		}
 	}
 
 
