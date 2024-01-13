@@ -1,9 +1,10 @@
 import React, {CSSProperties} from 'react';
 import {GoogleMap, InfoWindow, Marker, useJsApiLoader} from '@react-google-maps/api';
-import {BaseWaypoint, ManagerAction as MapAction} from "./WaypointManager.tsx";
+import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "./WaypointManager.tsx";
 import {Body1, Body1Stronger, Button,} from "@fluentui/react-components";
 import {ComposeFilled} from "@fluentui/react-icons";
 import {isNil, isUndefined} from "lodash";
+import {WaypointForm} from "./WaypointList.tsx";
 
 const key = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
 
@@ -119,61 +120,14 @@ interface WaypointMapProps {
     dispatch: React.Dispatch<MapAction>;
 }
 
-type InfoProps = {
-    dispatch: React.Dispatch<MapAction>;
-    temp?: BaseWaypoint;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    selected: BaseWaypoint | null;
+// Holds the information for the info window. If a waypoint is selected, uses that waypoint's information.
+type WaypointMapState = {
+    waypoint: BaseWaypoint,
+    location: google.maps.LatLng
 };
 
-const InfoWindows: React.FC<InfoProps> = props => {
-    if (isNil(props.selected) && isUndefined(props.temp)) {
-        props.setOpen(false);
-        return null
-    }
-    if (isNil(props.selected)) {
-        const waypoint = props.temp as BaseWaypoint;
-        const latLng = new google.maps.LatLng(waypoint.location.latitude, waypoint.location.longitude);
-        // props.dispatch({type: 'deselect', payload: waypoint});
-        props.setOpen(true);
-        return (
-            <InfoWindow position={latLng} onCloseClick={() => {
-                props.dispatch({type: 'clearTemp'});
-
-            }}>
-                <div style={{width: "200px"}}>
-                    <Body1>Lat: {waypoint.location.latitude.toFixed(4)}</Body1>
-                    <Body1>Long: {waypoint.location.longitude.toFixed(4)}</Body1>
-                    <Button icon={<ComposeFilled/>} onClick={() => {
-                        props.dispatch({type: 'writeTemp', payload: waypoint});
-                    }}>Edit</Button>
-                </div>
-            </InfoWindow>
-        );
-    }
-    const waypoint = props.selected
-    const latLng = new google.maps.LatLng(waypoint.location.latitude, waypoint.location.longitude);
-    props.setOpen(true);
-    return (
-        <InfoWindow position={latLng}>
-            <div style={{width: "200px"}}>
-                <Body1Stronger>{waypoint.description}</Body1Stronger>
-                <Body1>Lat: {waypoint.location.latitude.toFixed(4)}</Body1>
-                <Body1>Long: {waypoint.location.longitude.toFixed(4)}</Body1>
-                <Body1>Author: {waypoint.author}</Body1>
-                <Body1>Waypoint ID: {waypoint.waypoint_id}</Body1>
-            </div>
-        </InfoWindow>
-    );
-}
-
-type WaypointMapState = {
-    type: "marker" | "temp" | "none";
-    waypoint: BaseWaypoint | null
-}
-
 export const WaypointMap: React.FC<WaypointMapProps> = props => {
-    console.log("WaypointMap was rendered!")
+    const [state, setState] = React.useState<WaypointMapState | null>(null);
     const {isLoaded} = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: key
@@ -189,26 +143,57 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                 options={{
                     streetViewControl: false,
                     mapTypeControlOptions: {mapTypeIds: ['elevation', 'visible', 'infrared']}
-                }}>
+                }}
+                onRightClick={e => {
+                    const latLng = new google.maps.LatLng(e.latLng!.lat(), e.latLng!.lng());
+                    setState({
+                        waypoint: {
+                            waypoint_id: -1,
+                            description: "",
+                            type: WaypointType.NAV,
+                            location: {
+                                latitude: latLng.lat(),
+                                longitude: latLng.lng()
+                            },
+                            author: -1
+                        },
+                        location: latLng
+                    })}}>
                 {props.waypoints.map(marker => {
                     const position = {lat: marker.location.latitude, lng: marker.location.longitude};
                     return (
                         <div key={marker.waypoint_id}>
                             <Marker position={position}
-                                    onClick={() => {
-                                        props.dispatch({type: 'select', payload: marker});
-                                    }}/>
+                                    onClick={e => setState({location: e.latLng!, waypoint: marker})}/>
                         </div>);
                 })}
-                {(!isNil(props.selected) && isUndefined(props.temp)) ?
-                    <InfoWindow
-                        onLoad={i => console.log(i)}
-                        position={{lat: props.selected.location.latitude, lng: props.selected.location.longitude}}>
-                        <div>
-                            Test
+                { // If state is not null, the info window should appear where the right click occurred
+                    !isNil(state) ? (<InfoWindow position={state.location} onCloseClick={() => {
+                        setState(null);
+                        props.dispatch({type: 'clearTemp'});
+                    }}>
+                        <div style={{width: "200px"}}>
+                            <Body1>Lat: {state.waypoint.location.latitude.toFixed(4)}</Body1>
+                            <Body1>Long: {state.waypoint.location.longitude.toFixed(4)}</Body1>
+                            <WaypointForm dispatch={props.dispatch}
+                                          text={"Create Waypoint"}
+                                          temp={state.waypoint}
+                                          buttonProps={{icon: <ComposeFilled/>}}/>
                         </div>
-                    </InfoWindow> : null
-                }
+                    </InfoWindow>) :
+                    // If a waypoint is selected, the info window should appear where the waypoint is
+                    !isNil(props.selected) ? (
+                    <InfoWindow position={{lat: props.selected.location.latitude, lng: props.selected.location.longitude}}
+                                onCloseClick={() => props.dispatch({type: 'deselect', payload: props.selected as BaseWaypoint})}>
+                        <div style={{width: "200px"}}>
+                            <Body1Stronger>{props.selected.description}</Body1Stronger>
+                            <Body1>Lat: {props.selected.location.latitude.toFixed(4)}</Body1>
+                            <Body1>Long: {props.selected.location.longitude.toFixed(4)}</Body1>
+                            <Body1>Author: {props.selected.author}</Body1>
+                            <Body1>Waypoint ID: {props.selected.waypoint_id}</Body1>
+                        </div>
+                    </InfoWindow>
+                ) : null }
             </GoogleMap>
         </div>
     ) : <></>

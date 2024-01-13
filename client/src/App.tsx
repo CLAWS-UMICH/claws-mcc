@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './App.css';
 import axios from 'axios';
 import {FluentProvider, webLightTheme} from "@fluentui/react-components";
-import WaypointManager from "./components/WaypointManager.tsx";
+import WaypointManager from "./components/waypoints/WaypointManager.tsx";
 
 interface AstronautData {
     heartrate: number;

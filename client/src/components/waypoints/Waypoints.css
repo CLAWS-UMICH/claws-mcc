@@ -1,0 +1,24 @@
+.waypoints-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    justify-items: end;
+    margin: 0 2rem;
+    border: #ccc 1px solid;
+    padding: 3px;
+}
+
+.waypoint {
+    border: #ccc 1px solid;
+    border-radius:8px!important;
+    box-shadow:unset !important;
+}
+
+.add-waypoint-btn {
+    margin-top: 10px;
+}
+
+.waypoints-list {
+    overflow-y: scroll;
+    max-height: 330px;
+}

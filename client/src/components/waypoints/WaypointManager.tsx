@@ -1,6 +1,8 @@
 import React, {CSSProperties, useEffect, useReducer, useState} from "react";
 import {WaypointMap} from "./WaypointMap.tsx";
 import {WaypointList} from "./WaypointList.tsx";
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import './Waypoints.css';
 
 export enum WaypointType {
     STATION,
@@ -143,16 +145,26 @@ const containerStyle: CSSProperties = {
 const WaypointManager: React.FC = () => {
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [loading, setLoading] = useState(true)
+    const [messageHistory, setMessageHistory] = useState<string[]>([]);
+    const { sendMessage, lastMessage, readyState } = useWebSocket("ws://localhost:8000/frontend", {
+        onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
+    });
+    useEffect(() => {
+        if (lastMessage !== null) {
+            setMessageHistory((prev) => prev.concat(lastMessage.data));
+            dispatch({type: 'set', payload: JSON.parse(lastMessage.data).data});
+        }
+    }, [lastMessage, setMessageHistory]);
     return (
         <div>
             <h1 style={{textAlign: "center"}}>{loading ? "Loading waypoints" : "Waypoints"}</h1>
-            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", justifyItems: "center", margin: "0 2em"}}>
+            <div className='waypoints-container'>
                 <WaypointMap temp={state.temp} style={containerStyle} waypoints={state.waypoints}
                              selected={state.selected}
                              dispatch={dispatch}/>
                 <WaypointList temp={state.temp} waypoints={state.waypoints} selected={state.selected}
                               dispatch={dispatch}/>
-                <ServerListener setLoading={setLoading} dispatch={dispatch}/>
+                {/*<ServerListener setLoading={setLoading} dispatch={dispatch}/>*/}
             </div>
         </div>
     );

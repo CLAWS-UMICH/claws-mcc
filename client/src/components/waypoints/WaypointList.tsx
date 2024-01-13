@@ -134,14 +134,30 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
         }
         props.dispatch({type: "update", payload: {old: props.waypoint, new: updated}});
     }
+    const handleDelete = async () => {
+        const res = await fetch("/api/waypoint", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                data: {
+                    waypoints: [props.waypoint]
+                }
+            })
+        });
+        if (!res.ok) {
+            alert("Failed to delete waypoint");
+            return;
+        }
+    }
     return (
-        <Card selected={props.selected}
-              onSelectionChange={(event, data) =>
-                  props.dispatch(data.selected ? {type: "select", payload: props.waypoint} : {
-                      type: "deselect",
-                      payload: props.waypoint
-                  })
-              }>
+        <Card className='waypoint' selected={props.selected}
+              // onSelectionChange={(event, data) => {
+              //     props.selected ? props.dispatch({type: "deselect", payload: props.waypoint}) :
+              //         props.dispatch({ type: "select", payload: props.waypoint }) } }>
+        >
             <div className={styles.container}>
                 <Body1>
                     {metadata.map(([icon, label, data]) => {
@@ -152,11 +168,10 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
             <div style={{display: "flex", columnGap: "1em"}}>
                 <WaypointForm waypoint={props.waypoint} dispatch={props.dispatch} text={"Edit"}
                               buttonProps={{icon: <EditFilled/>, appearance: "primary", style: {width: "100%"}}}
-                              style={{width: "50%"}}
-                />
+                              style={{width: "50%"}} />
                 <Button style={{width: "50%"}}
                         icon={<DeleteFilled/>}
-                        onClick={() => props.dispatch({type: "remove", payload: [props.waypoint]})}>Delete</Button>
+                        onClick={handleDelete}>Delete</Button>
             </div>
         </Card>
     );
@@ -169,9 +184,10 @@ interface WaypointFormProps {
     text: string;
     buttonProps?: React.ComponentPropsWithRef<typeof Button>;
     style?: CSSProperties
+    primary?: boolean;
 }
 
-const WaypointForm: React.FC<WaypointFormProps> = props => {
+export const WaypointForm: React.FC<WaypointFormProps> = props => {
     const creating = isUndefined(props.waypoint);
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [selectedType, setSelectedType] = React.useState<WaypointType | undefined>(props.waypoint?.type)
@@ -179,7 +195,9 @@ const WaypointForm: React.FC<WaypointFormProps> = props => {
     const styles = listStyles();
     const dropDownOptions = Object.keys(WaypointType).filter(key => isNaN(Number(key)));
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+        // TODO: Add validation
         e.preventDefault();
+        // const selectedType = parseInt(e.currentTarget["waypoint-type"].value, 10);
         if (selectedType === undefined) {
             alert("Please select a waypoint type");
             return;
@@ -203,10 +221,10 @@ const WaypointForm: React.FC<WaypointFormProps> = props => {
         };
         if (isEqual(newWaypoint, props.waypoint)) return;
         const res = await fetch("/api/waypoint", {
-            method: "POST",
+            method: creating ? "put" : "post",
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
+                "content-type": "application/json",
+                "accept": "application/json"
             },
             body: JSON.stringify({
                 data: {
@@ -215,16 +233,14 @@ const WaypointForm: React.FC<WaypointFormProps> = props => {
             })
         });
         if (!res.ok) {
-            alert("Failed to update waypoint");
+            alert("failed to update waypoint");
             return;
         }
-        props.dispatch(creating ?
-            {type: "add", payload: newWaypoint} :
-            {type: "update", payload: {old: props.waypoint as BaseWaypoint, new: newWaypoint}});
+        setDialogOpen(false);
     }
     return (
-        <div style={{...props.style}}>
-            <Dialog open={dialogOpen || props.temp !== undefined}>
+        <div className={props.primary ? 'add-waypoint-btn' : undefined} style={{...props.style}}>
+            <Dialog open={dialogOpen}>
                 <DialogTrigger>
                     <Button {...props.buttonProps} children={props.text} onClick={() => setDialogOpen(true)}/>
                 </DialogTrigger>
@@ -242,8 +258,8 @@ const WaypointForm: React.FC<WaypointFormProps> = props => {
                                 <Dropdown className={styles.wide}
                                           placeholder={"Select a waypoint type"}
                                           id={"waypoint-type"}
-                                          onOptionSelect={(_, data) =>
-                                              setSelectedType(parseInt(data.optionValue as string))}>
+                                          onOptionSelect={(e, data) => setSelectedType(parseInt(data.optionValue!, 10))}
+                                          >
                                     {dropDownOptions.map(option =>
                                         (<Option key={option}
                                                  value={String(Object.entries(WaypointType).filter(
@@ -268,8 +284,9 @@ const WaypointForm: React.FC<WaypointFormProps> = props => {
                                     <Tooltip visible={tooltipVisible} content={"Latitude, Longitude"}
                                              relationship={"label"}>
                                         <Input
-                                            defaultValue={isUndefined(props.temp) ? undefined :
-                                                `${props.temp.location.latitude.toString(10)},${props.temp.location.longitude.toString(10)}`}
+                                            defaultValue={!isUndefined(props.temp) ?
+                                                `${props.temp.location.latitude.toString(10)},${props.temp.location.longitude.toString(10)}`
+                                                : props.waypoint?.location.latitude.toString(10) + "," + props.waypoint?.location.longitude.toString(10)}
                                             onFocus={() => setTooltipVisible(true)}
                                             onBlur={() => setTooltipVisible(false)}
                                             type="text"
@@ -326,16 +343,19 @@ export const WaypointList: React.FC<WaypointListProps> = props => {
     const styles = dialogStyles();
     return (
         <div className={styles.content}>
-            {props.waypoints.map((waypoint) =>
-                (<WaypointListItem
-                    key={waypoint.waypoint_id}
-                    selected={props.selected === waypoint}
-                    waypoint={waypoint}
-                    dispatch={props.dispatch}/>)
-            )}
-            {/*TODO: remove waypoint props */}
-            <WaypointForm style={{marginTop: "20px"}} dispatch={props.dispatch} text={"Add waypoint"}
+            <WaypointForm primary={true} dispatch={props.dispatch} text={"Add waypoint"}
                           buttonProps={{appearance: "primary"}}/>
+            <div className='waypoints-list'>
+                {props.waypoints.map((waypoint) =>
+                    (<WaypointListItem
+                        key={waypoint.waypoint_id}
+                        selected={props.selected === waypoint}
+                        waypoint={waypoint}
+                        dispatch={props.dispatch}/>)
+                )}
+            </div>
+            {/*TODO: remove waypoint props */}
+
         </div>
     );
 };
