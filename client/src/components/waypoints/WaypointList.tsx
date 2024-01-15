@@ -35,7 +35,7 @@ import {BaseWaypoint, ManagerAction as ListAction, WaypointType, useAstronaut} f
 type WaypointListProps = {
     temp?: BaseWaypoint; // Temporary waypoint for adding a new waypoint after clicking on the map
     waypoints: BaseWaypoint[];
-    selected: BaseWaypoint | null;
+    selected?: BaseWaypoint;
     dispatch: React.Dispatch<ListAction>;
 };
 
@@ -79,7 +79,6 @@ const iconFromWaypointType = (type: WaypointType) => {
 }
 
 const WaypointListItem: React.FC<WaypointListItemProps> = props => {
-    const [selectedType, setSelectedType] = React.useState<WaypointType>(props.waypoint.type)
     const author = useAstronaut(props.waypoint.author);
     const styles = listStyles();
     // Icon, Label, Data
@@ -92,48 +91,6 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
         [
             <PersonFilled/>, "Author ID", isNil(author) ? props.waypoint.author : `${author.name} (${author.id})`]
     ]
-    const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-        e.preventDefault();
-        if (selectedType === null) {
-            alert("Please select a waypoint type");
-            return;
-        }
-        const form = e.currentTarget;
-        const coords = form["waypoint-coords"].value;
-        const matches = coords.match(/(.*),(.*)/);
-        if (matches === null) {
-            alert("Invalid coordinates");
-            return;
-        }
-        const updated: BaseWaypoint = {
-            waypoint_id: parseInt(form["waypoint-id"].value),
-            type: selectedType,
-            description: form["waypoint-description"].value,
-            author: parseInt(form["waypoint-author"].value, 10),
-            location: {
-                latitude: parseFloat(matches[1]),
-                longitude: parseFloat(matches[2])
-            }
-        }
-        if (isEqual(updated, props.waypoint)) return;
-        const res = await fetch("/api/waypoint", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                data: {
-                    waypoints: [updated]
-                }
-            })
-        });
-        if (!res.ok) {
-            alert("Failed to update waypoint");
-            return;
-        }
-        props.dispatch({type: "update", payload: {old: props.waypoint, new: updated}});
-    }
     const handleDelete = async () => {
         const res = await fetch("/api/waypoint", {
             method: "DELETE",
@@ -153,11 +110,9 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
         }
     }
     return (
-        <Card className='waypoint' selected={props.selected}
-              // onSelectionChange={(event, data) => {
-              //     props.selected ? props.dispatch({type: "deselect", payload: props.waypoint}) :
-              //         props.dispatch({ type: "select", payload: props.waypoint }) } }>
-        >
+        <Card className='waypoint' onSelectionChange={(e, v) =>
+            props.dispatch({type: v.selected ? "select" : "deselect", payload: props.waypoint})
+        } selected={props.selected}>
             <div className={styles.container}>
                 <Body1>
                     {metadata.map(([icon, label, data]) => {
@@ -168,7 +123,7 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
             <div style={{display: "flex", columnGap: "1em"}}>
                 <WaypointForm waypoint={props.waypoint} dispatch={props.dispatch} text={"Edit"}
                               buttonProps={{icon: <EditFilled/>, appearance: "primary", style: {width: "100%"}}}
-                              style={{width: "50%"}} />
+                              style={{width: "50%"}}/>
                 <Button style={{width: "50%"}}
                         icon={<DeleteFilled/>}
                         onClick={handleDelete}>Delete</Button>
@@ -185,6 +140,7 @@ interface WaypointFormProps {
     buttonProps?: React.ComponentPropsWithRef<typeof Button>;
     style?: CSSProperties
     primary?: boolean;
+    afterSubmit?: () => void;
 }
 
 export const WaypointForm: React.FC<WaypointFormProps> = props => {
@@ -237,6 +193,7 @@ export const WaypointForm: React.FC<WaypointFormProps> = props => {
             return;
         }
         setDialogOpen(false);
+        !isUndefined(props.afterSubmit) && props.afterSubmit();
     }
     return (
         <div className={props.primary ? 'add-waypoint-btn' : undefined} style={{...props.style}}>
@@ -259,7 +216,7 @@ export const WaypointForm: React.FC<WaypointFormProps> = props => {
                                           placeholder={"Select a waypoint type"}
                                           id={"waypoint-type"}
                                           onOptionSelect={(e, data) => setSelectedType(parseInt(data.optionValue!, 10))}
-                                          >
+                                >
                                     {dropDownOptions.map(option =>
                                         (<Option key={option}
                                                  value={String(Object.entries(WaypointType).filter(
@@ -284,9 +241,10 @@ export const WaypointForm: React.FC<WaypointFormProps> = props => {
                                     <Tooltip visible={tooltipVisible} content={"Latitude, Longitude"}
                                              relationship={"label"}>
                                         <Input
-                                            defaultValue={!isUndefined(props.temp) ?
-                                                `${props.temp.location.latitude.toString(10)},${props.temp.location.longitude.toString(10)}`
-                                                : props.waypoint?.location.latitude.toString(10) + "," + props.waypoint?.location.longitude.toString(10)}
+                                            defaultValue={isUndefined(props.temp) ?
+                                                isUndefined(props.waypoint) ? undefined :
+                                                    props.waypoint.location.latitude.toString(10) + "," + props.waypoint.location.longitude.toString(10) :
+                                                `${props.temp.location.latitude.toString(10)},${props.temp.location.longitude.toString(10)}`}
                                             onFocus={() => setTooltipVisible(true)}
                                             onBlur={() => setTooltipVisible(false)}
                                             type="text"

@@ -1,7 +1,7 @@
 import React, {CSSProperties, useEffect, useReducer, useState} from "react";
 import {WaypointMap} from "./WaypointMap.tsx";
 import {WaypointList} from "./WaypointList.tsx";
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import useWebSocket, {ReadyState} from 'react-use-websocket';
 import './Waypoints.css';
 
 export enum WaypointType {
@@ -14,7 +14,7 @@ export enum WaypointType {
 export type ManagerState = {
     temp?: BaseWaypoint; // Used to store a waypoint that is being created
     waypoints: BaseWaypoint[];
-    selected: BaseWaypoint | null;
+    selected?: BaseWaypoint;
     message: string | null;
 }
 
@@ -35,33 +35,6 @@ export type BaseWaypoint = {
     type: WaypointType;
     description: string;
     author: number; //-1 if mission control created
-}
-
-interface ServerListenerProps {
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    dispatch: React.Dispatch<ManagerAction>;
-}
-
-// Does not render anything, but listens for server events and dispatches actions
-const ServerListener: React.FC<ServerListenerProps> = props => {
-    const {dispatch, setLoading} = props;
-    useEffect(() => {
-        const ws = new WebSocket('ws://localhost:8000/frontend');
-        ws.onopen = () => {
-            // Send a message to the server to get all waypoints
-            ws.send(JSON.stringify({type: 'GET_WAYPOINTS'}));
-        }
-        ws.onmessage = e => {
-            const message = JSON.parse(e.data);
-            dispatch({type: 'set', payload: message.data});
-            setLoading(false);
-        }
-        return () => {
-            if (ws.readyState === WebSocket.OPEN) ws.close();
-        };
-    }, [dispatch, setLoading]);
-
-    return null
 }
 
 export interface Astronaut {
@@ -112,7 +85,7 @@ const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerSt
         case 'deselect':
             return {
                 ...state,
-                selected: null
+                selected: undefined
             };
         case 'set':
             return {
@@ -134,7 +107,7 @@ const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerSt
     }
 }
 
-const initialState: ManagerState = {waypoints: [], selected: null, message: ""}
+const initialState: ManagerState = {waypoints: [], message: ""}
 
 const containerStyle: CSSProperties = {
     width: '400px',
@@ -144,7 +117,6 @@ const containerStyle: CSSProperties = {
 
 const WaypointManager: React.FC = () => {
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
-    const [loading, setLoading] = useState(true)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const { sendMessage, lastMessage, readyState } = useWebSocket("ws://localhost:8000/frontend", {
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
@@ -157,14 +129,13 @@ const WaypointManager: React.FC = () => {
     }, [lastMessage, setMessageHistory]);
     return (
         <div>
-            <h1 style={{textAlign: "center"}}>{loading ? "Loading waypoints" : "Waypoints"}</h1>
+            <h1 style={{textAlign: "center"}}>{readyState !== ReadyState.OPEN ? "Loading waypoints" : "Waypoints"}</h1>
             <div className='waypoints-container'>
-                <WaypointMap temp={state.temp} style={containerStyle} waypoints={state.waypoints}
+                <WaypointMap style={containerStyle} waypoints={state.waypoints}
                              selected={state.selected}
                              dispatch={dispatch}/>
                 <WaypointList temp={state.temp} waypoints={state.waypoints} selected={state.selected}
                               dispatch={dispatch}/>
-                {/*<ServerListener setLoading={setLoading} dispatch={dispatch}/>*/}
             </div>
         </div>
     );
