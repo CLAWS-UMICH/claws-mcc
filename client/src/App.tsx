@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './App.css';
 import axios from 'axios';
-import {FluentProvider, webLightTheme} from "@fluentui/react-components";
+import {FluentProvider, webDarkTheme, webLightTheme} from "@fluentui/react-components";
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
 
 interface AstronautData {
@@ -10,6 +10,7 @@ interface AstronautData {
 }
 
 function App() {
+    const [theme, setTheme] = useState(webDarkTheme);
     const [astronaut, setAstronaut] = useState<string | undefined>(undefined);
 
     function getAstronaut() {
@@ -20,8 +21,14 @@ function App() {
         }
     }
 
+    // Use webDarkTheme by default, but set it to webLightTheme if user prefers light mode.
+    window.addEventListener("load", () => {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            setTheme(webLightTheme);
+        }
+    })
     return (
-        <FluentProvider theme={webLightTheme}>
+        <FluentProvider theme={theme}>
             <WaypointManager/>
         </FluentProvider>
 

@@ -1,8 +1,10 @@
-import React, {CSSProperties, useEffect, useReducer, useState} from "react";
+import React, {useEffect, useReducer, useState} from "react";
+import {Divider, InlineDrawer} from "@fluentui/react-components";
 import {WaypointMap} from "./WaypointMap.tsx";
 import {WaypointList} from "./WaypointList.tsx";
 import useWebSocket, {ReadyState} from 'react-use-websocket';
 import './Waypoints.css';
+import {WaypointsDrawer} from "./WaypointsDrawer.tsx";
 
 export enum WaypointType {
     STATION,
@@ -109,16 +111,10 @@ const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerSt
 
 const initialState: ManagerState = {waypoints: [], message: ""}
 
-const containerStyle: CSSProperties = {
-    width: '400px',
-    height: '400px',
-    justifySelf: "center",
-};
-
 const WaypointManager: React.FC = () => {
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
-    const { sendMessage, lastMessage, readyState } = useWebSocket("ws://localhost:8000/frontend", {
+    const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
     });
     useEffect(() => {
@@ -128,14 +124,18 @@ const WaypointManager: React.FC = () => {
         }
     }, [lastMessage, setMessageHistory]);
     return (
-        <div>
-            <h1 style={{textAlign: "center"}}>{readyState !== ReadyState.OPEN ? "Loading waypoints" : "Waypoints"}</h1>
+        <div style={{display: "flex"}}>
+            <InlineDrawer separator open>
+                <WaypointsDrawer selected={state.selected} waypoints={state.waypoints} dispatch={dispatch}
+                                 ready={readyState === ReadyState.OPEN}/>
+            </InlineDrawer>
             <div className='waypoints-container'>
-                <WaypointMap style={containerStyle} waypoints={state.waypoints}
-                             selected={state.selected}
-                             dispatch={dispatch}/>
                 <WaypointList temp={state.temp} waypoints={state.waypoints} selected={state.selected}
                               dispatch={dispatch}/>
+                <Divider/>
+                <WaypointMap waypoints={state.waypoints}
+                             selected={state.selected}
+                             dispatch={dispatch}/>
             </div>
         </div>
     );

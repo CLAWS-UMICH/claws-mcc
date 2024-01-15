@@ -1,4 +1,4 @@
-import React, {CSSProperties} from 'react';
+import React from 'react';
 import {GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader} from '@react-google-maps/api';
 import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "./WaypointManager.tsx";
 import {Body1, Body1Stronger} from "@fluentui/react-components";
@@ -105,15 +105,8 @@ function makeMarsMapType(m: MapObject): google.maps.ImageMapType {
     return new google.maps.ImageMapType(opts);
 }
 
-
-const center = {
-    lat: 42.27697713747799,
-    lng: -83.73820501490505
-};
-
 interface WaypointMapProps {
     temp?: BaseWaypoint
-    style: CSSProperties
     waypoints: BaseWaypoint[];
     selected?: BaseWaypoint;
     dispatch: React.Dispatch<MapAction>;
@@ -126,46 +119,49 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
         id: 'google-map-script',
         googleMapsApiKey: key
     })
-    // Selects the correct map type based on the selected waypoint and the temp waypoint.
+    const handleRightClick = (e: google.maps.MapMouseEvent) => {
+        const latLng = e.latLng!;
+        setTempWindow(<InfoWindow
+                position={latLng}
+                onCloseClick={() => setTempWindow(null)}
+            >
+                <div style={{display: "flex", flexDirection: "column", width: "max-content", color: "black"}}>
+                    <div>
+                        <Body1Stronger>Latitude: </Body1Stronger>
+                        <Body1>{latLng.lat().toFixed(5)}</Body1>
+                    </div>
+                    <div>
+                        <Body1Stronger>Longitude: </Body1Stronger>
+                        <Body1>{latLng.lng().toFixed(5)}</Body1>
+                    </div>
+                    <WaypointForm
+                        afterSubmit={() => setTempWindow(null)}
+                        waypoint={props.temp!}
+                        temp={{
+                            waypoint_id: -1,
+                            type: WaypointType.NAV,
+                            description: "",
+                            location: {
+                                latitude: latLng.lat(),
+                                longitude: latLng.lng()
+                            },
+                            author: -1
+                        }}
+                        dispatch={props.dispatch}
+                        text={"Create Waypoint"}
+                        buttonProps={{icon: <ComposeFilled/>}}/>
+                </div>
+            </InfoWindow>
+        );
+    }
     return isLoaded ? (
         <div style={{gridColumn: "1"}}>
             <GoogleMap
-                mapContainerStyle={props.style}
-                center={center}
+                mapContainerClassName={"map"}
+                center={{lat: 42.27697713747799, lng: -83.73820501490505}}
                 zoom={10}
                 onLoad={addMarsMapTypes}
-                onRightClick={e => {
-                    const latLng = e.latLng!;
-                    setTempWindow(<InfoWindow position={latLng} onCloseClick={() => setTempWindow(null)}>
-                            <div style={{display: "flex", flexDirection: "column", width: "max-content"}}>
-                                <div>
-                                    <Body1Stronger>Latitude: </Body1Stronger>
-                                    <Body1>{latLng.lat().toFixed(5)}</Body1>
-                                </div>
-                                <div>
-                                    <Body1Stronger>Longitude: </Body1Stronger>
-                                    <Body1>{latLng.lng().toFixed(5)}</Body1>
-                                </div>
-                                <WaypointForm
-                                    afterSubmit={() => setTempWindow(null)}
-                                    waypoint={props.temp!}
-                                    temp={{
-                                        waypoint_id: -1,
-                                        type: WaypointType.NAV,
-                                        description: "",
-                                        location: {
-                                            latitude: latLng.lat(),
-                                            longitude: latLng.lng()
-                                        },
-                                        author: -1
-                                    }}
-                                    dispatch={props.dispatch}
-                                    text={"Create Waypoint"}
-                                    buttonProps={{icon: <ComposeFilled/>}}/>
-                            </div>
-                        </InfoWindow>
-                    );
-                }}
+                onRightClick={handleRightClick}
                 options={{
                     streetViewControl: false,
                     mapTypeControlOptions: {mapTypeIds: ['elevation', 'visible', 'infrared']}
