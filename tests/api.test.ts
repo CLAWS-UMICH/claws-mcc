@@ -5,7 +5,7 @@ import WebSocket, {Server as WebSocketServer} from "ws";
 import {BaseWaypoint} from "../api/types/Waypoints";
 
 
-const MONGO_URI = process.env.MONGO_URI
+const MONGO_URI = process.env.MONGO_URI as string;
 
 const client = new MongoClient(MONGO_URI);
 const initializeTests = async (data: any[]) => {
@@ -15,9 +15,8 @@ const initializeTests = async (data: any[]) => {
     await collection.insertMany(data);
 }
 
-const testData: WithId<BaseWaypoint>[] = [
+const testData: BaseWaypoint[] = [
     {
-        _id: undefined,
         waypoint_id: 1,
         location: {
             latitude: 1,
@@ -27,7 +26,6 @@ const testData: WithId<BaseWaypoint>[] = [
         description: 'Test waypoint',
         author: -1
     }, {
-        _id: undefined,
         waypoint_id: 2,
         location: {
             latitude: 2,
@@ -86,7 +84,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe("Deleted waypoints with ids: [" + waypointId + "]");
                         expect(response.data[0]).toMatchObject(testData[1]);
                     }
@@ -118,7 +116,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe("Edited waypoints with ids: [" + waypointId + "]");
                     }
                 } as ExpressResponse<ResponseBody>;
@@ -152,7 +150,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe("Added waypoints with ids: [" + waypointId + "]");
                     }
                 } as ExpressResponse<ResponseBody>;
@@ -185,7 +183,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe("Waypoints with ids: [" + waypointId +
                             "] already exist in the database");
                     }
@@ -230,7 +228,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe(`Edited waypoints with ids: [${waypointId}]. ` +
                             `Could not find waypoints with ids: [${nonexistentWaypointId}]`);
                     }
@@ -275,7 +273,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe(`Added waypoints with ids: [${waypointId}, ${waypointId2}]`);
                     }
                 } as ExpressResponse<ResponseBody>;
@@ -319,7 +317,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe(`Deleted waypoints with ids: [${waypointId}, ${waypointId2}]`);
                     }
                 } as ExpressResponse<ResponseBody>;
@@ -363,7 +361,7 @@ describe('API route', () => {
                     }
                 } as ExpressRequest;
                 const res = {
-                    send: (response) => {
+                    send: (response: ResponseBody) => {
                         expect(response.message).toBe(`Edited waypoints with ids: [${waypointId}, ${waypointId2}]`);
                     }
                 } as ExpressResponse<ResponseBody>;
@@ -435,14 +433,8 @@ describe('API route', () => {
                     expect(response.data.length).toBe(3);
                     const parsedData = response.data.map((waypoint: WithId<BaseWaypoint>) => (
                         {...waypoint, _id: waypoint._id.toString('hex')}));
-                    expect(parsedData[0]).toStrictEqual({
-                        ...testData[0],
-                        _id: testData[0]._id.toString()
-                    });
-                    expect(parsedData[1]).toStrictEqual({
-                        ...testData[1],
-                        _id: testData[1]._id.toString()
-                    });
+                    expect({...parsedData[0], _id:{}}).toStrictEqual({...testData[0], _id: {}});
+                    expect({...parsedData[1], _id:{}}).toStrictEqual({...testData[1], _id: {}});
                     // We don't know what the _id will be for the new waypoint, so we just check that it exists
                     expect(newWaypoint).toEqual({...parsedData[2], _id: undefined});
                 });

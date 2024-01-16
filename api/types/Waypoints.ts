@@ -37,9 +37,10 @@ export const isMessage = (message: any): boolean => {
 
 }
 
+// TODO: Implement
 export const isWaypointMessage = (message: Message): boolean => {
     if (!isMessage(message)) return false;
-    if (message.type !== 'Waypoints') return false;
+    return false;
 }
 
 export interface WaypointsMessage extends Message {

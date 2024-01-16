@@ -11,6 +11,8 @@ import {MongoClient} from "mongodb";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 const port = process.env.PORT || 8000;
 
 // serve the files for our built React app
@@ -81,7 +83,7 @@ client.connect().then(() => {
 
             // so anything can now connect to us via ws://localhost:8000/frontend or ws://localhost:8000/hololens
             server.on('upgrade', (request, socket, head) => {
-                const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
+                const pathname = new URL(request.url as string, `http://${request.headers.host}`).pathname;
 
                 if (pathname === '/frontend') {
                     wssFrontend.handleUpgrade(request, socket, head, (ws) => {
@@ -97,9 +99,20 @@ client.connect().then(() => {
             });
 
             // Initialize frontend WS server
-            wssFrontend.on('connection', () => {
+            wssFrontend.on('connection', (sock, request) => {
                 console.log('Frontend WebSocket connection established');
+                sock.on("message", (message) => {
+                    const data = JSON.parse(message.toString());
+
+                    console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
+
+                    // call the handler for the event type
+                    if (eventRegistry[data.type.toUpperCase()]) {
+                        eventRegistry[data.type](data.data);
+                    }
+                });
             });
+
             // Frontend doesn't dispatch events to the backend, so we don't need to register any event handlers
 
             // Initialize HoloLens WS server

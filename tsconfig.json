@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
+    "strictNullChecks": true,
     "noImplicitAny": true,
     // Ensure this is set to "react"
     "jsx": "react"

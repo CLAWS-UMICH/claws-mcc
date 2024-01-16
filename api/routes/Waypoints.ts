@@ -29,10 +29,8 @@ export default class Waypoints extends Base {
     ];
     public events: RouteEvent[] = [
         {
-            type: 'GET',
-            handler: (data) => {
-                console.log(`Received GET event with data: ${JSON.stringify(data)}`);
-            }
+            type: 'GET_WAYPOINTS',
+            handler: this.sendWaypoints.bind(this),
         }
     ]
     private collection: Collection<BaseWaypoint>
@@ -41,6 +39,19 @@ export default class Waypoints extends Base {
         super(db);
         // If no collection is passed in, use the default one
         this.collection = collection || db.collection<BaseWaypoint>('waypoints');
+    }
+
+    async sendWaypoints() {
+        const allWaypoints = this.collection.find();
+        const data = await allWaypoints.toArray();
+        const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
+        this.dispatch('FRONTEND', {
+            id: messageId,
+            type: 'WAYPOINTS',
+            use: 'GET',
+            data: data,
+        })
+        this.updateARWaypoints(messageId, data);
     }
 
     async addWaypoint(req: Request, res: Response<ResponseBody>): Promise<ResponseBody> {
@@ -222,7 +233,7 @@ export default class Waypoints extends Base {
                 errors.push(editedWaypoint.waypoint_id);
                 error = true;
             }
-            if (updateResult.modifiedCount !== 1)
+            if (updateResult.matchedCount !== 1)
                 notFound.push(editedWaypoint.waypoint_id);
         }
         const allWaypoints = this.collection.find();

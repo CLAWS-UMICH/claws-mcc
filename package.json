@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node ./dist/api/index.js",
+    "start": "node ./dist/api/index.js",
     "test": "jest"
   },
   "name": "web",
