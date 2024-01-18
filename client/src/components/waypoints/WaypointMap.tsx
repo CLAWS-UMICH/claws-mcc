@@ -1,9 +1,12 @@
 import React from 'react';
+import './Waypoints.css'
 import {GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader} from '@react-google-maps/api';
 import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "./WaypointManager.tsx";
 import {Body1, Body1Stronger} from "@fluentui/react-components";
 import {ComposeFilled} from "@fluentui/react-icons";
 import {WaypointForm} from "./WaypointList.tsx";
+import Shape from '../../assets/Shape.png';
+import {isEqual} from "lodash";
 
 const key = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
 
@@ -119,6 +122,11 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
         id: 'google-map-script',
         googleMapsApiKey: key
     })
+    const intToChar = (i: number): string => {
+        // If i > 26, add another letter.
+        if (i > 26) return String.fromCharCode(i / 26 + 65) + String.fromCharCode(i % 26 + 65);
+        return String.fromCharCode(i + 65);
+    };
     const handleRightClick = (e: google.maps.MapMouseEvent) => {
         const latLng = e.latLng!;
         setTempWindow(<InfoWindow
@@ -168,15 +176,11 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                 }}>
                 {props.waypoints.map(marker => {
                     const position = {lat: marker.location.latitude, lng: marker.location.longitude};
-                    const svgMarker: google.maps.Symbol = {
-                        path: "M7.79073 6.09108C12.3246 1.5572 19.6755 1.5572 24.2094 6.09108C28.7432 10.625 28.7432 17.9758 24.2094 22.5097L22.6267 24.0749C21.4602 25.2198 19.9467 26.6917 18.0856 28.4912C16.9226 29.6156 15.0775 29.6155 13.9147 28.4908L9.25989 23.963C8.67487 23.3886 8.18518 22.9042 7.79073 22.5097C3.25685 17.9758 3.25685 10.625 7.79073 6.09108ZM22.7951 7.5053C19.0423 3.75247 12.9578 3.75247 9.20494 7.5053C5.45211 11.2581 5.45211 17.3427 9.20494 21.0955L11.1877 23.0521C12.2796 24.1207 13.6522 25.4546 15.3051 27.0532C15.6927 27.4281 16.3077 27.4281 16.6954 27.0533L21.2219 22.6514C21.8472 22.0377 22.3716 21.519 22.7951 21.0955C26.548 17.3427 26.548 11.2581 22.7951 7.5053ZM16 10.6653C18.2103 10.6653 20.0021 12.4571 20.0021 14.6674C20.0021 16.8776 18.2103 18.6694 16 18.6694C13.7898 18.6694 11.998 16.8776 11.998 14.6674C11.998 12.4571 13.7898 10.6653 16 10.6653ZM16 12.6653C14.8943 12.6653 13.998 13.5616 13.998 14.6674C13.998 15.7731 14.8943 16.6694 16 16.6694C17.1058 16.6694 18.0021 15.7731 18.0021 14.6674C18.0021 13.5616 17.1058 12.6653 16 12.6653Z",
-                        strokeWeight: props.selected! === marker ? 3 : 1,
-                        strokeColor: "white",
-                        anchor: new google.maps.Point(16, 32),
-                    }
                     return (
                         <div key={marker.waypoint_id}>
-                            <Marker position={position} clickable={false} icon={svgMarker}/>
+                            <Marker position={position} clickable={false}
+                                    label={{text: intToChar(marker.waypoint_id), color: "white", fontWeight: "bold"}}
+                                    icon={Shape}/>
                             <InfoBox
                                 position={new google.maps.LatLng(marker.location.latitude, marker.location.longitude)}
                                 options={{
@@ -186,14 +190,8 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                                     pane: "markerLayer"
                                 }}
                                 onCloseClick={() => setInfoWindow(null)}>
-                                <div style={{
-                                    opacity: 0.95,
-                                    padding: `12px`,
-                                    color: "white",
-                                    flexDirection: "column",
-                                    display: "flex",
-                                    width: "max-content"
-                                }}>
+                                <div className={'info-box'}
+                                     style={{backgroundColor: isEqual(props.selected, marker) ? "grey" : undefined}}>
                                     <Body1Stronger>Waypoint {marker.waypoint_id}</Body1Stronger>
                                     <Body1>{marker.description}</Body1>
                                 </div>
