@@ -5,7 +5,7 @@ import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "./Waypoint
 import {Body1, Body1Stronger} from "@fluentui/react-components";
 import {ComposeFilled} from "@fluentui/react-icons";
 import {WaypointForm} from "./WaypointList.tsx";
-import Shape from '../../assets/Shape.png';
+import waypointImage from '../../assets/waypoint.png';
 import {isEqual} from "lodash";
 
 const key = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
@@ -180,7 +180,7 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                         <div key={marker.waypoint_id}>
                             <Marker position={position} clickable={false}
                                     label={{text: intToChar(marker.waypoint_id), color: "white", fontWeight: "bold"}}
-                                    icon={Shape}/>
+                                    icon={waypointImage}/>
                             <InfoBox
                                 position={new google.maps.LatLng(marker.location.latitude, marker.location.longitude)}
                                 options={{

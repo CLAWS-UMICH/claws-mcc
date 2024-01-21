@@ -3,7 +3,7 @@ import {BaseWaypoint, ManagerAction, useAstronaut} from "./WaypointManager.tsx";
 import {Body1, Body1Stronger, Skeleton} from "@fluentui/react-components";
 import {isEqual} from "lodash";
 // @ts-ignore
-import Shape from '../../assets/Shape.png';
+import waypointImage from '../../assets/waypoint.png';
 
 interface WaypointsDrawerProps {
     waypoints: BaseWaypoint[];
@@ -41,7 +41,7 @@ const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispat
                 style={{display: "flex", backgroundColor: selected || hovering ? "grey" : undefined}}>
 
         <div className={"waypoint-image"}>
-            <img style={{alignSelf: "center", padding: "0 15px 0 0"}} width={27} height={31} src={Shape}
+            <img style={{alignSelf: "center", padding: "0 15px 0 0"}} width={27} height={31} src={waypointImage}
                  alt={"Waypoint Icon"}/>
             <div className={'waypoint-image-text'}>
                 {intToChar(waypoint.waypoint_id)}
