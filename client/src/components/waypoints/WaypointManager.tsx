@@ -124,7 +124,7 @@ const WaypointManager: React.FC = () => {
         }
     }, [lastMessage, setMessageHistory]);
     return (
-        <div style={{display: "flex"}}>
+        <div style={{display: "flex", height:"100vh"}}>
             <InlineDrawer className={'drawer'} separator open>
                 <DrawerHeader>
                     <DrawerHeaderTitle action={
