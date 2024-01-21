@@ -10,7 +10,7 @@ type WaypointViewProps = { dispatch: React.Dispatch<ManagerAction> } & ManagerSt
  * @constructor
  */
 const NewView: React.FC = props => {
-    return <div>TODO: Implement</div>
+    return <div>TODO: New</div>
 };
 
 /**
@@ -21,7 +21,7 @@ const NewView: React.FC = props => {
  * @constructor
  */
 const SelectedView: React.FC = props => {
-    return <div>TODO: Implement</div>
+    return <div>TODO: Selected</div>
 };
 
 /**
@@ -30,7 +30,7 @@ const SelectedView: React.FC = props => {
  * @constructor
  */
 const EmptyView: React.FC = props => {
-    return <div>TODO: Implement</div>
+    return <div>TODO: Empty</div>
 }
 
 /**
