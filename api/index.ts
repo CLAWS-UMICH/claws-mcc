@@ -39,7 +39,7 @@ client.connect().then(() => {
             const routeInstances: Route[] = [];
 
             for (const file of files) {
-                if (path.extname(file) === '.js') {
+                if (path.extname(file) === '.ts') {
                     try {
                         const RouteClass = require(path.join(routesDirectory, file)).default;
 

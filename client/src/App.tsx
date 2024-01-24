@@ -3,6 +3,7 @@ import './App.css';
 import axios from 'axios';
 import {FluentProvider, webDarkTheme, webLightTheme} from "@fluentui/react-components";
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
+import { NavBar } from './components/layout/NavBar/NavBar.tsx';
 
 interface AstronautData {
     heartrate: number;
@@ -29,7 +30,7 @@ function App() {
     })
     return (
         <FluentProvider theme={theme}>
-            <WaypointManager/>
+            <NavBar></NavBar>
         </FluentProvider>
 
         // <Button appearance="primary">Hello Fluent UI React</Button>
