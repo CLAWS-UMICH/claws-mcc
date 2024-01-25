@@ -102,8 +102,8 @@ export const NavBar = () => {
         <Tab icon={<Chat />} value="messagesTab">
           Messages
         </Tab>
-        <Tab icon={<Document />} value="guidesTab">
-          Guides
+        <Tab icon={<Document />} value="connectionsTab">
+          Connection
         </Tab>
       </>
     );
