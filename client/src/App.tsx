@@ -7,6 +7,7 @@ import {
     webLightTheme, 
 } from "@fluentui/react-components";
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
+import GeosampleManager from './components/geosamples/Geosamples.tsx';
 import NavBar from './components/layout/NavBar/NavBar.tsx';
 
 interface AstronautData {
@@ -40,11 +41,12 @@ function App() {
             case 'tasktab':
                 break;
             case 'navigationTab':
-                setSelectedPage(<WaypointManager/>);
+                setSelectedPage(<WaypointManager />);
                 break;
             case 'vitalsTab':
                 break;
             case 'samplesTab':
+                setSelectedPage(<GeosampleManager />);
                 break;
             case 'navigationTab':
                 break;
