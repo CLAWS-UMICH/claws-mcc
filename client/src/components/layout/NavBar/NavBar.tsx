@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {
   SelectTabData,
   SelectTabEvent,
@@ -25,7 +25,6 @@ import {
   DocumentText16Filled,
   PersonStanding16Regular,
   PersonStanding16Filled,
-
 } from "@fluentui/react-icons";
 
 const ClipboardTaskList = bundleIcon(ClipboardTaskList16Filled, ClipboardTaskList16Regular);

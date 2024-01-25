@@ -5,8 +5,7 @@ import {
     FluentProvider, 
     webDarkTheme, 
     webLightTheme, 
-    SelectTabData, 
-    SelectTabEvent,} from "@fluentui/react-components";
+} from "@fluentui/react-components";
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
 import NavBar from './components/layout/NavBar/NavBar.tsx';
 
