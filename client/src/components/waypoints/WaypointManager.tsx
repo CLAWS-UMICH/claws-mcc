@@ -157,7 +157,7 @@ const WaypointManager: React.FC = () => {
             </InlineDrawer>
             <div className={"waypoints-container"}>
                 <WaypointView {...state} dispatch={dispatch}/>
-                <Divider/>
+                <Divider className="waypoints-container-divider"/>
                 <WaypointMap waypoints={state.waypoints}
                              selected={state.selected}
                              dispatch={dispatch}/>
