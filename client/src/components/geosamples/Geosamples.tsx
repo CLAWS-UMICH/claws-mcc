@@ -1,7 +1,7 @@
 // Geosamples.tsx
 import React from 'react';
 import SidebarMenu from './SidebarMenu.tsx';
-import SamplesList from './SamplesList.tsx';
+import DropdownMenu from './DropdownMenu.tsx';
 import {
     Divider,
   DrawerBody,
@@ -34,8 +34,8 @@ const useStyles = makeStyles({
 
 const GeosampleManager: React.FC = () => {
     const dropdownMenus = [
-        <SamplesList header="Header 1" samples={['Link 1.1', 'Link 1.2', 'Link 1.3']} />,
-        <SamplesList header="Header 2" samples={['Link 2.1', 'Link 2.2']} />,
+        <DropdownMenu header="Header 1" samples={['Link 1.1', 'Link 1.2', 'Link 1.3']} />,
+        <DropdownMenu header="Header 2" samples={['Link 2.1', 'Link 2.2']} />,
     ];
     const styles = useStyles();
     const menuData = [

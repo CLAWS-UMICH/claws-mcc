@@ -1,6 +1,5 @@
 // SidebarMenu.tsx
 import React from 'react';
-import SamplesList from './SamplesList';
 import SearchBox from '../common/SearchBox/SearchBox.tsx';
 
 interface SidebarMenuProps {

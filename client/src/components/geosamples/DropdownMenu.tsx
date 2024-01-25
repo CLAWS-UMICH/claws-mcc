@@ -13,7 +13,7 @@ interface SampleListProps {
     samples: string[];
 }
 
-const SamplesList = ({header, samples}) => {
+const DropdownMenu = ({header, samples}) => {
     return (
         <Accordion multiple collapsible>
             <AccordionItem value='1'>
@@ -52,4 +52,4 @@ const SamplesList = ({header, samples}) => {
     );
 }
 
-export default SamplesList;
+export default DropdownMenu;
