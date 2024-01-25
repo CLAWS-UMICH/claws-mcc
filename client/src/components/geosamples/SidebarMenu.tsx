@@ -1,6 +1,6 @@
 // SidebarMenu.tsx
 import React from 'react';
-import SamplesList from './SamplesList'; // Ensure this is the correct path
+import SamplesList from './SamplesList';
 
 interface SidebarMenuProps {
     dropdownMenus: JSX.Element[]; // Array of DropdownMenu components as JSX elements

@@ -11,6 +11,7 @@ import {
   makeStyles,
   shorthands,
 } from "@fluentui/react-components";
+import SearchBox from '../common/SearchBox/SearchBox.tsx'
 
 
 const useStyles = makeStyles({
@@ -18,7 +19,7 @@ const useStyles = makeStyles({
     ...shorthands.border("2px", "solid", "#ccc"),
     ...shorthands.overflow("hidden"),
     display: "flex",
-    height: "500px",
+    height: "100vh",
     backgroundColor: "#fff",
   },
 
@@ -33,10 +34,24 @@ const useStyles = makeStyles({
 
 const GeosampleManager: React.FC = () => {
     // const dropdownMenus = [
-    //     <DropdownMenu header="Header 1" samples={['Link 1.1', 'Link 1.2', 'Link 1.3']} />,
+        //     <DropdownMenu header="Header 1" samples={['Link 1.1', 'Link 1.2', 'Link 1.3']} />,
     //     <DropdownMenu header="Header 2" samples={['Link 2.1', 'Link 2.2']} />,
     // ];
     const styles = useStyles();
+    const menuData = [
+    {
+        header: 'Header 1',
+        samples: ['Link 1.1', 'Link 1.2', 'Link 1.3'],
+    },
+    {
+        header: 'Header 2',
+        samples: ['Link 2.1', 'Link 2.2'],
+    },
+    ];
+    const dropdownTest = {
+        header: 'test drop',
+        samples: ['1', '2', '3'],
+    };
 
     return (
         <div className={styles.root}>
@@ -45,6 +60,7 @@ const GeosampleManager: React.FC = () => {
             <DrawerHeaderTitle>Samples</DrawerHeaderTitle>
             </DrawerHeader>
             <DrawerBody>
+                <SearchBox/>
                 <SamplesList/>
             </DrawerBody>
         </InlineDrawer>
