@@ -37,8 +37,24 @@ function App() {
 
     const handleTabSelect = (selectedValue : string) => {
         switch (selectedValue) {
-            case "navigationTab":
+            case 'tasktab':
+                break;
+            case 'navigationTab':
                 setSelectedPage(<WaypointManager/>);
+                break;
+            case 'vitalsTab':
+                break;
+            case 'samplesTab':
+                break;
+            case 'navigationTab':
+                break;
+            case 'roverTab':
+                break;
+            case 'suitsTab':
+                break;
+            case 'messagesTab':
+                break;
+            case 'connectTab':
                 break;
             default:
                 setSelectedPage(undefined);

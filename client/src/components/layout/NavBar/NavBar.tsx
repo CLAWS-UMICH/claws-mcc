@@ -62,30 +62,30 @@ const NavBar : React.FC<NavBarProps> = ({ onTabSelect }) => {
   // need to change the default page to something
   return (
     <div className={styles.root}>
-      <TabList onTabSelect={handleTabSelect} defaultSelectedValue="taskTab">        
-        <Tab icon={<ClipboardTaskList />} value="taskTab">
+      <TabList onTabSelect={handleTabSelect} defaultSelectedValue='taskTab'>        
+        <Tab icon={<ClipboardTaskList />} value='taskTab'>
           Tasks
         </Tab>
-        <Tab icon={<Book />} value="vitalsTab">
+        <Tab icon={<Book />} value='vitalsTab'>
           Vitals
         </Tab>
-        <Tab icon={<Hexagon />} value="samplesTab">
+        <Tab icon={<Hexagon />} value='samplesTab'>
           Samples
         </Tab>
-        <Tab icon={<Location />} value="navigationTab">
+        <Tab icon={<Location />} value='navigationTab'>
           Navigation
         </Tab>
-        <Tab icon={<Truck />} value="roverTab">
+        <Tab icon={<Truck />} value='roverTab'>
           Rover
         </Tab>
-        <Tab icon={<Person />} value="suitsTab">
+        <Tab icon={<Person />} value='suitsTab'>
           Suits
         </Tab>
-        <Tab icon={<Chat />} value="messagesTab">
+        <Tab icon={<Chat />} value='messagesTab'>
           Messages
         </Tab>
-        <Tab icon={<Document />} value="connectionTab">
-          Connection
+        <Tab icon={<Document />} value='connectTab'>
+          Connect
         </Tab>
       </TabList>
       <Divider/>
