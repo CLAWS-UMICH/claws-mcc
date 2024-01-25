@@ -1,16 +1,37 @@
-import {ManagerAction, ManagerState} from "./WaypointManager.tsx";
-import React from 'react';
-import {isUndefined} from "lodash";
+import {
+  BaseWaypoint,
+  ManagerAction,
+  ManagerState,
+} from "./WaypointManager.tsx";
+import React from "react";
+import { isUndefined } from "lodash";
+import {
+  Checkbox,
+  Display,
+  Dropdown,
+  Input,
+  Label,
+  Textarea,
+  Title3,
+} from "@fluentui/react-components";
+// import { log } from "console";
 
-type WaypointViewProps = { dispatch: React.Dispatch<ManagerAction> } & ManagerState;
+type WaypointViewProps = {
+  dispatch: React.Dispatch<ManagerAction>;
+} & ManagerState;
 
 /**
  * Renders when a temp waypoint is selected. Does not affect the state unless the user commits their changes
  * @param props
  * @constructor
  */
-const NewView: React.FC = props => {
-    return <div>TODO: New</div>
+const NewView: React.FC = (props) => {
+  return <div>TODO: New</div>;
+};
+
+type SelectedViewProps = {
+  selected?: BaseWaypoint;
+  dispatch: React.Dispatch<ManagerAction>;
 };
 
 /**
@@ -20,8 +41,121 @@ const NewView: React.FC = props => {
  * @param props
  * @constructor
  */
-const SelectedView: React.FC = props => {
-    return <div>TODO: Selected</div>
+const SelectedView: React.FC<SelectedViewProps> = (props) => {
+  // console.log(props)
+  return (
+    <div>
+      <Title3>Edit Waypoint</Title3>
+      <form
+        style={{ display: "flex", width: "100%" }}
+        onSubmit={() => console.log("Hello")}
+      >
+        <div
+          className="left-view"
+          style={{
+            display: "flex",
+            width: "60%",
+            flexDirection: "column",
+            padding: "2%",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Label htmlFor={"waypoint-type"}>Type</Label>
+            <Dropdown
+              style={{
+                width: "60%",
+              }}
+              placeholder={"Select a waypoint type"}
+              id={"waypoint-type"}
+            ></Dropdown>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Label htmlFor={"waypoint-name"}>Name</Label>
+            <Input
+              style={{
+                width: "60%",
+              }}
+              type="text"
+              id={"waypoint-name"}
+              value={props.selected?.description}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Label htmlFor={"waypoint-identifier"}>Identifier</Label>
+            <Input
+              style={{
+                width: "60%",
+              }}
+              type="text"
+              id={"waypoint-identifier"}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Label htmlFor={"waypoint-coords"}>Coordinates</Label>
+            <div style={{ display: "flex", width: "60%" }}>
+              <Input
+                disabled
+                style={{ width: "48%" }}
+                type="number"
+                id={"waypoint-coords-lat"}
+                value={props.selected?.location.latitude.toString(10)}
+              />{" "}
+              º
+              <Input
+                disabled
+                style={{ width: "48%" }}
+                type="number"
+                id={"waypoint-coords-long"}
+                value={props.selected?.location.longitude.toString(10)}
+              />{" "}
+              º
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Label htmlFor={"waypoint-time-log"}>Time Logged</Label>
+            <Checkbox label="Time Logged" />
+          </div>
+        </div>
+        <div
+          className="right-view"
+          style={{ border: "1px solid", width: "100%", margin: "0% 2%" }}
+        >
+          <Textarea
+            style={{ width: "100%", height: "100%" }}
+            value={props.selected?.description}
+          ></Textarea>
+        </div>
+      </form>
+    </div>
+  );
 };
 
 /**
@@ -29,9 +163,9 @@ const SelectedView: React.FC = props => {
  * @param props
  * @constructor
  */
-const EmptyView: React.FC = props => {
-    return <div>TODO: Empty</div>
-}
+const EmptyView: React.FC = (props) => {
+  return <div>TODO: Empty</div>;
+};
 
 /**
  * Renders the appropriate view based on the manager's state. This component does not affect the manager's state, but
@@ -39,10 +173,10 @@ const EmptyView: React.FC = props => {
  * @param {WaypointViewProps} props
  * @constructor
  */
-export const WaypointView: React.FC<WaypointViewProps> = props => {
-    if (isUndefined(props.temp)) {
-        if (isUndefined(props.selected)) return <EmptyView/>
-        return <SelectedView/>
-    }
-    return <NewView/>
-}
+export const WaypointView: React.FC<WaypointViewProps> = (props) => {
+  if (isUndefined(props.temp)) {
+    if (isUndefined(props.selected)) return <EmptyView />;
+    return <SelectedView dispatch={props.dispatch} selected={props.selected} />;
+  }
+  return <NewView />;
+};
