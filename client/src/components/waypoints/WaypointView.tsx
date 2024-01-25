@@ -10,7 +10,7 @@ type WaypointViewProps = { dispatch: React.Dispatch<ManagerAction> } & ManagerSt
  * @constructor
  */
 const NewView: React.FC = props => {
-    return <div>TODO: New</div>
+    return <div>TODO: Implement</div>
 };
 
 /**
@@ -21,7 +21,7 @@ const NewView: React.FC = props => {
  * @constructor
  */
 const SelectedView: React.FC = props => {
-    return <div>TODO: Selected</div>
+    return <div>TODO: Implement</div>
 };
 
 /**
@@ -29,9 +29,12 @@ const SelectedView: React.FC = props => {
  * @param props
  * @constructor
  */
+//no waypoints at all -- loading page
 const EmptyView: React.FC = props => {
-    return <div>TODO: Empty</div>
-}
+    return (
+        <div className="loader"></div>
+    )
+};
 
 /**
  * Renders the appropriate view based on the manager's state. This component does not affect the manager's state, but
@@ -41,7 +44,7 @@ const EmptyView: React.FC = props => {
  */
 export const WaypointView: React.FC<WaypointViewProps> = props => {
     if (isUndefined(props.temp)) {
-        if (isUndefined(props.selected)) return <EmptyView/>
+        if (isUndefined(props.selected)) return <EmptyView/> 
         return <SelectedView/>
     }
     return <NewView/>
