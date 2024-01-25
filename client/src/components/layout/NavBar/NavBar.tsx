@@ -1,16 +1,13 @@
 import React, {useState} from "react";
 import {
-    SelectTabData,
-    SelectTabEvent,
-    Divider,
+  SelectTabData,
+  SelectTabEvent,
+  Divider,
   makeStyles,
-  shorthands,
   Tab,
   TabList,
 } from "@fluentui/react-components";
 import {
-  CalendarMonthRegular,
-  CalendarMonthFilled,
   bundleIcon,
   ClipboardTaskList16Regular,
   ClipboardTaskList16Filled,
@@ -30,8 +27,6 @@ import {
   PersonStanding16Filled,
 
 } from "@fluentui/react-icons";
-import WaypointManager from "../../waypoints/WaypointManager.tsx";
-import GeosampleManager from "../../geosamples/Geosamples.tsx";
 
 const ClipboardTaskList = bundleIcon(ClipboardTaskList16Filled, ClipboardTaskList16Regular);
 const Book = bundleIcon(Book16Filled, Book16Regular);
@@ -42,6 +37,9 @@ const Truck = bundleIcon(VehicleTruckCube20Filled, VehicleTruckCube20Regular); /
 const Document = bundleIcon(DocumentText16Filled, DocumentText16Regular); // change to guides icon
 const Person = bundleIcon(PersonStanding16Filled, PersonStanding16Regular); // change to suits icon
 
+interface NavBarProps {
+  onTabSelect: (selectedValue: any) => void;
+}
 
 const useStyles = makeStyles({
   root: {
@@ -55,29 +53,17 @@ const useStyles = makeStyles({
   },
 });
 
-export const NavBar = () => {
+const NavBar : React.FC<NavBarProps> = ({ onTabSelect }) => {
   const styles = useStyles();
-  const [selectedValue, setSelectedValue] = useState<any>('conditions');
 
-  const onTabSelect = (_: SelectTabEvent, data: SelectTabData) => {
-    setSelectedValue(data.value);
+  const handleTabSelect = (_: SelectTabEvent, data: SelectTabData) => {
+    onTabSelect(data.value);
   };
 
-  // need to add more values
-  const renderSelectedTab = () => {
-    switch (selectedValue) {
-        case "taskTab":
-            return <WaypointManager/>;
-        case "navigationTab":
-            return <WaypointManager/>;
-        default:
-            break;
-    }
-  }
-
-  const renderTabs = () => {
-    return (
-      <>
+  // need to change the default page to something
+  return (
+    <div className={styles.root}>
+      <TabList onTabSelect={handleTabSelect} defaultSelectedValue="taskTab">        
         <Tab icon={<ClipboardTaskList />} value="taskTab">
           Tasks
         </Tab>
@@ -99,19 +85,13 @@ export const NavBar = () => {
         <Tab icon={<Chat />} value="messagesTab">
           Messages
         </Tab>
-        <Tab icon={<Document />} value="guidesTab">
-          Guides
+        <Tab icon={<Document />} value="connectionTab">
+          Connection
         </Tab>
-      </>
-    );
-  };
-
-  // need to change the default page to something
-  return (
-    <div className={styles.root}>
-      <TabList selectedValue={selectedValue} onTabSelect={onTabSelect} defaultSelectedValue="taskTab">{renderTabs()}</TabList>
+      </TabList>
       <Divider/>
-    {renderSelectedTab()}
     </div>
   );
 };
+
+export default NavBar;
