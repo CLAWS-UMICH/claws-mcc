@@ -7,25 +7,22 @@ import {
     AccordionPanel
 } from '@fluentui/react-components';
 
-// interface DropdownMenuProps {
-//     header: string;
-//     samples: string[];
-// }
 
+interface SampleListProps {
+    header: string;
+    samples: string[];
+}
 
-const SamplesList = () => {
+const SamplesList = ({header, samples}) => {
     return (
         <Accordion multiple collapsible>
             <AccordionItem value='1'>
                 <AccordionHeader expandIconPosition="end">
                     Zone A
                 </AccordionHeader>
-                <AccordionPanel>
-                    <div>Geo Sample 1</div>
-                </AccordionPanel>
-                <AccordionPanel>
-                    <div>Geo Sample 2</div>
-                </AccordionPanel>
+                {samples.map((sample) => (
+                    <AccordionPanel><div>{sample}</div></AccordionPanel>
+                ))}
             </AccordionItem>
             <AccordionItem value='2'>
                 <AccordionHeader expandIconPosition="end">
