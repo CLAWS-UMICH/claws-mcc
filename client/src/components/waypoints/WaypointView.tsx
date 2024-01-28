@@ -13,6 +13,7 @@ import {
   Label,
   Textarea,
   Title3,
+  makeStyles,
 } from "@fluentui/react-components";
 // import { log } from "console";
 
@@ -34,6 +35,45 @@ type SelectedViewProps = {
   dispatch: React.Dispatch<ManagerAction>;
 };
 
+const listStyles = makeStyles({
+  red: {
+    color:"red"
+  },
+  form:{
+    display: "flex", width: "100%"
+  },
+  leftview:{
+    display: "flex",
+    width: "60%",
+    flexDirection: "column",
+    //padding: 2%//maybe not working
+  },
+  container:{
+    display: "flex",
+    justifyContent: "space-between",  
+  },
+  boxwide:{
+    width:"60%"
+  },
+  smallboxwide:{
+    width:"48%"
+  },
+  rightview:{
+    width: "100%",
+    marginTop: "0%",
+    marginBottom:"0%",
+    marginLeft:"2%",
+    marginRight:"2%"
+
+  },
+  description:{
+    width: "100%",
+    height: "100%", 
+    // borderRadius:"2%" //doesn't work
+  }
+
+});
+
 /**
  * Renders when a waypoint is selected, but there is no temp waypoint. This view has an edit mode and a view mode. The
  * edit mode allows the user to change the waypoint's properties. No changes to the manager's state will be made until
@@ -43,113 +83,41 @@ type SelectedViewProps = {
  */
 const SelectedView: React.FC<SelectedViewProps> = (props) => {
   // console.log(props)
+  const styles = listStyles();
   return (
     <div>
       <Title3>Edit Waypoint</Title3>
-      <form
-        style={{ display: "flex", width: "100%" }}
-        onSubmit={() => console.log("Hello")}
-      >
-        <div
-          className="left-view"
-          style={{
-            display: "flex",
-            width: "60%",
-            flexDirection: "column",
-            padding: "2%",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+      <form className={styles.form} onSubmit={() => console.log("Hello")}>
+        <div className={styles.leftview} style={{padding:"2%"}}>
+          <div className={styles.container}>
             <Label htmlFor={"waypoint-type"}>Type</Label>
-            <Dropdown
-              style={{
-                width: "60%",
-              }}
-              placeholder={"Select a waypoint type"}
-              id={"waypoint-type"}
-            ></Dropdown>
+            <Dropdown className={styles.boxwide} placeholder={"Select a waypoint type"}id={"waypoint-type"}></Dropdown>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className={styles.container}>
             <Label htmlFor={"waypoint-name"}>Name</Label>
-            <Input
-              style={{
-                width: "60%",
-              }}
-              type="text"
-              id={"waypoint-name"}
-              value={props.selected?.description}
-            />
+            <Input className={styles.boxwide} type="text" id={"waypoint-name"} value={props.selected?.description}/>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className={styles.container}>
             <Label htmlFor={"waypoint-identifier"}>Identifier</Label>
-            <Input
-              style={{
-                width: "60%",
-              }}
-              type="text"
-              id={"waypoint-identifier"}
-            />
+            <Input className={styles.boxwide} type="text" id={"waypoint-identifier"} />
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className={styles.container}>
             <Label htmlFor={"waypoint-coords"}>Coordinates</Label>
-            <div style={{ display: "flex", width: "60%" }}>
-              <Input
-                disabled
-                style={{ width: "48%" }}
-                type="number"
-                id={"waypoint-coords-lat"}
-                value={props.selected?.location.latitude.toString(10)}
-              />{" "}
-              º
-              <Input
-                disabled
-                style={{ width: "48%" }}
-                type="number"
-                id={"waypoint-coords-long"}
-                value={props.selected?.location.longitude.toString(10)}
-              />{" "}
-              º
+            <div className={styles.boxwide} style={{ display: "flex" }}>
+              <Input disabled className={styles.smallboxwide} type="number" id={"waypoint-coords-lat"} value={props.selected?.location.latitude.toString(10)} />{" "} º
+              <Input disabled className={styles.smallboxwide} type="number" id={"waypoint-coords-long"} value={props.selected?.location.longitude.toString(10)} />{" "} º
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className={styles.container}>
             <Label htmlFor={"waypoint-time-log"}>Time Logged</Label>
             <Checkbox label="Time Logged" />
           </div>
         </div>
-        <div
-          className="right-view"
-          style={{ border: "1px solid", width: "100%", margin: "0% 2%" }}
-        >
-          <Textarea
-            style={{ width: "100%", height: "100%" }}
+        <div className={styles.rightview}>
+          <Textarea className={styles.description}
             value={props.selected?.description}
           ></Textarea>
         </div>
