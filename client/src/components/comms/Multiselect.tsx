@@ -5,8 +5,9 @@ import {
   Option,
   shorthands,
   useId,
+  Button
 } from "@fluentui/react-components";
-import type { DropdownProps } from "@fluentui/react-components";
+import type { DropdownProps, ButtonProps } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
   root: {
@@ -41,3 +42,8 @@ export const Multiselect = (props: Partial<DropdownProps>) => {
     </div>
   );
 };
+
+// TODO ideally this should be in its own file
+export const SendButton = (props: ButtonProps) => (
+  <Button {...props}>Send</Button>
+);
