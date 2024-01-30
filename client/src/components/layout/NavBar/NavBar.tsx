@@ -32,6 +32,7 @@ import {
 } from "@fluentui/react-icons";
 import WaypointManager from "../../waypoints/WaypointManager.tsx";
 import GeosampleManager from "../../geosamples/Geosamples.tsx";
+import { Communication } from "../../comms/Communication.tsx";
 
 const ClipboardTaskList = bundleIcon(ClipboardTaskList16Filled, ClipboardTaskList16Regular);
 const Book = bundleIcon(Book16Filled, Book16Regular);
@@ -72,6 +73,8 @@ export const NavBar = () => {
             return <WaypointManager/>;
         case "samplesTab":
             return <GeosampleManager/>;
+        case "communicationsTab":
+          return <Communication/>;
         default:
             break;
     }
@@ -102,8 +105,8 @@ export const NavBar = () => {
         <Tab icon={<Chat />} value="messagesTab">
           Messages
         </Tab>
-        <Tab icon={<Document />} value="guidesTab">
-          Guides
+        <Tab icon={<Document />} value="communicationsTab">
+          Communications
         </Tab>
       </>
     );
