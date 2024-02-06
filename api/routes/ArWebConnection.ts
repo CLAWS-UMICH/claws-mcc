@@ -5,12 +5,11 @@ import { readdirSync, readFileSync } from 'fs';
 import express, { Request, Response } from 'express';
 
 /*
- * Questions to consider:
-1) What format do you want your data in? Right now it's just in Mongo's default format
-2) Computing aspect ratio-- hardcode or write a function?
-3) Confirm type of sending over WebSocket
-4) Confirm that binary data is okay to render for FRONTEND as well, or consider adding a new field (filepath) to screen info
-5) Would you rather a traditional API request or to use the infrastructure set up for WebSocket?
+ TODO:
+ - Implement frontend function to return Image ID and/or string (might need a function to do combine functionality)
+ - Call these functions to add the screens to the database and tell AR that the aspect ratio is 1 / 1:  "add screens to collection" function
+ - Remember that you can delete images using delete image by ScreenID and i can add any functions to add screens individually by index of the hardcoded array, or by passing in a particular object, filepath or however u want
+
  */ 
 
 //-----------
@@ -19,7 +18,6 @@ import express, { Request, Response } from 'express';
 // Defines the structure for each string to be sent to the HUD (img-- converted to binary)
 interface ScreenInfo {
     title: string; // Format: type_descriptor_enumeration
-    aspect_ratio: number; 
     img_binary: Buffer; // Good for handling binary data in Node.js!
     id: string; // ID representing the image
 }
@@ -28,58 +26,51 @@ interface ScreenInfo {
 // GLOBALS
 //-----------
 
+const IMG_ASPECT_RATIO = 1 / 1;
+
 const presetScreens: ScreenInfo[] = [
     {
         title: 'connection_instr_1.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/connection_instr_1.jpg'),
         id: 'aB2cD',
     },
     {
         title: 'pressure_instr_2.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/pressure_instr_2.jpg'),
         id: 'eFgHi',
     },
     {
         title: 'suit_instr_1.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/suit_instr_1.jpg'),
         id: 'kLmNo',
     },
     {
         title: 'hardware_instr_1.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/hardware_instr_1.jpg'),
         id: 'pQrSt',
     },
     {
         title: 'rover_instr_1.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/rover_instr_1.jpg'),
         id: 'uVwXy',
     },
     {
         title: 'terrain_visual_1.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/terrain_visual_1.jpg'),
         id: 'z12a3',
     },
     {
         title: 'mars_instr_1.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/mars_instr_1.jpg'),
         id: '45abc',
     },
     {
         title: 'rover_instr_2.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/rover_instr_2.jpg'),
         id: 'd1e2f',
     },
     {
         title: 'terrain_visual_2.jpg',
-        aspect_ratio: 1 / 1,
         img_binary: readImageFile('./assets/terrain_visual_2.jpg'),
         id: 'ghi12',
     },
@@ -131,15 +122,42 @@ export default class ARWebConnection extends Base {
     
             // Send the screens to the 'FRONTEND' WebSocket target
             this.dispatch('FRONTEND', {
-                id: -1, // TODO: What should go here?
-                type: 'SCREEN',
-                use: 'GET',
+                id: -1, 
+                type: 'PICTURE',
+                use: 'PUT',
                 data: allScreens,
             });
     
             console.log('All screens sent to FRONTEND successfully! Slay!');
         } catch (error) {
             console.error('Error sending screens to FRONTEND:', error);
+            throw error; // Propagate the error if necessary
+        }
+    }
+
+    // FUNC: Send a specific ScreenInfo object to AR over our WebSocket
+    public async sendScreenToAR(imageID: string, astronautID: number): Promise<void> {
+        try {
+            const screensCollection = this.db.collection('screens'); // Get collection of ScreenInfo objects
+            const screen = await screensCollection.findOne({ id: imageID }); // Find the screen by ID
+        
+            if (screen) {
+                // Send the screen to the 'AR' WebSocket target
+                this.dispatch('AR', {
+                    id: astronautID, // Assuming astronautID is the ID of the astronaut
+                    type: 'PICTURE',
+                    use: 'PUT',
+                    data: {
+                        title: screen.title,
+                        img_binary: screen.img_binary                    },
+                });
+
+                console.log('Screen sent to AR successfully! Slay!');
+            } else {
+                console.error('Screen not found with ID:', imageID);
+            }
+        } catch (error) {
+            console.error('Error sending screen to AR:', error);
             throw error; // Propagate the error if necessary
         }
     }
