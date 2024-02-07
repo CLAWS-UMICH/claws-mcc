@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Multiselect, SendButton } from "./Multiselect.tsx"
 import { CardSelectable } from "./Card.tsx";
-
+import ButtonRow from "./Sendbutton.tsx";
+ 
 export const Communication = () => {
     return(
         <div>
@@ -16,6 +17,7 @@ export const Communication = () => {
                         }
                     `}
                 </style>
+                <ButtonRow></ButtonRow>
                 <CardSelectable></CardSelectable>
             </div>
         </div>
