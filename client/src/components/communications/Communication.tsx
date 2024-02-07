@@ -2,6 +2,7 @@ import * as React from "react";
 import { Multiselect, SendButton } from "./Multiselect.tsx"
 import { CardSelectable } from "./Card.tsx";
 import ButtonRow from "./Sendbutton.tsx";
+import Dropdown from "./Dropdown.tsx";
  
 export const Communication = () => {
     return(
@@ -18,7 +19,7 @@ export const Communication = () => {
                     `}
                 </style>
                 <ButtonRow></ButtonRow>
-                <CardSelectable></CardSelectable>
+                <Dropdown></Dropdown>
             </div>
         </div>
     )
