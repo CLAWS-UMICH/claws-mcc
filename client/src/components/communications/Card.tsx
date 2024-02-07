@@ -40,7 +40,8 @@ const useStyles = makeStyles({
 
   card: {
     width: "350px",
-    maxWidth: "100%",
+    // height: "350px",
+    // maxWidth: "100%",
     height: "fit-content",
   },
 
@@ -87,10 +88,12 @@ const ImageCard = (props: CardProps) => {
           </div>
         )}
 
-        <img
-          className={styles.smallRadius}
-          src={resolveAsset("office1.png")}
-        />
+        <div style={{ aspectRatio: 1 }}>
+          <img
+            className={styles.smallRadius}
+            src={resolveAsset("office1.png")}
+          />
+        </div>
       </CardPreview>
 
       <CardHeader
