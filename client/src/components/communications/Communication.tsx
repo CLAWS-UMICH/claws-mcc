@@ -3,6 +3,7 @@ import { Multiselect, SendButton } from "./Multiselect.tsx"
 import { CardSelectable } from "./Card.tsx";
 import ButtonRow from "./Sendbutton.tsx";
 import Dropdown from "./Dropdown.tsx";
+import Header from "./Header.tsx";
  
 export const Communication = () => {
     return(
@@ -18,6 +19,7 @@ export const Communication = () => {
                         }
                     `}
                 </style>
+                <Header></Header>
                 <ButtonRow></ButtonRow>
                 <Dropdown></Dropdown>
             </div>
