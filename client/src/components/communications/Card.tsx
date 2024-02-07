@@ -88,12 +88,12 @@ const ImageCard = (props: CardProps) => {
           </div>
         )}
 
-        <div style={{ aspectRatio: 1 }}>
-          <img
+        {/* <div style={{ aspectRatio: 1 }}> */}
+          <img style={{ aspectRatio: 1, objectFit: 'cover' }}
             className={styles.smallRadius}
             src={resolveAsset("office1.png")}
           />
-        </div>
+        {/* </div> */}
       </CardPreview>
 
       <CardHeader
