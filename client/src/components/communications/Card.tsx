@@ -6,14 +6,17 @@ import {
   Caption1,
   tokens,
   Text,
-} from "@fluentui/react-components";
-import { MoreHorizontal20Regular } from "@fluentui/react-icons";
-import {
   Card,
   CardHeader,
   CardPreview,
   CardProps,
 } from "@fluentui/react-components";
+import { 
+  bundleIcon,
+  SlideSizeRegular,
+  SlideSizeFilled,
+} from "@fluentui/react-icons";
+import { useState } from "react";
 
 
 // TODO make image gray on selection, make selection more starkly visible
@@ -53,7 +56,7 @@ const useStyles = makeStyles({
     backgroundColor: tokens.colorNeutralBackground3,
   },
 
-  logoBadge: {
+  logoBadge: { // FIXME
     ...shorthands.padding("5px"),
     ...shorthands.borderRadius(tokens.borderRadiusSmall),
     backgroundColor: "#FFF",
@@ -62,25 +65,31 @@ const useStyles = makeStyles({
   },
 });
 
+const Enlarge = bundleIcon(SlideSizeRegular, SlideSizeFilled); // change to guides icon
+
 const ImageCard = (props: CardProps) => {
   const styles = useStyles();
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <Card className={styles.card} {...props}>
       <CardPreview
         className={styles.grayBackground}
-        logo={
-          <img
-            className={styles.logoBadge}
-            src={resolveAsset("logo3.svg")}
-            alt="Figma app logo"
-          />
-        }
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{ position: 'relative' }} // FIXME verify. Ensure CardPreview container has relative positioning
       >
+        {/* Show the logo only when CardPreview is hovered */}
+        {/* FIXME - positioning. and should it be top: '0' with quotes? */}
+        {isHovered && (
+          <div style={{ position: 'absolute', top: 0, right: 0, color: 'black' }}>
+            <Enlarge />
+          </div>
+        )}
+
         <img
           className={styles.smallRadius}
           src={resolveAsset("office1.png")}
-          alt="Presentation Preview"
         />
       </CardPreview>
 
@@ -147,3 +156,5 @@ export const CardSelectable = () => {
     </div>
   );
 };
+
+// export default ImageCard;
