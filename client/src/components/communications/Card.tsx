@@ -16,16 +16,10 @@ import {
 } from "@fluentui/react-components";
 
 
-/**
- * Questions:
- * where are the components that will stay on the left side - doesn't rlly matter rn
- * scrollable
- *  
- * TODO:
- * make image blur
- * get image from where
- * three dots??
- */
+// TODO make image gray on selection, make selection more starkly visible
+// TODO aspect ratio. 1:1 square
+// TODO make the scrollbar invisible or less ugly ? overflow: hidden;
+// BUG in case where need to scroll on main page, make sure you keep that position when scrolling in mini page https://forum.bubble.io/t/tutorial-scroll-within-a-popup-without-scrolling-the-page/144153
 
 const resolveAsset = (asset: string) => {
   const ASSET_URL =
@@ -42,7 +36,7 @@ const useStyles = makeStyles({
   },
 
   card: {
-    width: "400px",
+    width: "350px",
     maxWidth: "100%",
     height: "fit-content",
   },
@@ -91,17 +85,8 @@ const ImageCard = (props: CardProps) => {
       </CardPreview>
 
       <CardHeader
-        header={<Text weight="semibold">iOS App Prototype</Text>}
-        description={
-          <Caption1 className={styles.caption}>You created 53m ago</Caption1>
-        }
-        action={
-          <Button
-            appearance="transparent"
-            icon={<MoreHorizontal20Regular />}
-            aria-label="More actions"
-          />
-        }
+        header={<Text weight="semibold">claws</Text>}
+        // action={        }
       />
     </Card>
   );
@@ -109,13 +94,6 @@ const ImageCard = (props: CardProps) => {
 
 export const CardSelectable = () => {
   const styles = useStyles();
-
-  // TODO make selection more starkly visible
-  // TODO make the scrollbar invisible or less ugly ? overflow: hidden;
-  // TODO move to right and get correct max width and height
-  // TODO where did 'ios app prototype' come from
-  // TODO customize image squares
-  // BUG in case where need to scroll on main page, make sure you keep that position when scrolling in mini page https://forum.bubble.io/t/tutorial-scroll-within-a-popup-without-scrolling-the-page/144153
 
     // FIXME this is too redundant
   const [selected1, setSelected1] = React.useState(false);
