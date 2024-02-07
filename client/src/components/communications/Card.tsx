@@ -39,7 +39,7 @@ const useStyles = makeStyles({
   },
 
   card: {
-    width: "350px",
+    width: "350px", // FIXME bad to have px hardcoded?
     // height: "350px",
     // maxWidth: "100%",
     height: "fit-content",
@@ -80,10 +80,11 @@ const ImageCard = (props: CardProps) => {
         onMouseLeave={() => setIsHovered(false)}
         style={{ position: 'relative' }} // FIXME verify. Ensure CardPreview container has relative positioning
       >
-        {/* Show the logo only when CardPreview is hovered */}
+        {/* Show enlarge only when CardPreview is hovered */}
         {/* FIXME - positioning. and should it be top: '0' with quotes? */}
+        {/* width: '100px', height: '150px' -- why did adding this change the location of the image? */}
         {isHovered && (
-          <div style={{ position: 'absolute', top: 0, right: 0, color: 'black' }}>
+          <div style={{ position: 'absolute', top: 0, right: 0, color: 'black'}}>
             <Enlarge />
           </div>
         )}
