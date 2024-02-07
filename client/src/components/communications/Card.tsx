@@ -12,9 +12,9 @@ import {
   CardProps,
 } from "@fluentui/react-components";
 import { 
-  bundleIcon,
-  SlideSizeRegular,
-  SlideSizeFilled,
+  // bundleIcon,
+  SlideSize24Regular,
+  // SlideSizeFilled24,
 } from "@fluentui/react-icons";
 import { useState } from "react";
 
@@ -39,7 +39,7 @@ const useStyles = makeStyles({
   },
 
   card: {
-    width: "350px", // FIXME bad to have px hardcoded?
+    width: "200px", // FIXME bad to have px hardcoded?
     // height: "350px",
     // maxWidth: "100%",
     height: "fit-content",
@@ -66,7 +66,7 @@ const useStyles = makeStyles({
   },
 });
 
-const Enlarge = bundleIcon(SlideSizeRegular, SlideSizeFilled); // change to guides icon
+// const Enlarge = bundleIcon(SlideSize24Regular, SlideSizeFilled24); // change to guides icon
 
 const ImageCard = (props: CardProps) => {
   const styles = useStyles();
@@ -85,7 +85,7 @@ const ImageCard = (props: CardProps) => {
         {/* width: '100px', height: '150px' -- why did adding this change the location of the image? */}
         {isHovered && (
           <div style={{ position: 'absolute', top: 0, right: 0, color: 'black'}}>
-            <Enlarge />
+            <SlideSize24Regular />
           </div>
         )}
 
