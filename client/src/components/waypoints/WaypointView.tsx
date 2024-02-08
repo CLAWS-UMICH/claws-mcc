@@ -2,8 +2,9 @@ import {
   BaseWaypoint,
   ManagerAction,
   ManagerState,
+  WaypointType,
 } from "./WaypointManager.tsx";
-import React from "react";
+import React, { useState } from "react";
 import { isUndefined } from "lodash";
 import {
   Button,
@@ -12,10 +13,12 @@ import {
   Dropdown,
   Input,
   Label,
+  Option,
   Textarea,
   Title3,
   makeStyles,
 } from "@fluentui/react-components";
+import { log } from "console";
 
 type WaypointViewProps = {
   dispatch: React.Dispatch<ManagerAction>;
@@ -27,9 +30,7 @@ type WaypointViewProps = {
  * @constructor
  */
 const NewView: React.FC = (props) => {
-  return (
-      <div>TODO:NEW</div>
-  );
+  return <div>TODO:NEW</div>;
 };
 
 type SelectedViewProps = {
@@ -38,40 +39,19 @@ type SelectedViewProps = {
 };
 
 const listStyles = makeStyles({
-  red: {
-    color: "red",
-  },
-  form: {
+  container: {
     display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
     width: "100%",
   },
-  leftview: {
-    display: "flex",
-    width: "60%",
-    flexDirection: "column",
-    //padding: 2%//maybe not working
-  },
-  container: {
+  container2: {
     display: "flex",
     justifyContent: "space-between",
   },
-  boxwide: {
-    width: "60%",
-  },
-  smallboxwide: {
-    width: "48%",
-  },
-  rightview: {
-    width: "100%",
-    marginTop: "0%",
-    marginBottom: "0%",
-    marginLeft: "2%",
-    marginRight: "2%",
-  },
-  description: {
-    width: "100%",
-    height: "100%",
-    // borderRadius:"2%" //doesn't work
+  edit: {
+    display: "flex",
+    justifyContent: "flex-end",
   },
 });
 
@@ -83,82 +63,100 @@ const listStyles = makeStyles({
  * @constructor
  */
 const SelectedView: React.FC<SelectedViewProps> = (props) => {
-  // console.log(props)
   const styles = listStyles();
+  const dropDownOptions = Object.keys(WaypointType).filter((key) =>
+    isNaN(Number(key))
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditButtonClick = () => {
+    setIsEditing(!isEditing);
+  };
+
+
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between",alignItems:"center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <h4>Station B</h4>
-        <div style={{ display: "flex",width:"50%",justifyContent:"space-around"}}>
+        <div
+          style={{
+            display: "flex",
+            width: "50%",
+            justifyContent: "space-around",
+          }}
+        >
           <Button appearance="primary">Send WayPoint</Button>
-          <Button>View Route</Button>
-          <Button>Edit</Button>
+          {/* <Button>View Route</Button> */}
+          <Button onClick={handleEditButtonClick}>Edit</Button>
           <Button>Delete</Button>
         </div>
       </div>
+
       <Title3>Edit Waypoint</Title3>
-      <form className={styles.form} onSubmit={() => console.log("Hello")}>
-        <div className={styles.leftview} style={{ padding: "2%" }}>
-          <div className={styles.container}>
+      <form style={{ padding: "0% 2%" }} onSubmit={() => console.log("Hello")}>
+        <div className={styles.container}>
+          <Label htmlFor={"waypoint-details"}>Details</Label>
+          <Input
+            type="text"
+            id={"waypoint-details"}
+            value={props.selected?.details}
+          />
+        </div>
+        <br />
+        <div className={styles.container2}>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
             <Label htmlFor={"waypoint-type"}>Type</Label>
-            <Dropdown
-              className={styles.boxwide}
-              placeholder={"Select a waypoint type"}
-              id={"waypoint-type"}
-            ></Dropdown>
+            <Dropdown placeholder="Select station type" {...props}>
+              {dropDownOptions.map((option) => (
+                <Option key={option}>{option}</Option>
+              ))}
+            </Dropdown>
           </div>
-
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-name"}>Name</Label>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+            <Label htmlFor={"waypoint-location"}>Location</Label>
             <Input
-              className={styles.boxwide}
               type="text"
-              id={"waypoint-name"}
-              value={props.selected?.description}
+              id={"waypoint-location"}
+              value={
+                props.selected?.location.latitude +
+                "," +
+                props.selected?.location.longitude
+              }
             />
           </div>
-
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-identifier"}>Identifier</Label>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+            <Label htmlFor={"waypoint-time"}>Time</Label>
             <Input
-              className={styles.boxwide}
               type="text"
-              id={"waypoint-identifier"}
+              id={"waypoint-time"}
+              value={props.selected?.time}
             />
           </div>
+          <div className={styles.container}>
+            <Label htmlFor={"waypoint-date"}>Date</Label>
+            <Input
+              type="text"
+              id={"waypoint-date"}
+              value={props.selected?.date}
+            />
+          </div>
+        </div>
 
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-coords"}>Coordinates</Label>
-            <div className={styles.boxwide} style={{ display: "flex" }}>
-              <Input
-                disabled
-                className={styles.smallboxwide}
-                type="number"
-                id={"waypoint-coords-lat"}
-                value={props.selected?.location.latitude.toString(10)}
-              />{" "}
-              º
-              <Input
-                disabled
-                className={styles.smallboxwide}
-                type="number"
-                id={"waypoint-coords-long"}
-                value={props.selected?.location.longitude.toString(10)}
-              />{" "}
-              º
-            </div>
+        {isEditing ? (
+          <div style={{ margin: "2%" }} id={"edit"} className={styles.edit}>
+            <Button appearance="secondary">Save</Button>
+            <Button>Cancel</Button>
           </div>
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-time-log"}>Time Logged</Label>
-            <Checkbox label="Time Logged" />
-          </div>
-        </div>
-        <div className={styles.rightview}>
-          <Textarea
-            className={styles.description}
-            value={props.selected?.description}
-          ></Textarea>
-        </div>
+        ) : (
+          <div></div>
+        )}
       </form>
     </div>
   );
