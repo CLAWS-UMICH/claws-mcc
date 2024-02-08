@@ -152,7 +152,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
         {isEditing ? (
           <div style={{ margin: "2%" }} id={"edit"} className={styles.edit}>
             <Button appearance="secondary">Save</Button>
-            <Button>Cancel</Button>
+            <Button onClick={handleEditButtonClick}>Cancel</Button>
           </div>
         ) : (
           <div></div>
