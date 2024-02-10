@@ -93,6 +93,7 @@ const ImageCard = (props: CardProps) => {
           <img style={{ aspectRatio: 1, objectFit: 'cover' }}
             className={styles.smallRadius}
             src={resolveAsset("office1.png")}
+            // TODO send http get request
           />
         {/* </div> */}
       </CardPreview>

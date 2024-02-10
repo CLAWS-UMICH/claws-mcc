@@ -29,20 +29,22 @@ const CustomComponent = () => {
 
   const handleClick = (e) => {
     if (e.button === 0) { // Left mouse button
-        setPosition({ x: e.clientX, y: e.clientY });
-        if(!isCombined && isVisible) {
-          setCombinedPosition({ x: e.clientX, y: e.clientY });
-        } // FIXME
-        if (isVisible) {
-            setIsCombined(true);
-            setTimeout(() => {
-              setIsCombined(false); // Reset isCombined after 2 seconds
-              setIsVisible(false);
-            }, 2000);
-        }
-        else{
-            setIsVisible(!isVisible); // Toggle visibility
-            setIsCombined(false);
+        if(isVisible){
+          setPosition({ x: e.clientX, y: e.clientY });
+          if(!isCombined && isVisible) {
+            setCombinedPosition({ x: e.clientX, y: e.clientY });
+          } // FIXME
+          if (isVisible) {
+              setIsCombined(true);
+              setTimeout(() => {
+                setIsCombined(false); // Reset isCombined after 2 seconds
+                setIsVisible(false);
+              }, 2000);
+          }
+          else{
+              setIsVisible(!isVisible); // Toggle visibility
+              setIsCombined(false);
+          }
         }
     }
   };
