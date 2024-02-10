@@ -147,8 +147,7 @@ export default class ARWebConnection extends Base {
             const screensCollection = this.db.collection('screens');
             const allScreens = await screensCollection.find().toArray();
 
-            res.json({
-                id: -1,
+            res.send({
                 type: 'PICTURE',
                 use: 'PUT',
                 data: allScreens,
