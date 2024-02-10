@@ -149,7 +149,7 @@ export default class ARWebConnection extends Base {
 
             res.send({
                 type: 'PICTURE',
-                use: 'PUT',
+                use: 'GET',
                 data: allScreens,
             });
 
