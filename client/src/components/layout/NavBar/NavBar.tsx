@@ -9,31 +9,31 @@ import {
 } from "@fluentui/react-components";
 import {
   bundleIcon,
-  ClipboardTaskList16Regular,
-  ClipboardTaskList16Filled,
-  Book16Regular,
-  Book16Filled,
-  Hexagon16Regular,
-  Hexagon16Filled,
-  Chat16Regular,
-  Chat16Filled,
-  Location16Regular,
-  Location16Filled,
+  ClipboardTaskListLtr24Regular,
+  ClipboardTaskListLtr24Filled,
+  BookPulse20Regular,
+  BookPulse20Filled,
+  Hexagon20Regular,
+  Hexagon20Filled,
+  Chat20Regular,
+  Chat20Filled,
+  Location20Regular,
+  Location20Filled,
   VehicleTruckCube20Regular,
   VehicleTruckCube20Filled,
-  DocumentText16Regular,
-  DocumentText16Filled,
+  DocumentText20Regular,
+  DocumentText20Filled,
   PersonStanding16Regular,
   PersonStanding16Filled,
 } from "@fluentui/react-icons";
 
-const ClipboardTaskList = bundleIcon(ClipboardTaskList16Filled, ClipboardTaskList16Regular);
-const Book = bundleIcon(Book16Filled, Book16Regular);
-const Hexagon = bundleIcon(Hexagon16Filled, Hexagon16Regular);
-const Chat = bundleIcon(Chat16Filled, Chat16Regular);
-const Location = bundleIcon(Location16Filled, Location16Regular);
+const ClipboardTaskList = bundleIcon(ClipboardTaskListLtr24Filled, ClipboardTaskListLtr24Regular);
+const Book = bundleIcon(BookPulse20Filled, BookPulse20Regular);
+const Hexagon = bundleIcon(Hexagon20Filled, Hexagon20Regular);
+const Chat = bundleIcon(Chat20Filled, Chat20Regular);
+const Location = bundleIcon(Location20Filled, Location20Regular);
 const Truck = bundleIcon(VehicleTruckCube20Filled, VehicleTruckCube20Regular); // change to rover icon
-const Document = bundleIcon(DocumentText16Filled, DocumentText16Regular); // change to guides icon
+const Document = bundleIcon(DocumentText20Filled, DocumentText20Regular); // change to guides icon
 const Person = bundleIcon(PersonStanding16Filled, PersonStanding16Regular); // change to suits icon
 
 interface NavBarProps {
@@ -46,9 +46,11 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
-    // marginTop: "10px",
-    // ...shorthands.padding("50px", "20px"),
     rowGap: "5px",
+    backgroundColor: '#000000',
+  },
+  tab: {
+    fontSize: '15px',
   },
 });
 

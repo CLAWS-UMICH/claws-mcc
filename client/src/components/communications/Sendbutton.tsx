@@ -1,7 +1,6 @@
 import React from "react";
 import "./ButtonRow.css";
 import {
-  bundleIcon,
   ClipboardTaskListLtr24Regular,
   BookPulse24Regular,
   Hexagon24Regular,
