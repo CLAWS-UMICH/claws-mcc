@@ -1,22 +1,21 @@
 import * as React from "react";
+import { useState } from "react";
 import {
   makeStyles,
   shorthands,
-  Button,
-  Caption1,
   tokens,
-  Text,
   Card,
   CardHeader,
   CardPreview,
   CardProps,
+  Dialog,
+  DialogTrigger,
+  DialogSurface,
+  DialogBody,
+  DialogContent,
+  Text,
 } from "@fluentui/react-components";
-import { 
-  // bundleIcon,
-  SlideSize24Regular,
-  // SlideSizeFilled24,
-} from "@fluentui/react-icons";
-import { useState } from "react";
+import { ArrowExpand24Regular } from "@fluentui/react-icons";
 
 
 // TODO make image gray on selection, make selection more starkly visible
@@ -71,6 +70,12 @@ const useStyles = makeStyles({
 const ImageCard = (props: CardProps) => {
   const styles = useStyles();
   const [isHovered, setIsHovered] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleIconClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation(); // Prevent the event from propagating to parent elements
+    setIsDialogOpen(true); // Open the Dialog
+  };
 
   return (
     <Card className={styles.card} {...props}>
@@ -84,9 +89,22 @@ const ImageCard = (props: CardProps) => {
         {/* FIXME - positioning. and should it be top: '0' with quotes? */}
         {/* width: '100px', height: '150px' -- why did adding this change the location of the image? */}
         {isHovered && (
-          <div style={{ position: 'absolute', top: 0, right: 0, color: 'black'}}>
-            <SlideSize24Regular />
-          </div>
+          <Dialog open={isDialogOpen} onOpenChange={(_, data) => setIsDialogOpen(data.open)}>
+            <DialogTrigger>
+              <div 
+                onClick={handleIconClick} 
+                style={{ position: 'absolute', top: 0, right: 0, cursor: 'pointer'}}>
+                <ArrowExpand24Regular />
+             </div>
+            </DialogTrigger>
+            <DialogSurface>
+              <DialogBody>
+                <DialogContent>
+                  <img src={resolveAsset("office1.png")} style={{ width: '100%', height: 'auto' }} />
+                </DialogContent>
+              </DialogBody>
+            </DialogSurface>
+          </Dialog>
         )}
 
         {/* <div style={{ aspectRatio: 1 }}> */}
