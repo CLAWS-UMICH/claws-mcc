@@ -9,6 +9,7 @@ import {
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
 import GeosampleManager from './components/geosamples/Geosamples.tsx';
 import NavBar from './components/layout/NavBar/NavBar.tsx';
+import Communication from './components/communications/Communication.tsx';
 
 interface AstronautData {
     heartrate: number;
@@ -57,6 +58,7 @@ function App() {
             case 'messagesTab':
                 break;
             case 'connectTab':
+                setSelectedPage(<Communication/>);
                 break;
             default:
                 setSelectedPage(undefined);

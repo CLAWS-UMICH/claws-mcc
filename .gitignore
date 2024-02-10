@@ -2,3 +2,5 @@ node_modules
 dist
 .env
 .history
+**/package.json
+**/package-lock.json
