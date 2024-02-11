@@ -17,6 +17,7 @@ import {
   Text,
 } from "@fluentui/react-components";
 import { ArrowExpand24Regular, Dismiss24Regular } from "@fluentui/react-icons";
+import SearchBar from "./SearchBar.tsx";
 
 // TODO make image gray on selection, make selection more starkly visible
 // TODO aspect ratio. 1:1 square
@@ -174,44 +175,49 @@ export const CardSelectable = () => {
   const [selected9, setSelected9] = React.useState(false);
 
   return (
-    <div className={styles.main}>
-      <ImageCard
-        selected={selected1}
-        onSelectionChange={(_, { selected }) => setSelected1(selected)}
-      />
-      <ImageCard
-        selected={selected2}
-        onSelectionChange={(_, { selected }) => setSelected2(selected)}
-      />
-      <ImageCard
-        selected={selected3}
-        onSelectionChange={(_, { selected }) => setSelected3(selected)}
-      />
-      <ImageCard
-        selected={selected4}
-        onSelectionChange={(_, { selected }) => setSelected4(selected)}
-      />
-      <ImageCard
-        selected={selected5}
-        onSelectionChange={(_, { selected }) => setSelected5(selected)}
-      />
-      <ImageCard
-        selected={selected6}
-        onSelectionChange={(_, { selected }) => setSelected6(selected)}
-      />
-      <ImageCard
-        selected={selected7}
-        onSelectionChange={(_, { selected }) => setSelected7(selected)}
-      />
-      <ImageCard
-        selected={selected8}
-        onSelectionChange={(_, { selected }) => setSelected8(selected)}
-      />
-      <ImageCard
-        selected={selected9}
-        onSelectionChange={(_, { selected }) => setSelected9(selected)}
-      />
-    </div>
+    <>
+      <div style={{ margin: '20px' }}>
+        <SearchBar />
+      </div>
+      <div className={styles.main}>
+        <ImageCard
+          selected={selected1}
+          onSelectionChange={(_, { selected }) => setSelected1(selected)}
+        />
+        <ImageCard
+          selected={selected2}
+          onSelectionChange={(_, { selected }) => setSelected2(selected)}
+        />
+        <ImageCard
+          selected={selected3}
+          onSelectionChange={(_, { selected }) => setSelected3(selected)}
+        />
+        <ImageCard
+          selected={selected4}
+          onSelectionChange={(_, { selected }) => setSelected4(selected)}
+        />
+        <ImageCard
+          selected={selected5}
+          onSelectionChange={(_, { selected }) => setSelected5(selected)}
+        />
+        <ImageCard
+          selected={selected6}
+          onSelectionChange={(_, { selected }) => setSelected6(selected)}
+        />
+        <ImageCard
+          selected={selected7}
+          onSelectionChange={(_, { selected }) => setSelected7(selected)}
+        />
+        <ImageCard
+          selected={selected8}
+          onSelectionChange={(_, { selected }) => setSelected8(selected)}
+        />
+        <ImageCard
+          selected={selected9}
+          onSelectionChange={(_, { selected }) => setSelected9(selected)}
+        />
+      </div>
+    </>
   );
 };
 
