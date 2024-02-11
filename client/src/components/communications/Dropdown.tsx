@@ -130,7 +130,7 @@ const CustomComponent = () => {
       <div
         onContextMenu={handleContextMenu}
         onMouseDown={handleClick}
-        style={{ height: '100vh', width: '100%' }}
+        style={{ height: '100vh', width: '100%', backgroundColor: '#000000'}}
       >
       <CardSelectable></CardSelectable>
     

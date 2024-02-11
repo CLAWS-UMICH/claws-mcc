@@ -27,9 +27,3 @@
   .search-input::placeholder {
     color: #adadad;
   }
-  
-  /* Remove the input borders and outline on focus */
-  .search-input:focus {
-    border: none;
-    outline: none;
-  }

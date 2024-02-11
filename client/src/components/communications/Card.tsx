@@ -36,6 +36,7 @@ const useStyles = makeStyles({
     ...shorthands.gap("16px"),
     display: "flex",
     flexWrap: "wrap",
+    backgroundColor: '#000000',
   },
 
   card: {
@@ -175,8 +176,8 @@ export const CardSelectable = () => {
   const [selected9, setSelected9] = React.useState(false);
 
   return (
-    <>
-      <div style={{ margin: '20px' }}>
+    <div style={{ margin: '20px'}}>
+      <div style={{ margin: '0 0 20px 0'}}>
         <SearchBar />
       </div>
       <div className={styles.main}>
@@ -217,7 +218,7 @@ export const CardSelectable = () => {
           onSelectionChange={(_, { selected }) => setSelected9(selected)}
         />
       </div>
-    </>
+    </div>
   );
 };
 

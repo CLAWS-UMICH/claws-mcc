@@ -7,7 +7,7 @@ import Header from "./Header.tsx";
  
 export const Communication = () => {
     return(
-        <div>
+        <div style={{ backgroundColor: '#000000' }}>
             <div id="myPopup">
                 <style>
                     {`
