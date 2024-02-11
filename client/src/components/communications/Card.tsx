@@ -13,10 +13,10 @@ import {
   DialogSurface,
   DialogBody,
   DialogContent,
+  DialogTitle,
   Text,
 } from "@fluentui/react-components";
-import { ArrowExpand24Regular } from "@fluentui/react-icons";
-
+import { ArrowExpand24Regular, Dismiss24Regular } from "@fluentui/react-icons";
 
 // TODO make image gray on selection, make selection more starkly visible
 // TODO aspect ratio. 1:1 square
@@ -56,7 +56,8 @@ const useStyles = makeStyles({
     backgroundColor: tokens.colorNeutralBackground3,
   },
 
-  logoBadge: { // FIXME
+  logoBadge: {
+    // FIXME
     ...shorthands.padding("5px"),
     ...shorthands.borderRadius(tokens.borderRadiusSmall),
     backgroundColor: "#FFF",
@@ -83,24 +84,57 @@ const ImageCard = (props: CardProps) => {
         className={styles.grayBackground}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        style={{ position: 'relative' }} // FIXME verify. Ensure CardPreview container has relative positioning
+        style={{ position: "relative" }} // FIXME verify. Ensure CardPreview container has relative positioning
       >
         {/* Show enlarge only when CardPreview is hovered */}
         {/* FIXME - positioning. and should it be top: '0' with quotes? */}
         {/* width: '100px', height: '150px' -- why did adding this change the location of the image? */}
         {isHovered && (
-          <Dialog open={isDialogOpen} onOpenChange={(_, data) => setIsDialogOpen(data.open)}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(_, data) => setIsDialogOpen(data.open)}
+          >
             <DialogTrigger>
-              <div 
-                onClick={handleIconClick} 
-                style={{ position: 'absolute', top: 0, right: 0, cursor: 'pointer'}}>
-                <ArrowExpand24Regular />
-             </div>
+              <div>
+                <ArrowExpand24Regular
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    cursor: "pointer",
+                  }}
+                ></ArrowExpand24Regular>
+              </div>
             </DialogTrigger>
-            <DialogSurface>
+            <DialogSurface
+              style={{
+                width: "auto",
+                height: "auto",
+                maxWidth: "80vw",
+                maxHeight: "80vh",
+              }}
+            >
               <DialogBody>
+                <DialogTitle>
+                  Image Name
+                  <DialogTrigger disableButtonEnhancement>
+                    <div>
+                      <Dismiss24Regular
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 10,
+                          cursor: "pointer",
+                        }}
+                      ></Dismiss24Regular>
+                    </div>
+                  </DialogTrigger>
+                </DialogTitle>
                 <DialogContent>
-                  <img src={resolveAsset("office1.png")} style={{ width: '100%', height: 'auto' }} />
+                  <img
+                    src={resolveAsset("office1.png")}
+                    style={{ width: "100%", height: "auto" }}
+                  />
                 </DialogContent>
               </DialogBody>
             </DialogSurface>
@@ -108,11 +142,12 @@ const ImageCard = (props: CardProps) => {
         )}
 
         {/* <div style={{ aspectRatio: 1 }}> */}
-          <img style={{ aspectRatio: 1, objectFit: 'cover' }}
-            className={styles.smallRadius}
-            src={resolveAsset("office1.png")}
-            // TODO send http get request
-          />
+        <img
+          style={{ aspectRatio: 1, objectFit: "cover" }}
+          className={styles.smallRadius}
+          src={resolveAsset("office1.png")}
+          // TODO send http get request
+        />
         {/* </div> */}
       </CardPreview>
 
@@ -127,7 +162,7 @@ const ImageCard = (props: CardProps) => {
 export const CardSelectable = () => {
   const styles = useStyles();
 
-    // FIXME this is too redundant
+  // FIXME this is too redundant
   const [selected1, setSelected1] = React.useState(false);
   const [selected2, setSelected2] = React.useState(false);
   const [selected3, setSelected3] = React.useState(false);
