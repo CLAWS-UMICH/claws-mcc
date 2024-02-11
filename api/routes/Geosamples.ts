@@ -7,8 +7,13 @@ export default class Geosamples extends Base {
     public routes = [
         {
             path: '/api/geosamples',
-            method: 'put',
+            method: 'post',
             handler: this.addGeosample.bind(this),
+        },
+        {
+            path: '/api/geosamples',
+            method: 'delete',
+            handler: this.deleteGeosample.bind(this),
         }
     ];
 
@@ -19,7 +24,12 @@ export default class Geosamples extends Base {
         this.collection = db.collection<BaseGeosample>('geosamples');
     }
 
+
     async addGeosample(req: Request, res: Response) : Promise<string> {
+        return "hello";
+    }
+
+    async deleteGeosample(req: Request, res: Response) : Promise<string> {
         return "hello";
     }
 }

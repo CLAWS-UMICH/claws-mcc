@@ -2,16 +2,24 @@ import * as React from "react";
 
 import type { ButtonProps, FieldProps } from "@fluentui/react-components";
 import { makeStyles, useId, Field, Input, Button } from "@fluentui/react-components";
-import { Search12Regular } from "@fluentui/react-icons"
+import { Search12Regular, Dismiss16Regular} from "@fluentui/react-icons"
 
 
 const useStyles = makeStyles({
   root: {
     display: "flex",
-    flexDirection: "column",
     rowGap: "5px",
-    maxWidth: "300px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: "-10px"
   },
+  input: {
+    width: "230px",
+    marginRight: "auto"
+  },
+  dismiss: {
+    marginRight: "-10px"
+  }
 });
 
 const SearchButton: React.FC<ButtonProps> = (props) => {
@@ -25,13 +33,14 @@ const SearchButton: React.FC<ButtonProps> = (props) => {
   );
 };
 
-const SearchBox = () => {
+const SearchBox = ({handleDismiss}) => {
   const inputId = useId("search bar");
   const styles = useStyles();
 
   return (
     <div className={styles.root}>
-      <Input placeholder="Search Rock" contentAfter={<SearchButton aria-label="Enter by voice" />} id={inputId} />
+      <Input className={styles.input} contentBefore={<SearchButton aria-label="Enter by voice" />} id={inputId} />
+      <Button className={styles.dismiss} icon={<Dismiss16Regular/>} appearance="transparent" onClick={handleDismiss}></Button>
     </div>
   );
 };

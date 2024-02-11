@@ -8,8 +8,7 @@ interface SidebarMenuProps {
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ dropdownMenus }) => {
     return (
-        <div style={{ width: '200px', background: '#f3f2f1', padding: '10px' }}>
-            <SearchBox/>
+        <div>
             {dropdownMenus.map((menu, index) => (
                 <div key={index} style={{ marginBottom: '10px' }}>
                     {menu}
