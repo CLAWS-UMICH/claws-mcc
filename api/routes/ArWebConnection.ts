@@ -192,6 +192,7 @@ export default class ARWebConnection extends Base {
         }
     }
 
+    // FUNC: Tell AR to highlight a specific button for a specific astronaut in AR over our WebSocket
     public async highlightButton(buttonID: number, astronautID: number): Promise<void> {
         if (buttonID === null) {
             console.error('Invalid button ID. Cannot highlight a null button.');
@@ -199,7 +200,18 @@ export default class ARWebConnection extends Base {
         }
 
         try {
-            // Send information about the highlighted button to the 'AR' WebSocket target
+            // Additional checks to validate buttonID and astronautID
+            if (buttonID < 0 || buttonID > 5) {
+                console.error('Invalid button ID. Button ID must be between 1 and 6.');
+                return;
+            }
+
+            if (astronautID !== 1 && astronautID !== 2) {
+                console.error('Invalid astronaut ID. Astronaut ID must be either 1 or 2.');
+                return;
+            }
+
+            // Send information about the highlighted button to the AR WebSocket target
             this.dispatch('AR', {
                 id: astronautID, // Assuming astronautID is the ID of the astronaut
                 type: 'BUTTON_HIGHLIGHT',
