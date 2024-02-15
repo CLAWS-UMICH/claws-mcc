@@ -111,14 +111,18 @@ export function readImageFile(filePath: string): Buffer {
 export default class ARWebConnection extends Base {
     public events: RouteEvent[] = [
         {
-            type: 'GET_ALL_SCREENS',
+            type: 'SEND_SCREEN_TO_AR',
+            handler: this.sendScreenToAR.bind(this)
+        },
+        {
+            type: 'PUT_HIGHLIGHT_BUTTON',
             handler: this.sendAllScreensToFrontend.bind(this)
         }
     ]
 
     public routes = [
         {
-            path: '/api/astronaut/:screens',
+            path: '/api/screens',
             method: 'get',
             handler: this.sendAllScreensToFrontend.bind(this)
         }
@@ -184,6 +188,30 @@ export default class ARWebConnection extends Base {
             }
         } catch (error) {
             console.error('Error sending screen to AR:', error);
+            throw error; // Propagate the error if necessary
+        }
+    }
+
+    public async highlightButton(buttonID: number, astronautID: number): Promise<void> {
+        if (buttonID === null) {
+            console.error('Invalid button ID. Cannot highlight a null button.');
+            return;
+        }
+
+        try {
+            // Send information about the highlighted button to the 'AR' WebSocket target
+            this.dispatch('AR', {
+                id: astronautID, // Assuming astronautID is the ID of the astronaut
+                type: 'BUTTON_HIGHLIGHT',
+                use: 'PUT',
+                data: {
+                    button_id: buttonID
+                },
+            });
+
+            console.log('Button highlighted in AR successfully!');
+        } catch (error) {
+            console.error('Error highlighting button in AR:', error);
             throw error; // Propagate the error if necessary
         }
     }
