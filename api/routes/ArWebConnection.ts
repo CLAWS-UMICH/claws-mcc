@@ -202,7 +202,7 @@ export default class ARWebConnection extends Base {
         try {
             // Additional checks to validate buttonID and astronautID
             if (buttonID < 0 || buttonID > 5) {
-                console.error('Invalid button ID. Button ID must be between 1 and 6.');
+                console.error('Invalid button ID. Button ID must be between 0 and 5.');
                 return;
             }
 
