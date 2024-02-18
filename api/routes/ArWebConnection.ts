@@ -111,14 +111,18 @@ export function readImageFile(filePath: string): Buffer {
 export default class ARWebConnection extends Base {
     public events: RouteEvent[] = [
         {
-            type: 'GET_ALL_SCREENS',
+            type: 'SEND_SCREEN_TO_AR',
+            handler: this.sendScreenToAR.bind(this)
+        },
+        {
+            type: 'PUT_HIGHLIGHT_BUTTON',
             handler: this.sendAllScreensToFrontend.bind(this)
         }
     ]
 
     public routes = [
         {
-            path: '/api/astronaut/:screens',
+            path: '/api/screens',
             method: 'get',
             handler: this.sendAllScreensToFrontend.bind(this)
         }
@@ -184,6 +188,42 @@ export default class ARWebConnection extends Base {
             }
         } catch (error) {
             console.error('Error sending screen to AR:', error);
+            throw error; // Propagate the error if necessary
+        }
+    }
+
+    // FUNC: Tell AR to highlight a specific button for a specific astronaut in AR over our WebSocket
+    public async highlightButton(buttonID: number, astronautID: number): Promise<void> {
+        if (buttonID === null) {
+            console.error('Invalid button ID. Cannot highlight a null button.');
+            return;
+        }
+
+        try {
+            // Additional checks to validate buttonID and astronautID
+            if (buttonID < 0 || buttonID > 5) {
+                console.error('Invalid button ID. Button ID must be between 0 and 5.');
+                return;
+            }
+
+            if (astronautID !== 1 && astronautID !== 2) {
+                console.error('Invalid astronaut ID. Astronaut ID must be either 1 or 2.');
+                return;
+            }
+
+            // Send information about the highlighted button to the AR WebSocket target
+            this.dispatch('AR', {
+                id: astronautID, // Assuming astronautID is the ID of the astronaut
+                type: 'BUTTON_HIGHLIGHT',
+                use: 'PUT',
+                data: {
+                    button_id: buttonID
+                },
+            });
+
+            console.log('Button highlighted in AR successfully!');
+        } catch (error) {
+            console.error('Error highlighting button in AR:', error);
             throw error; // Propagate the error if necessary
         }
     }
