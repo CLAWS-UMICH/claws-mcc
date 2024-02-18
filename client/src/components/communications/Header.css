@@ -1,4 +1,4 @@
-.coonect-header {
+.connect-header {
     background-color: #141414;
     color: #FFFFFF;
     font-size: 18px;
@@ -6,6 +6,6 @@
     font-weight: bold;
     padding: 20px 20px;
     text-align: left;
-    width: 1280px;
+    /* width: 1280px; */
     box-sizing: border-box;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import "./Sendbutton.css";
+import "./SendButtons.css";
 import {
   ClipboardTaskListLtr24Regular,
   BookPulse24Regular,
