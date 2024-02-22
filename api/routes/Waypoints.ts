@@ -60,13 +60,25 @@ export default class Waypoints extends Base {
         let error = false;
         // the request is the array of all the waypoints
         const waypoints = req.body.data["waypoints"];
+        // Loop through waypoints, if they dont have a waypoint_id they are being added, assign one with -1 for now
+         for (let i = 0; i < waypoints.length; i++) {
+            if (waypoints[i].waypoint_id === undefined) {
+                waypoints[i].waypoint_id = -1;
+            }
+        }
         if (!this.isValidRequest(waypoints)) {
             const response: ResponseBody = {error: true, message: "Invalid request", data: []};
             res.send(response);
             return response;
         }
-        // @ts-ignore
         const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
+        // get current_index from DB
+        const index_collection = this.db.collection('waypoint_current_index');
+        var current_index = await index_collection.findOne()
+        .then((doc) => {
+            if(doc) return doc.index;
+            else return 0;
+        });
         // Get all existing waypoints
         const existingWaypoints = await this.collection.find({waypoint_id: {$in: waypointsId}}).toArray();
         const existingWayPointsId = existingWaypoints.map(waypoint => waypoint.waypoint_id);
@@ -84,8 +96,16 @@ export default class Waypoints extends Base {
                 res.send(response);
                 return response;
             }
+            // change the waypoint_id of the new waypoints
+            diff.forEach(waypoint => {
+                current_index++;
+                waypoint.waypoint_id = current_index;
+            });
+            // update the current_index in the collection
+            index_collection.updateOne({}, {$set: {index: current_index}});
             insertResult = await this.collection.insertMany(diff);
             message = "Waypoints with ids: " +
+                // @ts-ignore
                 diff.reduce((acc, waypointId) => {
                     return acc + waypointId.waypoint_id.toString(10) + ', ';
                 }, '').slice(0, -2)
@@ -93,6 +113,14 @@ export default class Waypoints extends Base {
         }
         // All waypoints sent in request are new
         else {
+            // change the waypoint_id of the new waypoints
+            waypoints.forEach(waypoint => {
+                current_index++;
+                waypoint.waypoint_id = current_index;
+            });
+            // update the current_index in the collection
+            index_collection.updateOne({}, {$set: {index: current_index}});
+
             insertResult = await this.collection.insertMany(waypoints);
             message = "Added waypoints with ids: [" +
                 waypointsId.reduce((acc, waypointId) => {
@@ -105,18 +133,6 @@ export default class Waypoints extends Base {
             error = true;
             const response: ResponseBody = {error, message, data: []};
             console.error(waypoints)
-            res.send(response);
-            return response;
-        }
-        if (insertResult.insertedCount !== waypoints.length) {
-            message = "Could not add all waypoints";
-            error = true;
-            const response: ResponseBody = {error, message, data: []};
-            // Delete waypoints that were added
-            const deleteResult = await this.collection.deleteMany({waypoint_id: {$in: waypointsId}});
-            if (!deleteResult.acknowledged) {
-                console.error("Could not delete waypoints");
-            }
             res.send(response);
             return response;
         }
