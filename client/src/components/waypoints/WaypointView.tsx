@@ -34,9 +34,11 @@ const NewView: React.FC = (props) => {
 };
 
 type SelectedViewProps = {
+  waypoints:BaseWaypoint[]
   selected?: BaseWaypoint;
   dispatch: React.Dispatch<ManagerAction>;
 };
+
 
 const listStyles = makeStyles({
   container: {
@@ -53,6 +55,7 @@ const listStyles = makeStyles({
     display: "flex",
     justifyContent: "flex-end",
   },
+  
 });
 
 /**
@@ -70,9 +73,34 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleEditButtonClick = () => {
+  const ToggleEdit = () => {
     setIsEditing(!isEditing);
   };
+
+  const handleEdit = () => {
+    const idx = props.waypoints.findIndex((x) => x._id === props.selected?._id);
+    if (idx >= 0) {
+      //change the values to the value from input boxes
+      props.waypoints[idx].description = "";
+      props.waypoints[idx].type = WaypointType.NAV;
+      props.waypoints[idx].details = "";
+      props.waypoints[idx].location.latitude = 0;
+      props.waypoints[idx].location.longitude = 0;
+
+      const res = fetch("/api/waypoint", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json",
+        },
+        body: JSON.stringify({
+          data: {
+            waypoints: props.waypoints,
+          },
+        }),
+      })
+    }
+  }
 
 
   return (
@@ -94,7 +122,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
         >
           <Button appearance="primary">Send WayPoint</Button>
           {/* <Button>View Route</Button> */}
-          <Button onClick={handleEditButtonClick}>Edit</Button>
+          <Button onClick={ToggleEdit}>Edit</Button>
           <Button>Delete</Button>
         </div>
       </div>
@@ -133,7 +161,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
           </div>
           <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
             <Label htmlFor={"waypoint-time"}>Time</Label>
-            <Input
+            <Input disabled
               type="text"
               id={"waypoint-time"}
               value={props.selected?.time}
@@ -141,9 +169,10 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
           </div>
           <div className={styles.container}>
             <Label htmlFor={"waypoint-date"}>Date</Label>
-            <Input
+            <Input disabled
               type="text"
               id={"waypoint-date"}
+              
               value={props.selected?.date}
             />
           </div>
@@ -151,8 +180,8 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
 
         {isEditing ? (
           <div style={{ margin: "2%" }} id={"edit"} className={styles.edit}>
-            <Button appearance="secondary">Save</Button>
-            <Button onClick={handleEditButtonClick}>Cancel</Button>
+            <Button onClick={handleEdit} appearance="secondary">Save</Button>
+            <Button onClick={ToggleEdit}>Cancel</Button>
           </div>
         ) : (
           <div></div>
@@ -168,7 +197,8 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
  * @constructor
  */
 const EmptyView: React.FC = (props) => {
-  return <div>TODO: Empty</div>;
+
+  return <h1 style={{marginTop:"8%",textAlign:"center"}}>Select or Add </h1>;
 };
 
 /**
@@ -180,7 +210,8 @@ const EmptyView: React.FC = (props) => {
 export const WaypointView: React.FC<WaypointViewProps> = (props) => {
   if (isUndefined(props.temp)) {
     if (isUndefined(props.selected)) return <EmptyView />;
-    return <SelectedView dispatch={props.dispatch} selected={props.selected} />;
+    return <SelectedView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected} />;
   }
   return <NewView />;
 };
+
