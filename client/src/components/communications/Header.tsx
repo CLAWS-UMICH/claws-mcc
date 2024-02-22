@@ -3,7 +3,7 @@ import "./Header.css";
 
 const Header = () => {
     return (
-        <div className="coonect-header">
+        <div className="connect-header">
             Connect
         </div>
       );

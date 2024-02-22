@@ -23,8 +23,8 @@ import {
   VehicleTruckCube20Filled,
   DocumentText20Regular,
   DocumentText20Filled,
-  PersonStanding16Regular,
-  PersonStanding16Filled,
+  Accessibility20Regular,
+  Accessibility20Filled,
 } from "@fluentui/react-icons";
 
 const ClipboardTaskList = bundleIcon(ClipboardTaskListLtr24Filled, ClipboardTaskListLtr24Regular);
@@ -34,7 +34,7 @@ const Chat = bundleIcon(Chat20Filled, Chat20Regular);
 const Location = bundleIcon(Location20Filled, Location20Regular);
 const Truck = bundleIcon(VehicleTruckCube20Filled, VehicleTruckCube20Regular); // change to rover icon
 const Document = bundleIcon(DocumentText20Filled, DocumentText20Regular); // change to guides icon
-const Person = bundleIcon(PersonStanding16Filled, PersonStanding16Regular); // change to suits icon
+const Accessibility = bundleIcon(Accessibility20Filled, Accessibility20Regular); // change to suits icon
 
 interface NavBarProps {
   onTabSelect: (selectedValue: any) => void;
@@ -80,7 +80,7 @@ const NavBar : React.FC<NavBarProps> = ({ onTabSelect }) => {
         <Tab icon={<Truck />} value='roverTab'>
           Rover
         </Tab>
-        <Tab icon={<Person />} value='suitsTab'>
+        <Tab icon={<Accessibility />} value='suitsTab'>
           Suits
         </Tab>
         <Tab icon={<Chat />} value='messagesTab'>

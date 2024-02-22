@@ -1,13 +1,26 @@
 import * as React from "react";
-import { Multiselect, SendButton } from "./Multiselect.tsx"
+import { useState } from 'react';
 import { CardSelectable } from "./Card.tsx";
-import ButtonRow from "./Sendbutton.tsx";
-import Dropdown from "./Dropdown.tsx";
+import ButtonRow from "./SendButtons.tsx";
+import DropDown from "./DropDown.tsx";
 import Header from "./Header.tsx";
  
 export const Communication = () => {
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+
+    const handleButtonClick = (buttonId) => {
+      console.log(buttonId);
+      setDropdownVisible(true);
+    };
+
+    const handleDropdownChange = (e, { open }) => {
+        if (!open) {
+          setDropdownVisible(false);
+        }
+      };
+
     return(
-        <div>
+        <div style={{ backgroundColor: '#000000' }}>
             <div id="myPopup">
                 <style>
                     {`
@@ -20,8 +33,9 @@ export const Communication = () => {
                     `}
                 </style>
                 <Header></Header>
-                <ButtonRow></ButtonRow>
-                <Dropdown></Dropdown>
+                <ButtonRow onButtonClick={handleButtonClick}></ButtonRow>
+                <DropDown open={dropdownVisible} onOpenChange={handleDropdownChange} />
+                <CardSelectable></CardSelectable>
             </div>
         </div>
     )

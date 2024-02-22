@@ -20,6 +20,8 @@ interface ScreenInfo {
     title: string; // Format: type_descriptor_enumeration
     img_binary: Buffer; // Good for handling binary data in Node.js!
     id: string; // ID representing the image
+    height: number;
+    width: number;
 }
 
 //----------
@@ -30,49 +32,67 @@ const IMG_ASPECT_RATIO = 1 / 1;
 
 const presetScreens: ScreenInfo[] = [
     {
-        title: 'connection_instr_1.jpg',
-        img_binary: readImageFile('./assets/connection_instr_1.jpg'),
+        title: 'connection_instr_1.png',
+        img_binary: readImageFile('./assets/connection_instr_1.png'),
         id: 'aB2cD',
+        height: 614,
+        width: 614
     },
     {
-        title: 'pressure_instr_2.jpg',
-        img_binary: readImageFile('./assets/pressure_instr_2.jpg'),
+        title: 'pressure_instr_2.png',
+        img_binary: readImageFile('./assets/pressure_instr_2.png'),
         id: 'eFgHi',
+        height: 768,
+        width: 768
     },
     {
-        title: 'suit_instr_1.jpg',
-        img_binary: readImageFile('./assets/suit_instr_1.jpg'),
+        title: 'suit_instr_1.png',
+        img_binary: readImageFile('./assets/suit_instr_1.png'),
         id: 'kLmNo',
+        height: 768,
+        width: 768
     },
     {
-        title: 'hardware_instr_1.jpg',
-        img_binary: readImageFile('./assets/hardware_instr_1.jpg'),
+        title: 'hardware_instr_1.png',
+        img_binary: readImageFile('./assets/hardware_instr_1.png'),
         id: 'pQrSt',
+        height: 614,
+        width: 614
     },
     {
-        title: 'rover_instr_1.jpg',
-        img_binary: readImageFile('./assets/rover_instr_1.jpg'),
+        title: 'rover_instr_1.png',
+        img_binary: readImageFile('./assets/rover_instr_1.png'),
         id: 'uVwXy',
+        height: 614,
+        width: 614
     },
     {
-        title: 'terrain_visual_1.jpg',
-        img_binary: readImageFile('./assets/terrain_visual_1.jpg'),
+        title: 'terrain_visual_1.png',
+        img_binary: readImageFile('./assets/terrain_visual_1.png'),
         id: 'z12a3',
+        height: 768,
+        width: 768
     },
     {
-        title: 'mars_instr_1.jpg',
-        img_binary: readImageFile('./assets/mars_instr_1.jpg'),
+        title: 'mars_instr_1.png',
+        img_binary: readImageFile('./assets/mars_instr_1.png'),
         id: '45abc',
+        height: 614,
+        width: 614
     },
     {
-        title: 'rover_instr_2.jpg',
-        img_binary: readImageFile('./assets/rover_instr_2.jpg'),
+        title: 'rover_instr_2.png',
+        img_binary: readImageFile('./assets/rover_instr_2.png'),
         id: 'd1e2f',
+        height: 768,
+        width: 768
     },
     {
-        title: 'terrain_visual_2.jpg',
-        img_binary: readImageFile('./assets/terrain_visual_2.jpg'),
+        title: 'terrain_visual_2.png',
+        img_binary: readImageFile('./assets/terrain_visual_2.png'),
         id: 'ghi12',
+        height: 768,
+        width: 768
     },
 ];
 
@@ -81,10 +101,9 @@ const presetScreens: ScreenInfo[] = [
 //-----------
 
 // FUNC: Reads image file and converts it to binary data to be sent to HUD
-function readImageFile(filePath: string): Buffer {
+export function readImageFile(filePath: string): Buffer {
     return readFileSync(filePath);
 }
-export { readImageFile }; // So other files can use this function (maybe frontend?)
 
 //-----------
 // CLASS DEFN.
@@ -92,7 +111,19 @@ export { readImageFile }; // So other files can use this function (maybe fronten
 export default class ARWebConnection extends Base {
     public events: RouteEvent[] = [
         {
-            type: 'GET_ALL_SCREENS',
+            type: 'SEND_SCREEN_TO_AR',
+            handler: this.sendScreenToAR.bind(this)
+        },
+        {
+            type: 'PUT_HIGHLIGHT_BUTTON',
+            handler: this.sendAllScreensToFrontend.bind(this)
+        }
+    ]
+
+    public routes = [
+        {
+            path: '/api/screens',
+            method: 'get',
             handler: this.sendAllScreensToFrontend.bind(this)
         }
     ]
@@ -115,25 +146,24 @@ export default class ARWebConnection extends Base {
     }
 
     // FUNC: Send all ScreenInfo objects to FRONTEND over our WebSocket
-    public async sendAllScreensToFrontend(): Promise<void> {
+    public async sendAllScreensToFrontend(req: Request, res: Response): Promise<void> { 
         try {
-            const screensCollection = this.db.collection('screens'); // Get collection of ScreenInfo objects
-            const allScreens = await screensCollection.find().toArray(); // Wait until you get all the objects and convert to array
-    
-            // Send the screens to the 'FRONTEND' WebSocket target
-            this.dispatch('FRONTEND', {
-                id: -1, 
+            const screensCollection = this.db.collection('screens');
+            const allScreens = await screensCollection.find().toArray();
+
+            res.send({
                 type: 'PICTURE',
-                use: 'PUT',
+                use: 'GET',
                 data: allScreens,
             });
-    
-            console.log('All screens sent to FRONTEND successfully! Slay!');
+
+            console.log('All screens sent to API successfully! Slay!');
         } catch (error) {
-            console.error('Error sending screens to FRONTEND:', error);
-            throw error; // Propagate the error if necessary
+            console.error('Error sending screens to API:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+    
 
     // FUNC: Send a specific ScreenInfo object to AR over our WebSocket
     public async sendScreenToAR(imageID: string, astronautID: number): Promise<void> {
@@ -158,6 +188,42 @@ export default class ARWebConnection extends Base {
             }
         } catch (error) {
             console.error('Error sending screen to AR:', error);
+            throw error; // Propagate the error if necessary
+        }
+    }
+
+    // FUNC: Tell AR to highlight a specific button for a specific astronaut in AR over our WebSocket
+    public async highlightButton(buttonID: number, astronautID: number): Promise<void> {
+        if (buttonID === null) {
+            console.error('Invalid button ID. Cannot highlight a null button.');
+            return;
+        }
+
+        try {
+            // Additional checks to validate buttonID and astronautID
+            if (buttonID < 0 || buttonID > 5) {
+                console.error('Invalid button ID. Button ID must be between 0 and 5.');
+                return;
+            }
+
+            if (astronautID !== 1 && astronautID !== 2) {
+                console.error('Invalid astronaut ID. Astronaut ID must be either 1 or 2.');
+                return;
+            }
+
+            // Send information about the highlighted button to the AR WebSocket target
+            this.dispatch('AR', {
+                id: astronautID, // Assuming astronautID is the ID of the astronaut
+                type: 'BUTTON_HIGHLIGHT',
+                use: 'PUT',
+                data: {
+                    button_id: buttonID
+                },
+            });
+
+            console.log('Button highlighted in AR successfully!');
+        } catch (error) {
+            console.error('Error highlighting button in AR:', error);
             throw error; // Propagate the error if necessary
         }
     }
