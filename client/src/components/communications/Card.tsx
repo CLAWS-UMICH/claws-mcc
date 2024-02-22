@@ -40,8 +40,8 @@ const useStyles = makeStyles({
   },
 
   card: {
-    width: "200px", // FIXME bad to have px hardcoded?
-    // height: "350px",
+    width: "285px", // FIXME bad to have px hardcoded?
+    // height: "180px",
     // maxWidth: "100%",
     height: "fit-content",
   },
@@ -104,6 +104,8 @@ const ImageCard = (props: CardProps) => {
                     top: 0,
                     right: 0,
                     cursor: "pointer",
+                    width: "13%",
+                    height: "13%",
                   }}
                 ></ArrowExpand24Regular>
               </div>
