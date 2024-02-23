@@ -9,27 +9,19 @@ import {
   MenuItemCheckbox,
   MenuPopover,
 } from "@fluentui/react-components";
-import type {
-  MenuProps,
-  MenuTriggerChildProps,
-} from "@fluentui/react-components";
 import { Send24Regular } from "@fluentui/react-icons";
 
-
-export const DropDown = () => {
-  const [open, setOpen] = React.useState(false);
+export const DropDown = ({open, onOpenChange, positioningRef}) => {
   const [key, setKey] = React.useState(0); // Add a key state to force re-render
 
-  const onOpenChange: MenuProps["onOpenChange"] = (e, data) => {
-    setOpen(data.open);
-    if (!data.open) {
-      // Reset key to force re-render of MenuItemCheckbox components when menu is closed
-      setKey((prevKey) => prevKey + 1);
-    }
-  };
-
   return (
-    <Menu open={open} onOpenChange={onOpenChange} key={key}>
+    <Menu open={open} onOpenChange={(e, data) => {
+      onOpenChange(e, data);
+      if (!data.open) {
+        // Reset key to force re-render of MenuItemCheckbox components when menu is closed
+        setKey((prevKey) => prevKey + 1);
+      }
+      }} positioning={{ target: positioningRef }} key={key}>
       <MenuTrigger>
       </MenuTrigger>
 

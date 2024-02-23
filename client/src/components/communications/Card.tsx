@@ -1,9 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
 import {
-  makeStyles,
-  shorthands,
-  tokens,
   Card,
   CardHeader,
   CardPreview,
@@ -18,6 +15,7 @@ import {
 } from "@fluentui/react-components";
 import { ArrowExpand24Regular, Dismiss24Regular } from "@fluentui/react-icons";
 import SearchBar from "./SearchBar.tsx";
+import "./Card.css";
 
 // TODO make image gray on selection, make selection more starkly visible
 // TODO aspect ratio. 1:1 square
@@ -31,47 +29,8 @@ const resolveAsset = (asset: string) => {
   return `${ASSET_URL}${asset}`;
 };
 
-const useStyles = makeStyles({
-  main: {
-    ...shorthands.gap("16px"),
-    display: "flex",
-    flexWrap: "wrap",
-    backgroundColor: '#000000',
-  },
-
-  card: {
-    width: "285px", // FIXME bad to have px hardcoded?
-    // height: "180px",
-    // maxWidth: "100%",
-    height: "fit-content",
-  },
-
-  caption: {
-    color: tokens.colorNeutralForeground3,
-  },
-
-  smallRadius: {
-    ...shorthands.borderRadius(tokens.borderRadiusSmall),
-  },
-
-  grayBackground: {
-    backgroundColor: tokens.colorNeutralBackground3,
-  },
-
-  logoBadge: {
-    // FIXME
-    ...shorthands.padding("5px"),
-    ...shorthands.borderRadius(tokens.borderRadiusSmall),
-    backgroundColor: "#FFF",
-    boxShadow:
-      "0px 1px 2px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12)",
-  },
-});
-
-// const Enlarge = bundleIcon(SlideSize24Regular, SlideSizeFilled24); // change to guides icon
-
 const ImageCard = (props: CardProps) => {
-  const styles = useStyles();
+  // const styles = useStyles();
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -81,11 +40,12 @@ const ImageCard = (props: CardProps) => {
   };
 
   return (
-    <Card className={styles.card} {...props}>
+    <Card className="card" {...props}>
       <CardPreview
-        className={styles.grayBackground}
+        className= "grayBackground"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        // onClick={()=>}
         style={{ position: "relative" }} // FIXME verify. Ensure CardPreview container has relative positioning
       >
         {/* Show enlarge only when CardPreview is hovered */}
@@ -99,7 +59,7 @@ const ImageCard = (props: CardProps) => {
             <DialogTrigger>
               <div>
                 <ArrowExpand24Regular
-                  style={{
+                style={{
                     position: "absolute",
                     top: 0,
                     right: 0,
@@ -110,25 +70,20 @@ const ImageCard = (props: CardProps) => {
                 ></ArrowExpand24Regular>
               </div>
             </DialogTrigger>
-            <DialogSurface
-              style={{
-                width: "auto",
-                height: "auto",
-                maxWidth: "80vw",
-                maxHeight: "80vh",
-              }}
-            >
+            <DialogSurface className="dialogSurface">
               <DialogBody>
-                <DialogTitle>
+                <DialogTitle className="dialogTitle">
                   Image Name
                   <DialogTrigger disableButtonEnhancement>
                     <div>
                       <Dismiss24Regular
                         style={{
                           position: "absolute",
-                          top: 10,
+                          top: 15,
                           right: 10,
                           cursor: "pointer",
+                          width: "4%",
+                          height: "4%",
                         }}
                       ></Dismiss24Regular>
                     </div>
@@ -137,7 +92,7 @@ const ImageCard = (props: CardProps) => {
                 <DialogContent>
                   <img
                     src={resolveAsset("office1.png")}
-                    style={{ width: "100%", height: "auto" }}
+                    className="imageContent"
                   />
                 </DialogContent>
               </DialogBody>
@@ -148,7 +103,7 @@ const ImageCard = (props: CardProps) => {
         {/* <div style={{ aspectRatio: 1 }}> */}
         <img
           style={{ aspectRatio: 1, objectFit: "cover" }}
-          className={styles.smallRadius}
+          className="smallRadius"
           src={resolveAsset("office1.png")}
           // TODO send http get request
         />
@@ -164,61 +119,30 @@ const ImageCard = (props: CardProps) => {
 };
 
 export const CardSelectable = () => {
-  const styles = useStyles();
+  // const styles = useStyles();
+  const numberOfCards = 13;
+  const [selectedStates, setSelectedStates] = useState(Array(numberOfCards).fill(false));
 
+  const handleSelectionChange = (index: number, event: any) => {
+    const isSelected = event.selected; // Adjust this line based on your event's structure
+    const updatedStates = [...selectedStates];
+    updatedStates[index] = isSelected;
+    setSelectedStates(updatedStates);
+  };
   // FIXME this is too redundant
-  const [selected1, setSelected1] = React.useState(false);
-  const [selected2, setSelected2] = React.useState(false);
-  const [selected3, setSelected3] = React.useState(false);
-  const [selected4, setSelected4] = React.useState(false);
-  const [selected5, setSelected5] = React.useState(false);
-  const [selected6, setSelected6] = React.useState(false);
-  const [selected7, setSelected7] = React.useState(false);
-  const [selected8, setSelected8] = React.useState(false);
-  const [selected9, setSelected9] = React.useState(false);
-
   return (
     <div style={{ margin: '20px'}}>
       <div style={{ margin: '0 0 20px 0'}}>
         <SearchBar />
       </div>
-      <div className={styles.main}>
-        <ImageCard
-          selected={selected1}
-          onSelectionChange={(_, { selected }) => setSelected1(selected)}
-        />
-        <ImageCard
-          selected={selected2}
-          onSelectionChange={(_, { selected }) => setSelected2(selected)}
-        />
-        <ImageCard
-          selected={selected3}
-          onSelectionChange={(_, { selected }) => setSelected3(selected)}
-        />
-        <ImageCard
-          selected={selected4}
-          onSelectionChange={(_, { selected }) => setSelected4(selected)}
-        />
-        <ImageCard
-          selected={selected5}
-          onSelectionChange={(_, { selected }) => setSelected5(selected)}
-        />
-        <ImageCard
-          selected={selected6}
-          onSelectionChange={(_, { selected }) => setSelected6(selected)}
-        />
-        <ImageCard
-          selected={selected7}
-          onSelectionChange={(_, { selected }) => setSelected7(selected)}
-        />
-        <ImageCard
-          selected={selected8}
-          onSelectionChange={(_, { selected }) => setSelected8(selected)}
-        />
-        <ImageCard
-          selected={selected9}
-          onSelectionChange={(_, { selected }) => setSelected9(selected)}
-        />
+      <div className="main">
+        {Array.from({ length: numberOfCards }, (_, index) => (
+          <ImageCard
+            key={index}
+            selected={selectedStates[index]}
+            onSelectionChange={(event) => handleSelectionChange(index, event)}
+          />
+        ))}
       </div>
     </div>
   );
