@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Search16Regular } from "@fluentui/react-icons";
-import "./SearchBar.css"; // Make sure you have this CSS file
+import "./SearchBar.css";
 
 const SearchBar = () => {
   const [searchInput, setSearchInput] = useState("");

@@ -1,10 +1,9 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Card,
   CardHeader,
   CardPreview,
-  CardProps,
   Dialog,
   DialogTrigger,
   DialogSurface,
@@ -14,7 +13,8 @@ import {
   Text,
 } from "@fluentui/react-components";
 import { ArrowExpand24Regular, Dismiss24Regular } from "@fluentui/react-icons";
-import SearchBar from "./SearchBar.tsx";
+
+import SearchBar from "../SearchBar/SearchBar.tsx";
 import "./Card.css";
 
 // TODO make image gray on selection, make selection more starkly visible
@@ -29,45 +29,38 @@ const resolveAsset = (asset: string) => {
   return `${ASSET_URL}${asset}`;
 };
 
-const ImageCard = (props: CardProps) => {
-  // const styles = useStyles();
+const ImageCard = ({ onClick, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleIconClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation(); // Prevent the event from propagating to parent elements
-    setIsDialogOpen(true); // Open the Dialog
+    const cardRef = useRef(null); // This ref is specific to this card
+
+  // Add an onClick handler to call the passed in onClick with this card's ref
+  const handleClick = () => {
+    if(onClick && !isDialogOpen) {
+      onClick(cardRef);
+    }
+  };
+
+  // Specifically handle clicks on the expand icon
+  const handleIconClick = (event) => {
+    event.stopPropagation(); // Stop the click from reaching the card
+    setIsDialogOpen(true);
   };
 
   return (
-    <Card className="card" {...props}>
+    <Card className="card" {...props} onClick={handleClick} ref={cardRef}>
       <CardPreview
         className= "grayBackground"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        // onClick={()=>}
         style={{ position: "relative" }} // FIXME verify. Ensure CardPreview container has relative positioning
       >
-        {/* Show enlarge only when CardPreview is hovered */}
-        {/* FIXME - positioning. and should it be top: '0' with quotes? */}
-        {/* width: '100px', height: '150px' -- why did adding this change the location of the image? */}
         {isHovered && (
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(_, data) => setIsDialogOpen(data.open)}
-          >
+          <Dialog open={isDialogOpen} onOpenChange={(_, data) => setIsDialogOpen(data.open)} >
             <DialogTrigger>
-              <div>
-                <ArrowExpand24Regular
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    cursor: "pointer",
-                    width: "13%",
-                    height: "13%",
-                  }}
-                ></ArrowExpand24Regular>
+              <div onClick={handleIconClick}>
+              <ArrowExpand24Regular className="iconExpand" />
               </div>
             </DialogTrigger>
             <DialogSurface className="dialogSurface">
@@ -76,16 +69,7 @@ const ImageCard = (props: CardProps) => {
                   Image Name
                   <DialogTrigger disableButtonEnhancement>
                     <div>
-                      <Dismiss24Regular
-                        style={{
-                          position: "absolute",
-                          top: 15,
-                          right: 10,
-                          cursor: "pointer",
-                          width: "4%",
-                          height: "4%",
-                        }}
-                      ></Dismiss24Regular>
+                    <Dismiss24Regular className="iconDismiss" />
                     </div>
                   </DialogTrigger>
                 </DialogTitle>
@@ -99,15 +83,13 @@ const ImageCard = (props: CardProps) => {
             </DialogSurface>
           </Dialog>
         )}
-
-        {/* <div style={{ aspectRatio: 1 }}> */}
+        
         <img
           style={{ aspectRatio: 1, objectFit: "cover" }}
-          className="smallRadius"
+          className="reviewImage"
           src={resolveAsset("office1.png")}
           // TODO send http get request
         />
-        {/* </div> */}
       </CardPreview>
 
       <CardHeader
@@ -118,34 +100,23 @@ const ImageCard = (props: CardProps) => {
   );
 };
 
-export const CardSelectable = () => {
-  // const styles = useStyles();
-  const numberOfCards = 13;
-  const [selectedStates, setSelectedStates] = useState(Array(numberOfCards).fill(false));
+export const CardSelectable = ({onCardClick}) => {
 
-  const handleSelectionChange = (index: number, event: any) => {
-    const isSelected = event.selected; // Adjust this line based on your event's structure
-    const updatedStates = [...selectedStates];
-    updatedStates[index] = isSelected;
-    setSelectedStates(updatedStates);
-  };
-  // FIXME this is too redundant
+  const numberOfCards = 13;
+
   return (
-    <div style={{ margin: '20px'}}>
-      <div style={{ margin: '0 0 20px 0'}}>
+    <div className="cardSelectableContainer">
+      <div className="searchBarContainer">
         <SearchBar />
       </div>
       <div className="main">
         {Array.from({ length: numberOfCards }, (_, index) => (
           <ImageCard
             key={index}
-            selected={selectedStates[index]}
-            onSelectionChange={(event) => handleSelectionChange(index, event)}
+            onClick={(ref) => onCardClick(index, ref)}
           />
         ))}
       </div>
     </div>
   );
 };
-
-// export default ImageCard;
