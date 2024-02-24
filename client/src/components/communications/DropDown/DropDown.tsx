@@ -2,13 +2,13 @@ import * as React from "react";
 
 import {
   Menu,
-  MenuTrigger,
   MenuList,
   MenuItem,
   MenuItemCheckbox,
   MenuPopover,
 } from "@fluentui/react-components";
 import { Send24Regular } from "@fluentui/react-icons";
+import "./DropDown.css";
 
 export const DropDown = ({open, onOpenChange, positioningRef}) => {
   const [key, setKey] = React.useState(0); // Add a key state to force re-render
@@ -21,10 +21,8 @@ export const DropDown = ({open, onOpenChange, positioningRef}) => {
         setKey((prevKey) => prevKey + 1);
       }
       }} positioning={{ target: positioningRef }} key={key}>
-      <MenuTrigger>
-      </MenuTrigger>
 
-      <MenuPopover>
+      <MenuPopover className="dropdown-popover">
         <MenuList>
           <MenuItemCheckbox name="Astronaut" value="1">
             Akira
