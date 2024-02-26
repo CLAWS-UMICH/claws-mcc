@@ -1,7 +1,6 @@
 // Geosamples.tsx
-import React, { useEffect, useReducer, useState } from 'react';
-import SidebarMenu from './SidebarMenu.tsx';
-import GeosampleList from './GeosampleList.tsx';
+import React, { useEffect, useId, useReducer, useState } from 'react';
+import useWebSocket from 'react-use-websocket';
 import {
     Button,
     Divider,
@@ -12,14 +11,18 @@ import {
   makeStyles,
   shorthands,
 } from "@fluentui/react-components";
-import { Search20Regular } from "@fluentui/react-icons";
+import { Search20Regular, Edit16Regular, Delete16Regular, Map16Regular, Star16Regular, Star16Filled } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
+import { DetailScreen } from './DetailScreen.tsx';
+import GeosampleList from './GeosampleList.tsx';
 import "./Geosamples.css"
-import { GeosampleMap } from './GeosampleMap.tsx';
-import { WaypointDrawer } from '../waypoints/WaypointDrawer.tsx';
-import { WaypointList } from '../waypoints/WaypointList.tsx';
+// import { GeosampleMap } from './GeosampleMap.tsx';
 import { WaypointMap } from '../waypoints/WaypointMap.tsx';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+
+type ARLocation = {
+    latitude: number;
+    longitude: number;
+}
 
 type EvaData = {
     name: string;
@@ -35,6 +38,27 @@ type EvaData = {
         K2O: number;
         P2O3: number;
     }
+}
+
+export type BaseZone = {
+    zone_id: string;
+    geosample_ids: [number];
+    location: Location;
+    radius: number;
+}
+
+export type BaseGeosample = {
+    geosample_id: number;
+    zone_id: string;
+    eva_data: EvaData;
+    time: string; 
+    color: string;
+    shape: string;
+    rock_type: string; 
+    location: ARLocation;
+    author: number;
+    description: string;
+    image: string;
 }
 
 export enum WaypointType {
@@ -57,6 +81,9 @@ export type BaseWaypoint = {
 }
 
 export type ManagerState = {
+    geosamples: BaseGeosample[];
+    starred?: Record<string, number[]>;
+
     temp?: BaseWaypoint; // Used to store a waypoint that is being created
     waypoints: BaseWaypoint[];
     selected?: BaseWaypoint;
@@ -80,33 +107,27 @@ const useStyles = makeStyles({
     height: "100vh",
     backgroundColor: "#fff",
   },
-
-  content: {
+  dividerContainer: {
+    width: "100%"
+  },
+  divider: {
+    marginTop: "15px",
+    marginBottom: "15px"
+  },
+  dividerTop: {
+    marginTop: "10px",
+  },
+  header: {
+    marginTop: "-14px",
+    marginBottom: "-7.5px"
+  },
+  mapContainer: {
     ...shorthands.flex(1),
     ...shorthands.padding("16px"),
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
   },
-
-  dividerContainer: {
-    width: "100%"
-  },
-
-  divider: {
-    marginTop: "15px",
-    marginBottom: "15px"
-  },
-
-  dividerTop: {
-    marginTop: "15px",
-    // marginBottom: "-10px"
-  },
-
-  header: {
-    marginTop: "-10px",
-    marginBottom: "-7.5px"
-  }
 });
 
 export const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerState => {
@@ -164,38 +185,18 @@ export const waypointsReducer = (state: ManagerState, action: ManagerAction): Ma
 
 const initialState: ManagerState = {waypoints: []}
 
-const GeosampleManager: React.FC = () => {    
+const GeosampleManager: React.FC = () => { 
+    // to keep stuff
+    const styles = useStyles();   
     const [showSearchBar, setShowSearchBar] = useState(false);
+    const [isStarred, setIsStarred] = useState(false); 
+
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
+    const outlineId = useId();
     const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
     });
-
-    const dropdownMenus = [
-        <GeosampleList header="Header 1" samples={['Link 1.1', 'Link 1.2', 'Link 1.3']} />,
-        <GeosampleList header="Header 2" samples={['Link 2.1', 'Link 2.2']} />,
-    ];
-    const styles = useStyles();
-    const menuData = [
-    {
-        header: 'Header 1',
-        samples: ['Link 1.1', 'Link 1.2', 'Link 1.3'],
-    },
-    {
-        header: 'Header 2',
-        samples: ['Link 2.1', 'Link 2.2'],
-    },
-    ];
-    const dropdownTest = {
-        header: 'test drop',
-        samples: ['1', '2', '3'],
-    };
-
-    const handleDismiss = () => {
-        setShowSearchBar(false);
-    };
-
     useEffect(() => {
         if (lastMessage !== null) {
             setMessageHistory((prev) => prev.concat(lastMessage.data));
@@ -203,120 +204,63 @@ const GeosampleManager: React.FC = () => {
         }
     }, [lastMessage, setMessageHistory]);
 
+    const handleDismiss = () => { setShowSearchBar(false); };
+    const handleFavoriting = () => {
+        setIsStarred(!isStarred);
+    }
+
     return (
         <div className={styles.root}>
-        <InlineDrawer separator open>
-            <DrawerHeader className={styles.header}>
-            <DrawerHeaderTitle action={<Button size="medium" icon={<Search20Regular/>} onClick={() => setShowSearchBar(!showSearchBar)}></Button>}><b>Samples</b></DrawerHeaderTitle>
-            </DrawerHeader>
-            <div className={styles.dividerContainer}>
-                <Divider className={styles.dividerTop}></Divider>
-                {showSearchBar && (
-                <div>               
+            <InlineDrawer style={{width:"33.33%"}}separator open>
+                <DrawerHeader className={styles.header}>
+                    <DrawerHeaderTitle>
+                        <b>temp section for camera view</b>
+                    </DrawerHeaderTitle>
+                </DrawerHeader>
+            </InlineDrawer>
+            <InlineDrawer style={{width:"220px"}}separator open>
+                <DrawerHeader className={styles.header}>
+                    <DrawerHeaderTitle action={<Button size="medium" icon={<Search20Regular/>} onClick={() => setShowSearchBar(!showSearchBar)}></Button>}>
+                        <b style={{fontSize:"18px"}}>Samples</b>
+                    </DrawerHeaderTitle>
+                </DrawerHeader>
+                <div className={styles.dividerContainer}>
+                    <Divider className={styles.dividerTop}></Divider>
+                    {showSearchBar && (<div>               
+                                            <DrawerBody>
+                                                <SearchBox handleDismiss={handleDismiss}/>
+                                            </DrawerBody>
+                                            <Divider className={styles.divider}></Divider>
+                                        </div>)}
+                </div>
                 <DrawerBody>
-                <SearchBox handleDismiss={handleDismiss}/>
-                {/* <SamplesList/> */}
+                    <GeosampleList header="Header 1" samples={['Link 1.1', 'Link 1.2', 'Link 1.3']} isStarred={isStarred} />
                 </DrawerBody>
-                <Divider className={styles.divider}></Divider></div>)}
-            </div>
-            <DrawerBody><SidebarMenu dropdownMenus={dropdownMenus}/></DrawerBody>
-        </InlineDrawer>
-        <div className={styles.content}>
-        {/* <div style={{display: "flex"}}> */}
-            {/* <InlineDrawer separator open>
-                <WaypointDrawer selected={state.selected} waypoints={state.waypoints} dispatch={dispatch}
-                                 ready={readyState === ReadyState.OPEN}/>
-            </InlineDrawer> */}
-            <div className='waypoints-container'>
-                {/* <WaypointList temp={state.temp} waypoints={state.waypoints} selected={state.selected}
-                              dispatch={dispatch}/> */}
-                <Divider/>
-                <WaypointMap waypoints={state.waypoints}
-                             selected={state.selected}
-                             dispatch={dispatch}/>
-            </div>
-        </div>
-        {/* </div> */}
+            </InlineDrawer>
+            <DrawerBody>
+                <div>
+                    <h4 style={{marginTop:'.7rem', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap:'10px' }}>
+                            <b style={{fontSize:"17px"}}>Geo Sample 1</b>
+                            <Button icon={isStarred ? <Star16Filled style={{color:"#EAA300"}}/> : <Star16Regular />} onClick={handleFavoriting}></Button>
+                        </div>
+                        <div style={{display:'flex', gap:'10px'}}>
+                            <Button icon={<Map16Regular/>}>View on map</Button>
+                            <Button icon={<Edit16Regular/>}>Edit</Button>
+                            <Button icon={<Delete16Regular/>}>Delete</Button>
+                        </div>
+                    </h4>
+                    <Divider style={{marginLeft:'-24px', marginTop:'-9.1px', marginBottom:'.75rem', width:'1120px'}}></Divider>
+                </div>
+                <DetailScreen/>
+                <div className={styles.mapContainer}>
+                    <div style={{alignItems:"center", height: "400px", width:"750px"}}>
+                        <WaypointMap waypoints={state.waypoints} selected={state.selected} dispatch={dispatch}/>
+                    </div>
+                </div>
+            </DrawerBody>
         </div>
     );
 };
 
-import React from 'react';
-import { useContext } from 'react';
-import { Stack } from '@fluentui/react';
-import Geosamples from '../common/Geosamples/Geosamples.tsx';
-import SearchBox from '../common/SearchBox/SearchBox.tsx';
-
-import DropdownElt from '../common/Dropdown/Dropdown.tsx';
-import Label from '../common/Label/Label.tsx';
-import Description from '../common/Description/Description.tsx';
-
-import { Button } from '@fluentui/react-components';
-import axios from 'axios';
-
-const GeosampleManager: React.FC = () => 
-{
-    const menuData = [
-        {
-            header: 'Header 1',
-            samples: ['Link 1.1', 'Link 1.2', 'Link 1.3'],
-        },
-        {
-            header: 'Header 2',
-            samples: ['Link 2.1', 'Link 2.2'],
-        },
-    ];
-    const dropdownTest = {
-        header: 'test drop',
-        samples: ['1', '2', '3'],
-    };
-
-    return (
-        <div>
-        <Geosamples />
-        {/* <DropdownMenu header={dropdownTest.header} samples={dropdownTest.samples} /> */}
-        {/* <SearchBox /> */}
-            <div style={{display:'flex', alignContent:'center', position:'absolute', left: '225px', right: '0px', background: '#f3f2f1', padding: '10px', top: '55px'}}>
-                <h4><b>Zone A: Geo Sample 1</b></h4>
-                <div style={{position:'relative', left:'10px', display:'flex', alignContent:'center', height: '35px', width:'5px', top:'10px'}}>
-                    <Button>☆</Button>
-                </div>
-                <div className="rightBtns" style={{position:'relative', left:'53%', display:'flex', alignContent:'center', top:'10px', height:'35px'}}>
-                    <Button style={{}}>View on map</Button>
-                    <Button style={{}}>Edit</Button>
-                    <Button style={{}}>Delete</Button>
-                </div>
-            </div>
-            <div style={{position:'relative', background: '#eeeeee', top:'-10px', left:'225px', width:'1270px', padding: '20px',}}>
-                <div style={{display:"flex", justifyContent:'space-between', width:'1260px'}}>
-                    <DropdownElt title="Shape" options={["Hexagon"]}/>
-                    <DropdownElt title="Color" options={["Brown"]}/>
-                    <Label title="Rock Type" text="Basalt"/>
-                    <Label title="ID" text="000000000" />
-                </div>
-                <div style={{position:'relative', right:'500px', left:'0px'}}>
-                    <Description text="Description"/>
-                </div>
-                <div style={{display:"flex", justifyContent:'space-between', width:'1260px', position:'relative', left:'0px', right:'500px',}}>
-                    <Label title="SiO2" text="40.58"/>
-                    <Label title="TiO2" text="12.83" />
-                    <Label title="Ai2O3" text="10.91" />
-                    <Label title="FeO" text="13.8" />
-                    <Label title="MnO" text="40.58" />
-                    <Label title="MgO" text="12.83" />
-                    <Label title="CaO" text="10.91" />
-                    <Label title="K2O" text="13.8" />
-                    <Label title="P2O3" text="12.8" />
-                </div>
-                <div style={{display:"flex", justifyContent:'space-between', width:'1260px', position:'relative', left:'0px', right:'500px',}}>
-                    <Label title="Location" text="40.58"/>
-                    <Label title="Time" text="12.83" />
-                    <Label title="Date" text="10.91" />
-                    <Label title="Zone" text="13.8" />
-                </div>
-            </div>
-
-        </div>
-    );;
-};
 export default GeosampleManager;

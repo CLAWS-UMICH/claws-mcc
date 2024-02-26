@@ -9,7 +9,8 @@ import {
     makeStyles
 } from '@fluentui/react-components';
 import { ChevronUp16Regular, ChevronDown16Regular } from '@fluentui/react-icons';
-import geosampleImage from '../../assets/geosample.png';
+import sampleIcon from '../../assets/geosample.png';
+import starredSampleIcon from '../../assets/starred_sample_pic.png'
 
 
 interface SampleListProps {
@@ -19,7 +20,7 @@ interface SampleListProps {
 
 const useStyles = makeStyles({
     container: {
-        // marginTop: "-7.5px",
+        marginLeft: ".2rem",
     },
 
     header: {
@@ -33,13 +34,14 @@ const useStyles = makeStyles({
     },
 
     sample: {
-        fontSize: "15px",
+        fontSize: "14px",
+        marginTop: ".25rem",
         marginBottom: "0px"
     },
 
     type: {
-        fontSize: "13px",
-        marginTop: "-17.5px",
+        fontSize: "12.25px",
+        marginTop: "-20px",
         marginBottom: "17.5px",
         marginLeft: "32.5px"
     },
@@ -52,7 +54,7 @@ const useStyles = makeStyles({
     }
 })
 
-const GeosampleList = ({header, samples}) => {
+const GeosampleList = ({header, samples, isStarred}) => {
     const [openItems, setOpenItems] = React.useState(["1"]);
     const handleToggle: AccordionToggleEventHandler<string> = (event, data) => {
         setOpenItems(data.openItems);
@@ -63,15 +65,15 @@ const GeosampleList = ({header, samples}) => {
         <Accordion className={styles.container} onToggle={handleToggle} openItems={openItems} multiple collapsible>
             <AccordionItem value="1">
                 <AccordionHeader className={styles.header} size="large" expandIcon={openItems[0] === "1" ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
-                    <b>Zone A</b>
+                    <b style={{fontSize:"15px"}}>Zone A</b>
                 </AccordionHeader>
                 {samples.map((sample: any) => (
                     <AccordionPanel>
                         <div className={styles.sampleContainer}>
                             <div>
-                                <img style={{alignSelf: "center", padding: "7px 15px 0 0"}} width={28} height={28} src={geosampleImage}/>
+                                <img style={{alignSelf: "center", padding: "7px 15px 0 0"}} width={28} height={28} src={sampleIcon}/>
                                 <div className={styles.imageText}><b>B1</b></div>
-                                </div>
+                            </div>
                             <div className={styles.sample}><b>{sample}</b></div>
                         </div>
                         <div className={styles.type}>Rock Type</div>
@@ -84,16 +86,3 @@ const GeosampleList = ({header, samples}) => {
 
 export default GeosampleList;
 
-        // <Menu>
-        //     <MenuTrigger>
-        //         <Button>{header}</Button>
-        //     </MenuTrigger>
-
-        //     <MenuPopover>
-        //         <MenuList>
-        //             {samples.map((sample, index) => (
-        //                 <MenuItem key={index}>{sample}</MenuItem>
-        //             ))}
-        //         </MenuList>
-        //     </MenuPopover>
-        // </Menu>

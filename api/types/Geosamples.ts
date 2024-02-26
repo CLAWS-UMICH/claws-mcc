@@ -1,7 +1,6 @@
 import Base from '../Base';
 import Message from './message';
 
-//TODO: should we have this type declaration in just one file
 type ARLocation = {
     latitude: number;
     longitude: number;
@@ -40,7 +39,7 @@ export type BaseGeosample = {
     rock_type: string; 
     location: ARLocation;
     author: number;
-    // description: string;
+    description: string;
     image: string;
 }
 

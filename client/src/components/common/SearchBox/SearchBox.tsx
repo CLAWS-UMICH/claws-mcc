@@ -11,10 +11,10 @@ const useStyles = makeStyles({
     rowGap: "5px",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: "-10px"
+    marginTop: "-10px",
   },
   input: {
-    width: "230px",
+    width: "150px",
     marginRight: "auto"
   },
   dismiss: {
@@ -56,18 +56,18 @@ const SearchBox = ({handleDismiss}) => {
 // );
 
 export default SearchBox;
-import type { FieldProps } from "@fluentui/react-components";
-import { Field, Input } from "@fluentui/react-components";
+// import type { FieldProps } from "@fluentui/react-components";
+// import { Field, Input } from "@fluentui/react-components";
 
-const Box = (props: Partial<FieldProps>) => (
-  <Field
-    label="Search"
-    validationState="success"
-    validationMessage="This is a success message."
-    {...props}
-  >
-    <Input />
-  </Field>
-);
+// const Box = (props: Partial<FieldProps>) => (
+//   <Field
+//     label="Search"
+//     validationState="success"
+//     validationMessage="This is a success message."
+//     {...props}
+//   >
+//     <Input />
+//   </Field>
+// );
 
-export default Box;
+// export default Box;
