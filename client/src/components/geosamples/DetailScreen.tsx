@@ -150,7 +150,7 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ ite
     );
 }
 
-export const DetailScreen = () => {
+const DetailScreen = () => {
   const dropdownIdShape = useId("dropdown-default");
   const dropdownIdColor = useId("dropdown-default");
   const outlineId = useId("");
@@ -251,3 +251,5 @@ export const DetailScreen = () => {
     </div>
   );
 };
+
+export default DetailScreen;

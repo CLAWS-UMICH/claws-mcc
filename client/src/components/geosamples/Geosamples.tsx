@@ -4,16 +4,16 @@ import useWebSocket from 'react-use-websocket';
 import {
     Button,
     Divider,
-  DrawerBody,
-  DrawerHeader,
-  DrawerHeaderTitle,
-  InlineDrawer,
-  makeStyles,
-  shorthands,
+    DrawerBody,
+    DrawerHeader,
+    DrawerHeaderTitle,
+    InlineDrawer,
+    makeStyles,
+    shorthands,
 } from "@fluentui/react-components";
 import { Search20Regular, Edit16Regular, Delete16Regular, Map16Regular, Star16Regular, Star16Filled } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
-import { DetailScreen } from './DetailScreen.tsx';
+import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
 import "./Geosamples.css"
 // import { GeosampleMap } from './GeosampleMap.tsx';

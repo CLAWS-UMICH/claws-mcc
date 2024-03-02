@@ -7,13 +7,17 @@ export default class Geosamples extends Base {
     public routes = [
         {
             path: '/api/geosamples',
-            method: 'post',
+            method: 'put',
             handler: this.addGeosample.bind(this),
         },
         {
             path: '/api/geosamples',
             method: 'delete',
             handler: this.deleteGeosample.bind(this),
+        },
+        {
+            path: '/api/geosamples',
+            method: ''
         }
     ];
 

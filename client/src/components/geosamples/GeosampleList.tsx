@@ -71,7 +71,8 @@ const GeosampleList = ({header, samples, isStarred}) => {
                     <AccordionPanel>
                         <div className={styles.sampleContainer}>
                             <div>
-                                <img style={{alignSelf: "center", padding: "7px 15px 0 0"}} width={28} height={28} src={sampleIcon}/>
+                                <img style={{alignSelf: "center", padding: "7px 15px 0 0"}} 
+                                    width={28} height={28} src={isStarred ? starredSampleIcon : sampleIcon}/>
                                 <div className={styles.imageText}><b>B1</b></div>
                             </div>
                             <div className={styles.sample}><b>{sample}</b></div>
