@@ -48,6 +48,7 @@ const useStyles = makeStyles({
     justifyContent: "flex-start",
     rowGap: "5px",
     backgroundColor: '#000000',
+    marginLeft: "33.33%",
   },
   tab: {
     fontSize: '15px',

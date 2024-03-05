@@ -1,6 +1,6 @@
 // Geosamples.tsx
 import React, { useEffect, useId, useReducer, useState } from 'react';
-import useWebSocket from 'react-use-websocket';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 import {
     Button,
     Divider,
@@ -24,7 +24,7 @@ type ARLocation = {
     longitude: number;
 }
 
-type EvaData = {
+export type EvaData = {
     name: string;
     id: number;
     data: {
@@ -40,18 +40,14 @@ type EvaData = {
     }
 }
 
-export type BaseZone = {
-    zone_id: string;
-    geosample_ids: [number];
-    location: Location;
-    radius: number;
-}
-
 export type BaseGeosample = {
+    _id?: number;
     geosample_id: number;
     zone_id: string;
+    starred: boolean;
     eva_data: EvaData;
     time: string; 
+    date: string;
     color: string;
     shape: string;
     rock_type: string; 
@@ -61,44 +57,26 @@ export type BaseGeosample = {
     image: string;
 }
 
-export enum WaypointType {
-    STATION,
-    NAV,
-    GEO,
-    DANGER
-}
-
-export type BaseWaypoint = {
-    _id?: number; // server generated
-    waypoint_id: number; //sequential
-    details: string // not in mongo
-    date: string// not in mongo
-    time: string// not in mongo
-    location: { latitude: number, longitude: number };
-    type: WaypointType;
-    description: string;
-    author: number; //-1 if mission control created
+export type BaseZone = {
+    zone_id: string;
+    geosample_ids: BaseGeosample[];
+    location: ARLocation;
+    radius: number;
 }
 
 export type ManagerState = {
+    sample_zones: BaseZone[];
     geosamples: BaseGeosample[];
-    starred?: Record<string, number[]>;
-
-    temp?: BaseWaypoint; // Used to store a waypoint that is being created
-    waypoints: BaseWaypoint[];
-    selected?: BaseWaypoint;
-    message?: string;
+    selected?: BaseGeosample;
 }
 
 export type ManagerAction =
-    { type: 'set', payload: BaseWaypoint[] } | // Should only be used by ServerListener
-    { type: 'add', payload: BaseWaypoint } |
-    { type: 'remove', payload: BaseWaypoint[] } |
-    { type: 'update', payload: { old: BaseWaypoint, new: BaseWaypoint } } |
-    { type: 'select', payload: BaseWaypoint } |
-    { type: 'deselect' } |
-    { type: 'writeTemp', payload: BaseWaypoint } |
-    { type: 'clearTemp' };
+    { type: 'set', payload: {zone: BaseZone[], samples: BaseGeosample[]} } | // Should only be used by ServerListener
+    { type: 'delete', payload: BaseGeosample } |
+    { type: 'update', payload: BaseGeosample } |
+    { type: 'select', payload: BaseGeosample } |
+    { type: 'deselect' };
+
 
 const useStyles = makeStyles({
   root: {
@@ -130,27 +108,34 @@ const useStyles = makeStyles({
   },
 });
 
-export const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerState => {
+export const geosampleReducer = (state: ManagerState, action: ManagerAction): ManagerState => {
     switch (action.type) {
-        case 'add':
+        case 'set':
             return {
                 ...state,
-                waypoints: [...state.waypoints, action.payload]
+                geosamples: action.payload.samples,
+                sample_zones: action.payload.zone,
             };
-        case 'remove':
+        case 'delete':
             return {
                 ...state,
-                waypoints: state.waypoints.filter((waypoint) => !action.payload.includes(waypoint))
+                sample_zones: state.sample_zones.map(zone => ({
+                    ...zone,
+                    geosample_ids: zone.geosample_ids.filter(id => id.geosample_id !== action.payload.geosample_id)
+                })),
             };
         case 'update':
+            if (action.payload === undefined) {
+                return state;
+            }
+
             return {
                 ...state,
-                waypoints: state.waypoints.map((waypoint) => {
-                    if (waypoint._id === action.payload.old._id) {
-                        return action.payload.new;
-                    } else {
-                        return waypoint;
+                geosamples: state.geosamples.map((sample) => {
+                    if (sample.geosample_id === action.payload.geosample_id) {
+                        return action.payload;
                     }
+                    return sample;
                 })
             };
         case 'select':
@@ -163,39 +148,102 @@ export const waypointsReducer = (state: ManagerState, action: ManagerAction): Ma
                 ...state,
                 selected: undefined
             };
-        case 'set':
-            return {
-                ...state,
-                waypoints: action.payload
-            };
-        case 'writeTemp':
-            return {
-                ...state,
-                temp: action.payload
-            };
-        case 'clearTemp':
-            return {
-                ...state,
-                temp: undefined
-            };
         default:
             return state;
     }
 }
+var geosample: BaseGeosample = {
+    geosample_id: 1, 
+    zone_id: "A", 
+    starred: true, 
+    eva_data: {
+        name: "Geo Sample 1",
+        id: 2394,
+        data: {
+            SiO2: 10.00,
+            TiO2: 10.00,
+            Al2O3: 10.00,
+            FeO: 10.00,
+            MnO: 10.00,
+            MgO: 10.00,
+            CaO: 10.00,
+            K2O: 10.00,
+            P2O3: 10.00,
+        }
+    },
+    time: "14:23:27",
+    date: "3/20/2025",
+    color: "Brown",
+    shape: "Square",
+    rock_type: "Basalt",
+    location: {
+        latitude: 93.1442,
+        longitude: 193.2442
+    },
+    author: 2,
+    description: "this is a description",
+    image: "../../assets/temp_sample_pic.png"
+}
 
-const initialState: ManagerState = {waypoints: []}
+var geosample2: BaseGeosample = {
+    geosample_id: 2, 
+    zone_id: "A", 
+    starred: false, 
+    eva_data: {
+        name: "Geo Sample 2",
+        id: 8372,
+        data: {
+            SiO2: 10.00,
+            TiO2: 10.00,
+            Al2O3: 10.00,
+            FeO: 10.00,
+            MnO: 10.00,
+            MgO: 10.00,
+            CaO: 10.00,
+            K2O: 10.00,
+            P2O3: 10.00,
+        }
+    },
+    time: "14:23:27",
+    date: "3/20/2025",
+    color: "Brown",
+    shape: "Square",
+    rock_type: "Basalt",
+    location: {
+        latitude: 93.1442,
+        longitude: 193.2442
+    },
+    author: 1,
+    description: "this is a description",
+    image: "../../assets/temp_sample_pic.png"
+}
+
+var zones: BaseZone[] = [{zone_id: "A",
+                            geosample_ids: [geosample, geosample2],
+                            location: {
+                                latitude: 100.2321,
+                                longitude: 205.2345
+                            },
+                            radius: 15.3249},
+                            {zone_id: "B",
+                            geosample_ids: [],
+                            location: {
+                                latitude: 100.2321,
+                                longitude: 205.2345
+                            },
+                            radius: 15.3249},
+                        ]
+
+const initialState: ManagerState = {geosamples: [geosample], sample_zones: zones, selected: undefined}
 
 const GeosampleManager: React.FC = () => { 
-    // to keep stuff
     const styles = useStyles();   
-    const [showSearchBar, setShowSearchBar] = useState(false);
-    const [isStarred, setIsStarred] = useState(false); 
-
-    const [state, dispatch] = useReducer(waypointsReducer, initialState)
+    const [state, dispatch] = useReducer(geosampleReducer, initialState);
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
-    const outlineId = useId();
+    const [showSearchBar, setShowSearchBar] = useState(false);
+
     const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
-        onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
+        onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'}))
     });
     useEffect(() => {
         if (lastMessage !== null) {
@@ -203,11 +251,6 @@ const GeosampleManager: React.FC = () => {
             dispatch({type: 'set', payload: JSON.parse(lastMessage.data).data});
         }
     }, [lastMessage, setMessageHistory]);
-
-    const handleDismiss = () => { setShowSearchBar(false); };
-    const handleFavoriting = () => {
-        setIsStarred(!isStarred);
-    }
 
     return (
         <div className={styles.root}>
@@ -228,35 +271,21 @@ const GeosampleManager: React.FC = () => {
                     <Divider className={styles.dividerTop}></Divider>
                     {showSearchBar && (<div>               
                                             <DrawerBody>
-                                                <SearchBox handleDismiss={handleDismiss}/>
+                                                <SearchBox handleDismiss={() => setShowSearchBar(!showSearchBar)}/>
                                             </DrawerBody>
                                             <Divider className={styles.divider}></Divider>
                                         </div>)}
                 </div>
                 <DrawerBody>
-                    <GeosampleList header="Header 1" samples={['Link 1.1', 'Link 1.2', 'Link 1.3']} isStarred={isStarred} />
+                    <GeosampleList sample_zones={state.sample_zones} selected={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
                 </DrawerBody>
             </InlineDrawer>
             <DrawerBody>
-                <div>
-                    <h4 style={{marginTop:'.7rem', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap:'10px' }}>
-                            <b style={{fontSize:"17px"}}>Geo Sample 1</b>
-                            <Button icon={isStarred ? <Star16Filled style={{color:"#EAA300"}}/> : <Star16Regular />} onClick={handleFavoriting}></Button>
-                        </div>
-                        <div style={{display:'flex', gap:'10px'}}>
-                            <Button icon={<Map16Regular/>}>View on map</Button>
-                            <Button icon={<Edit16Regular/>}>Edit</Button>
-                            <Button icon={<Delete16Regular/>}>Delete</Button>
-                        </div>
-                    </h4>
-                    <Divider style={{marginLeft:'-24px', marginTop:'-9.1px', marginBottom:'.75rem', width:'1120px'}}></Divider>
-                </div>
-                <DetailScreen/>
+                <DetailScreen geosample={state.selected} dispatch={dispatch}/>
                 <div className={styles.mapContainer}>
-                    <div style={{alignItems:"center", height: "400px", width:"750px"}}>
+                    {/* <div style={{alignItems:"center", height: "400px", width:"750px"}}>
                         <WaypointMap waypoints={state.waypoints} selected={state.selected} dispatch={dispatch}/>
-                    </div>
+                    </div> */}
                 </div>
             </DrawerBody>
         </div>

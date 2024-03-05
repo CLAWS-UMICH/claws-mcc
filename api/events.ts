@@ -8,6 +8,10 @@ const eventRegistry: { [key: string]: (data: Message) => void } = {
     "PUT": (data: Message) => {
         // TODO: Store data in database and send to frontend
         console.log(`Received PUT message: ${JSON.stringify(data)}`);
+    },
+
+    "SAMPLES": (data: Message) => {
+        console.log(`Received geosamples message: ${JSON.stringify(data)}`);
     }
 };
 export default eventRegistry;
