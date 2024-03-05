@@ -229,9 +229,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           "Accept": "application/json"
         },
         body: JSON.stringify({
-          data: {
-            sample: geosample
-          }
+          data: geosample
         })
       });
       if (!res.ok) {
@@ -255,6 +253,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
 
   const handleDelete = async (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
     if (geosample) {
+      console.log(geosample)
       const res = await fetch("/api/geosamples", {
         method: "DELETE",
         headers: {
@@ -265,7 +264,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           data: geosample
         })
       });
-      if (res.status !== 200) {
+      if (!res.ok) {
         alert("Failed to delete sample");
         return;
       }

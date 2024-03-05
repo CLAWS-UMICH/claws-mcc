@@ -1,5 +1,3 @@
-import Base from '../Base';
-import Geosamples from '../routes/Geosamples';
 import Message from './message';
 
 type ARLocation = {
