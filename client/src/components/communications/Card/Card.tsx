@@ -29,11 +29,11 @@ const resolveAsset = (asset: string) => {
   return `${ASSET_URL}${asset}`;
 };
 
-const ImageCard = ({ onClick, ...props }) => {
+const ImageCard = ({ onClick, images, index, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    const cardRef = useRef(null); // This ref is specific to this card
+  
+  const cardRef = useRef(null); // This ref is specific to this card
 
   // Add an onClick handler to call the passed in onClick with this card's ref
   const handleClick = () => {
@@ -77,6 +77,7 @@ const ImageCard = ({ onClick, ...props }) => {
                   <img
                     src={resolveAsset("office1.png")}
                     className="imageContent"
+                    alt="alt"
                   />
                 </DialogContent>
               </DialogBody>
@@ -88,32 +89,30 @@ const ImageCard = ({ onClick, ...props }) => {
           style={{ aspectRatio: 1, objectFit: "cover" }}
           className="reviewImage"
           src={resolveAsset("office1.png")}
-          // TODO send http get request
         />
       </CardPreview>
 
       <CardHeader
-        header={<Text weight="semibold">claws</Text>}
+        header={<Text weight="semibold">{images[Object.keys(images)[index]].title}</Text>}
         // action={        }
       />
     </Card>
   );
 };
 
-export const CardSelectable = ({onCardClick}) => {
-
-  const numberOfCards = 13;
-
+export const CardSelectable = ({onCardClick, images}) => {
   return (
     <div className="cardSelectableContainer">
       <div className="searchBarContainer">
         <SearchBar />
       </div>
       <div className="main">
-        {Array.from({ length: numberOfCards }, (_, index) => (
+        {Array.from({ length: images.length }, (_, index) => (
           <ImageCard
             key={index}
             onClick={(ref) => onCardClick(index, ref)}
+            images={images}
+            index={index}
           />
         ))}
       </div>
