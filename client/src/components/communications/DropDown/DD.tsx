@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CardSelectable } from "./Card.tsx";
+import { CardSelectable } from "../Card/Card.tsx";
 
 const CustomComponent = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
