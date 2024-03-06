@@ -35,6 +35,8 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
   
   const cardRef = useRef(null); // This ref is specific to this card
 
+  // console.log("data:image/gif;base64," + images[Object.keys(images)[index]].img_binary);
+
   // Add an onClick handler to call the passed in onClick with this card's ref
   const handleClick = () => {
     if(onClick && !isDialogOpen) {
@@ -75,7 +77,7 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
                 </DialogTitle>
                 <DialogContent>
                   <img
-                    src={resolveAsset("office1.png")}
+                    src={"data:image/gif;base64," + images[Object.keys(images)[index]].img_binary}
                     className="imageContent"
                     alt="alt"
                   />
@@ -88,7 +90,7 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
         <img
           style={{ aspectRatio: 1, objectFit: "cover" }}
           className="reviewImage"
-          src={resolveAsset("office1.png")}
+          src={"data:image/gif;base64," + images[Object.keys(images)[index]].img_binary}
         />
       </CardPreview>
 
