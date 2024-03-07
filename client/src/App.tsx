@@ -47,8 +47,6 @@ function App() {
                 break;
             case 'samplesTab':
                 break;
-            case 'navigationTab':
-                break;
             case 'roverTab':
                 break;
             case 'suitsTab':
