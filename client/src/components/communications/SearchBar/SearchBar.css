@@ -2,11 +2,12 @@
     position: relative;
     display: flex;
     align-items: center;
-    border: 1px solid #666666;
+    border: 2px solid #666666;
     border-radius: 5px;
     width: 295px;
+    height: 20px;
     padding: 4px;
-    background-color: #292929;
+    background-color: #141414;
   }
   
   .search-icon {
@@ -19,8 +20,9 @@
     padding: 6px;
     outline: none;
     flex-grow: 1;
-    background-color: #292929;
+    background-color: #141414;
     color: #d6d6d6;
+    font-size: 15px;
   }
   
   /* Style the input to match the provided image */

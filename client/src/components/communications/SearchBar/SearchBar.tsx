@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search16Regular } from "@fluentui/react-icons";
+import { Search20Regular } from "@fluentui/react-icons";
 import "./SearchBar.css";
 
 const SearchBar = () => {
@@ -49,7 +49,7 @@ const SearchBar = () => {
     // Use a fragment to wrap adjacent elements
     <>
       <div className="search-container">
-        <Search16Regular className="search-icon" />
+        <Search20Regular className="search-icon" />
         <input
           type="search"
           placeholder="Search"

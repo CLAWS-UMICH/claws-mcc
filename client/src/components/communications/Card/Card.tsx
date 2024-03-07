@@ -49,9 +49,8 @@ const ImageCard = ({ onClick, ...props }) => {
   };
 
   return (
-    <Card className="card" {...props} onClick={handleClick} ref={cardRef}>
+    <Card className="card" {...props} onClick={handleClick} ref={cardRef} style ={{backgroundColor: "#000000", alignItems:"center"}}>
       <CardPreview
-        className= "grayBackground"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         style={{ position: "relative" }} // FIXME verify. Ensure CardPreview container has relative positioning
@@ -92,10 +91,7 @@ const ImageCard = ({ onClick, ...props }) => {
         />
       </CardPreview>
 
-      <CardHeader
-        header={<Text weight="semibold">claws</Text>}
-        // action={        }
-      />
+      <CardHeader header={<Text weight="semibold" style={{ fontSize: '17px', alignItems:"center"}}> claws </Text>} style ={{backgroundColor: "#000000"}} />
     </Card>
   );
 };

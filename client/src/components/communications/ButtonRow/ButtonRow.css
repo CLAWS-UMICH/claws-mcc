@@ -19,8 +19,9 @@
   width: 198.3333333px;
   background-color: #292929;
   color: #d6d6d6;
-  border: 1px solid #666666;
+  border: 1.5px solid #666666;
   border-radius: 5px;
+  font-weight: semibold;    /*FIXME - This doesn't work when !bold*/
   font-size: 15px;
   cursor: pointer;
   padding: 0;

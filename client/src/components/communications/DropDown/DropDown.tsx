@@ -6,8 +6,9 @@ import {
   MenuItem,
   MenuItemCheckbox,
   MenuPopover,
+  MenuDivider,
 } from "@fluentui/react-components";
-import { Send24Regular } from "@fluentui/react-icons";
+import { Send20Regular } from "@fluentui/react-icons";
 import "./DropDown.css";
 
 export const DropDown = ({open, onOpenChange, positioningRef}) => {
@@ -24,22 +25,23 @@ export const DropDown = ({open, onOpenChange, positioningRef}) => {
 
       <MenuPopover className="dropdown-popover">
         <MenuList>
-          <MenuItemCheckbox name="Astronaut" value="1">
+          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="1">
             Akira
           </MenuItemCheckbox>
-          <MenuItemCheckbox name="Astronaut" value="2">
+          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="2">
             Emma
           </MenuItemCheckbox>
-          <MenuItemCheckbox name="Astronaut" value="3">
+          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="3">
             Jamie
           </MenuItemCheckbox>
-          <MenuItemCheckbox name="Astronaut" value="4">
+          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="4">
             Jenny
           </MenuItemCheckbox>
-          <MenuItemCheckbox name="Astronaut" value="5">
+          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="5">
             Sohavni
           </MenuItemCheckbox>
-          <MenuItem icon={<Send24Regular />}>Send</MenuItem>
+          <MenuDivider />
+          <MenuItem icon={<Send20Regular />} style={{fontSize: 15}} >Send</MenuItem>
         </MenuList>
       </MenuPopover>
     </Menu>

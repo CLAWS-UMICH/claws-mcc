@@ -1,10 +1,15 @@
 .dropdown-popover {
-    width: 180px !important;
-    position: absolute !important;
-    left: 6px !important; /* Adjust the position slightly to the right */
-    border-left: 1px solid #666666 !important;
-    border-right: 1px solid #666666 !important;
-    border-bottom: 1px solid #666666 !important;
-    border-radius: 5px !important;
-  }
+  width: 180px !important;
+  position: absolute !important;
+  left: 6px !important; /* Adjust the position slightly to the right */
+  border-left: 1.5px solid #666666 !important;
+  border-right: 1.5px solid #666666 !important;
+  border-bottom: 1.5px solid #666666 !important;
+  border-radius: 5px !important;
+}
+
+.dropdown-text {
+  font-size: 15px;
+  font-weight: bold;
+}
   
