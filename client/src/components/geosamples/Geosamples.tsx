@@ -1,5 +1,5 @@
 // Geosamples.tsx
-import React, { useEffect, useId, useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import {
     Button,
@@ -71,7 +71,7 @@ export type ManagerState = {
 }
 
 export type ManagerAction =
-    { type: 'set', payload: {zone: BaseZone[], samples: BaseGeosample[]} } | // Should only be used by ServerListener
+    { type: 'set', payload: {zones: BaseZone[], samples: BaseGeosample[]} } | // Should only be used by ServerListener
     { type: 'delete', payload: BaseGeosample } |
     { type: 'update', payload: BaseGeosample } |
     { type: 'select', payload: BaseGeosample } |
@@ -114,7 +114,7 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
             return {
                 ...state,
                 geosamples: action.payload.samples,
-                sample_zones: action.payload.zone,
+                sample_zones: action.payload.zones,
             };
         case 'delete':
             return {
@@ -177,8 +177,8 @@ var geosample: BaseGeosample = {
     shape: "Square",
     rock_type: "Basalt",
     location: {
-        latitude: 93.1442,
-        longitude: 193.2442
+        latitude: 108.1442,
+        longitude: 199.2442
     },
     author: 2,
     description: "this is a description",
@@ -191,30 +191,30 @@ var geosample2: BaseGeosample = {
     starred: false, 
     eva_data: {
         name: "Geo Sample 2",
-        id: 8372,
-        data: {
-            SiO2: 10.00,
-            TiO2: 10.00,
-            Al2O3: 10.00,
-            FeO: 10.00,
-            MnO: 10.00,
-            MgO: 10.00,
-            CaO: 10.00,
-            K2O: 10.00,
-            P2O3: 10.00,
+        id: 4924,
+        data: { 
+            SiO2: 11.72,
+            TiO2: 8.70,
+            Al2O3: 1.75,
+            FeO: 7.21,
+            MnO: 17.28,
+            MgO: 10.70,
+            CaO: 16.92,
+            K2O: 4.12,
+            P2O3: 20.87,
         }
     },
-    time: "14:23:27",
-    date: "3/20/2025",
-    color: "Brown",
-    shape: "Square",
-    rock_type: "Basalt",
+    time: "19:29:33",
+    date: "3/13/2025",
+    color: "Black",
+    shape: "Hexagon",
+    rock_type: "Limestone",
     location: {
-        latitude: 93.1442,
-        longitude: 193.2442
+        latitude: 104.1442,
+        longitude: 219.3333
     },
     author: 1,
-    description: "this is a description",
+    description: "ohhhhoo",
     image: "../../assets/temp_sample_pic.png"
 }
 
@@ -226,15 +226,46 @@ var zones: BaseZone[] = [{zone_id: "A",
                             },
                             radius: 15.3249},
                             {zone_id: "B",
-                            geosample_ids: [],
-                            location: {
+                            geosample_ids: [{
+                                geosample_id: 3, 
+                                zone_id: "B", 
+                                starred: false, 
+                                eva_data: {
+                                    name: "Geo Sample 1",
+                                    id: 3937,
+                                    data: { 
+                                        SiO2: 10.20,
+                                        TiO2: 7.80,
+                                        Al2O3: 3.30,
+                                        FeO: 9.30,
+                                        MnO: 13.27,
+                                        MgO: 6.13,
+                                        CaO: 18.65,
+                                        K2O: 29.35,
+                                        P2O3: 2.00,
+                                    }
+                                },
+                                time: "13:43:27",
+                                date: "3/10/2025",
+                                color: "Red",
+                                shape: "Circle",
+                                rock_type: "Granite",
+                                location: {
+                                    latitude: 95.1442,
+                                    longitude: 100.3333
+                                },
+                                author: 1,
+                                description: "ohhhhoo",
+                                image: "../../assets/temp_sample_pic.png"
+                            }],
+                                                        location: {
                                 latitude: 100.2321,
                                 longitude: 205.2345
                             },
                             radius: 15.3249},
                         ]
 
-const initialState: ManagerState = {geosamples: [geosample], sample_zones: zones, selected: undefined}
+const initialState: ManagerState = {geosamples: [geosample, geosample2], sample_zones: zones, selected: undefined}
 
 const GeosampleManager: React.FC = () => { 
     const styles = useStyles();   
@@ -243,7 +274,9 @@ const GeosampleManager: React.FC = () => {
     const [showSearchBar, setShowSearchBar] = useState(false);
 
     const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
-        onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'}))
+        onOpen: () => {
+            sendMessage(JSON.stringify({type: 'GET_SAMPLES'}));
+        }
     });
     useEffect(() => {
         if (lastMessage !== null) {

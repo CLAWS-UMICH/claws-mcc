@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
-import {Collection, Db, Document, InsertManyResult, WithId, FindCursor} from "mongodb";
+import {Collection, Db,  WithId} from "mongodb";
 import { BaseGeosample, BaseZone, SampleMessage, isBaseGeosample, isBaseZone } from "../types/Geosamples";
 
 export interface ResponseBody {
@@ -32,18 +32,19 @@ export default class Geosamples extends Base {
             type: 'GET_SAMPLES', // to handle incoming messages from frontend
             handler: this.sendSamples.bind(this),
         },
-    ]
+    ];
 
-    private samplesCollection: Collection<BaseGeosample>
-    private zonesCollection: Collection<BaseZone>
+    private samplesCollection: Collection<BaseGeosample>;
+    private zonesCollection: Collection<BaseZone>;
 
     constructor(db: Db, sampleCollection?: Collection<BaseGeosample>, zoneCollection?: Collection<BaseZone>) {
         super(db);
         this.samplesCollection = sampleCollection || db.collection<BaseGeosample>('samples');
         this.zonesCollection = zoneCollection || db.collection<BaseZone>('zones');
-    }
+    };
 
     async sendSamples() {
+        console.log("why not received?")
         const allSamples = this.samplesCollection.find();
         const allZones = this.zonesCollection.find();
         const sampleData = await allSamples.toArray();

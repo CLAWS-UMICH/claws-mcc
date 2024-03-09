@@ -105,7 +105,6 @@ client.connect().then(() => {
                     const data = JSON.parse(message.toString());
 
                     console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
-
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
                         eventRegistry[data.type](data.data);
