@@ -7,7 +7,6 @@ import {
   Option,
   shorthands,
   tokens,
-  useId,
   Button,
   Divider,
   Popover,
@@ -77,49 +76,49 @@ interface CompositionValuesProps {
 
 const CompositionValues : React.FC<CompositionValuesProps> = ({sample}) => {
   const styles = useStyles();
-  const other = 100 - sample.data.SiO2 - sample.data.Al2O3 - sample.data.CaO - sample.data.FeO - sample.data.K2O - sample.data.MgO - sample.data.MnO - sample.data.P2O3 - sample.data.TiO2;
+  let other = 100 - (sample.data.SiO2 + sample.data.Al2O3 + sample.data.CaO + sample.data.FeO + sample.data.K2O + sample.data.MgO + sample.data.MnO + sample.data.P2O3 + sample.data.TiO2);
 
   return (
     <div style={{display: "flex"}}>
       <div className={styles.composition}>
           <Label style={{color: "#BB6BD9", fontSize: "12.5px", textAlign: "center"}} htmlFor="sio2">SiO<sub>2</sub></Label>
-          <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="sio2" readOnly={true} defaultValue={sample.data.SiO2.toString()} />
+          <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="sio2" readOnly={true} value={sample.data.SiO2.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{fontSize: "12.5px", textAlign:"center"}} htmlFor="tio2">TiO<sub>2</sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="tio2" readOnly={true} defaultValue={sample.data.TiO2.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="tio2" readOnly={true} value={sample.data.TiO2.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#EB5757", fontSize: "12.5px", textAlign:"center"}} htmlFor="al2o3">Al<sub>2</sub>O<sub>3</sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="al2o3" readOnly={true} defaultValue={sample.data.Al2O3.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="al2o3" readOnly={true} value={sample.data.Al2O3.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#6FCF97", fontSize: "12.5px", textAlign:"center"}} htmlFor="feo">FeO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="feo" readOnly={true} defaultValue={sample.data.FeO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="feo" readOnly={true} value={sample.data.FeO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#2D9CDB", fontSize: "12.5px", textAlign:"center"}} htmlFor="mno">MnO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="mno" readOnly={true} defaultValue={sample.data.MnO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="mno" readOnly={true} value={sample.data.MnO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#219653", fontSize: "12.5px", textAlign:"center"}} htmlFor="mgo">MgO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="mgo" readOnly={true} defaultValue={sample.data.MgO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="mgo" readOnly={true} value={sample.data.MgO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#9B51E0", fontSize: "12.5px", textAlign:"center"}} htmlFor="cao">CaO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="cao" readOnly={true} defaultValue={sample.data.CaO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="cao" readOnly={true} value={sample.data.CaO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#F2C94C", fontSize: "12.5px", textAlign:"center"}} htmlFor="k2o">K<sub>2</sub>O</Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="k2o" readOnly={true} defaultValue={sample.data.K2O.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="k2o" readOnly={true} value={sample.data.K2O.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#6FCF97", fontSize: "12.5px", textAlign:"center"}} htmlFor="p2o3">P<sub>2</sub>O<sub>3</sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="p2o3" readOnly={true} defaultValue={sample.data.P2O3.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="p2o3" readOnly={true} value={sample.data.P2O3.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#F2994A", fontSize: "12.5px", textAlign:"center"}} htmlFor="other">Other<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="other" readOnly={true} defaultValue={other.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="other" readOnly={true} value={other.toString()} />
       </div>
     </div>
   )
@@ -133,12 +132,12 @@ function calculate(value, valueRangeStart, valueRangeEnd, newRangeStart, newRang
 // Define the props type
 interface CompositionVisualizationProps {
   sample: EvaData;
-  colors: string[];
 }
 
-const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sample, colors }) => {
+const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sample }) => {
     var total = 0;
-    let other = (100 - sample.data.SiO2 - sample.data.Al2O3 - sample.data.CaO - sample.data.FeO - sample.data.K2O - sample.data.MgO - sample.data.MnO - sample.data.P2O3 - sample.data.TiO2).toString();
+    let other = 100 - (sample.data.SiO2 + sample.data.Al2O3 + sample.data.CaO + sample.data.FeO + sample.data.K2O + sample.data.MgO + sample.data.MnO + sample.data.P2O3 + sample.data.TiO2);
+    console.log(other);
     const compositions = {
       "SiO2": sample.data.SiO2, 
       "TiO2": sample.data.TiO2,
@@ -152,19 +151,18 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sam
       "Other": other}
 
     for (var comp in compositions) {
-      if (compositions[comp]) {
-          var value = parseInt(compositions[comp], 10); 
-          if (!isNaN(value)) {
-              total += value;
-          }
+      var value = compositions[comp]
+      if (!isNaN(value)) {
+          total += value;
       }
     }
 
-    const components = Object.entries(sample.data).map(([_, value], index) => {
+    const comp_colors = ['#BB6BD9', '#FFFFFF', '#EB5757', '#6FCF97', '#2D9CDB', '#219653', '#9B51E0', '#F2C94C', '#6FCF97', '#F2994A'];
+    const components = Object.entries(compositions).map(([_, value], index) => {
         const wdth = Math.floor(calculate(value, 0, total, 0, 100));
         const classes: string[] = [];
         if (index === 0) classes.push('start');
-        if (index === Object.entries(sample.data).length - 1) classes.push('end');
+        if (index === Object.entries(compositions).length - 1) classes.push('end');
         // For each entry, create a list item or any other suitable HTML
         return (
           <div
@@ -172,7 +170,7 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sam
               className={classes.join(' ')}
               style={{
                   width: `${wdth}%`,
-                  backgroundColor: colors[index],
+                  backgroundColor: comp_colors[index],
               }}
           />
         );
@@ -203,6 +201,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
   useEffect(() => {
     setCurrentSample(props.geosample);
     setEditedSample(props.geosample);
+    console.log("props changed");
   }, [props.geosample]);
 
   if (!props.geosample) {
@@ -216,7 +215,6 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
   }
 
   const color_options = [ "Brown", "Copper Red", "Black", "Multi-color" ];
-  const comp_colors = ['#BB6BD9', '#FFFFFF', '#EB5757', '#6FCF97', '#2D9CDB', '#219653', '#9B51E0', '#F2C94C', '#6FCF97', '#F2994A'];
   const location_string = props.geosample.location.latitude + "˚ " + props.geosample.location.longitude + "˚";
 
   // TODO: make this send message to hololens if clicked
@@ -450,11 +448,11 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           </div>
           <div className={styles.field}>
             <Label htmlFor="rock_type">Rock Type<sub></sub></Label>
-            <Input appearance="outline" id="rock_type" readOnly={true} defaultValue={props.geosample.rock_type} />
+            <Input appearance="outline" id="rock_type" readOnly={true} value={props.geosample.rock_type} />
           </div>
           <div className={styles.field}>
             <Label htmlFor="sample_id">ID<sub></sub></Label>
-            <Input appearance="outline" id="sample_id" readOnly={true} defaultValue={props.geosample.eva_data.id.toString()} />
+            <Input appearance="outline" id="sample_id" readOnly={true} value={props.geosample.eva_data.id.toString()} />
           </div>
         </div>
         <div className={styles.line}>
@@ -465,14 +463,14 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           <img src={props.geosample.image} height={134.5} width={220}/>
         </div>
         <div style={{gap: "10px"}} className={styles.line}>
-          <CompositionVisualization sample={props.geosample.eva_data} colors={comp_colors}/>
+          <CompositionVisualization sample={props.geosample.eva_data}/>
           <div className={styles.quad} style={{marginLeft: "-22.5px"}}>
             <Label htmlFor="location">Location<sub></sub></Label>
-            <Input contentBefore={<Location16Regular/>} appearance="outline" id="location" readOnly={true} defaultValue={location_string} />
+            <Input contentBefore={<Location16Regular/>} appearance="outline" id="location" readOnly={true} value={location_string} />
           </div>
           <div className={styles.quad}>
             <Label htmlFor="time">Time<sub></sub></Label>
-            <Input contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} defaultValue={props.geosample.time} />
+            <Input contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={props.geosample.time} />
           </div>
         </div>
         <div style={{display: "flex", marginTop: "-2.5px"}}>
@@ -481,11 +479,11 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
             <div style={{marginLeft: "17.5px", display:"flex", gap: "15px"}}>
               <div className={styles.quad}>
                 <Label htmlFor="date">Date<sub></sub></Label>
-                <Input contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} defaultValue={props.geosample.date} />
+                <Input contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={props.geosample.date} />
               </div>
               <div className={styles.quad}>
                 <Label htmlFor="zone">Zone<sub></sub></Label>
-                <Input appearance="outline" id="zone" readOnly={true} defaultValue={props.geosample.zone_id} />
+                <Input appearance="outline" id="zone" readOnly={true} value={props.geosample.zone_id} />
               </div>
             </div>
           </div>

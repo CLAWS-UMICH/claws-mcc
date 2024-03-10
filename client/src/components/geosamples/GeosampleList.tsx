@@ -63,14 +63,13 @@ interface SampleListProps {
 const GeosampleList: React.FC<SampleListProps> = props => {
     const styles = useStyles();
     const [openItems, setOpenItems] = React.useState(["1"]);
-    const [hovering, setHovering] = React.useState(false);
 
     const handleToggle: AccordionToggleEventHandler<string> = (event, data) => {
         setOpenItems(data.openItems);
     };
 
     const handleSelect = (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
-        if (geosample && props.selected?.geosample_id === geosample.geosample_id) {
+        if (geosample && props.selected?.eva_data.id === geosample.eva_data.id) {
             dispatch({type: 'deselect'});
         }
         else if (geosample) {
@@ -97,7 +96,7 @@ const GeosampleList: React.FC<SampleListProps> = props => {
                                 onClick={() => handleSelect(props.dispatch, sample)}
                                 shape='circular'
                                 secondaryContent={sample.rock_type}
-                                icon={sample.starred ? <SampleImage sample={sample} index={index}/> : <StarredSample sample={sample} index={index}/>}
+                                icon={!sample.starred ? <SampleImage sample={sample} index={index}/> : <StarredSample sample={sample} index={index}/>}
                             >
                                 {sample.eva_data.name}
                             </CompoundButton>
