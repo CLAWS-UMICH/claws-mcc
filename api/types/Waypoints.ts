@@ -17,6 +17,7 @@ export type BaseWaypoint = {
     location: ARLocation;
     type: WaypointType;
     description: string;
+    details: string;
     author: number; //-1 if mission control created
 }
 

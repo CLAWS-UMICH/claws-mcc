@@ -30,10 +30,12 @@ const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispat
                 onClick={() => {
                     // If already selected, deselect.
                     if (selected)
-                        dispatch({type: 'deselect', payload: waypoint});
+                        dispatch({type: 'deselect'});
                     // Otherwise, select.
-                    else
+                    else {
+                        dispatch({type: 'clearTemp'});
                         dispatch({type: 'select', payload: waypoint});
+                    }
                 }}
                 onMouseEnter={() => setHovering(true)}
                 onMouseLeave={() => setHovering(false)}

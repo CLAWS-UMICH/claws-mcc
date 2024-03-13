@@ -2,8 +2,8 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    margin: 0 2rem;
-    border: #ccc 1px solid;
+    margin: 0 0 0 0rem;
+    border: #424242 1px solid;
     padding: 3px;
     width: calc(100% - var(--drawer-width) - 4rem - 6px - 2rem);
 }
@@ -13,7 +13,8 @@
 }
 
 .drawer {
-    width: var(--drawer-width);
+    /* width: var(--drawer-width); */
+    background-color: red;
 }
 
 /*Text over img*/
@@ -59,9 +60,12 @@
     box-shadow: unset !important;
 }
 
+
+
 .map {
     height: 400px;
-    margin: 0 5%;
+    width: 100%;
+    margin: 0 0 0 0;
 }
 
 .add-waypoint-btn {

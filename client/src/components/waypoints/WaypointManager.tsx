@@ -26,13 +26,16 @@ export type ManagerAction =
     { type: 'remove', payload: BaseWaypoint[] } |
     { type: 'update', payload: { old: BaseWaypoint, new: BaseWaypoint } } |
     { type: 'select', payload: BaseWaypoint } |
-    { type: 'deselect', payload: BaseWaypoint } |
+    { type: 'deselect' } |
     { type: 'writeTemp', payload: BaseWaypoint } |
     { type: 'clearTemp' };
 
 export type BaseWaypoint = {
     _id?: number; // server generated
     waypoint_id: number; //sequential
+    details: string // not in mongo
+    date: string// not in mongo
+    time: string// not in mongo
     location: { latitude: number, longitude: number };
     type: WaypointType;
     description: string;
@@ -124,9 +127,9 @@ const WaypointManager: React.FC = () => {
         }
     }, [lastMessage, setMessageHistory]);
     return (
-        <div style={{display: "flex", height:"100vh"}}>
-            <InlineDrawer className={'drawer'} separator open>
-                <DrawerHeader>
+        <div style={{display: "flex", height:"100vh", backgroundColor: "#000000"}}>
+            <InlineDrawer style={{backgroundColor: "#0F0F0F"}} className={'drawer'} separator open>
+                <DrawerHeader style={{backgroundColor: "#141414"}}>
                     <DrawerHeaderTitle action={
                         <Button size={"medium"} icon={
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
@@ -135,16 +138,23 @@ const WaypointManager: React.FC = () => {
                                     d="M6.5 8.5C6.5 8.22386 6.72386 8 7 8H9.5V5.5C9.5 5.22386 9.72386 5 10 5C10.2761 5 10.5 5.22386 10.5 5.5V8H13C13.2761 8 13.5 8.22386 13.5 8.5C13.5 8.77614 13.2761 9 13 9H10.5V11.5C10.5 11.7761 10.2761 12 10 12C9.72386 12 9.5 11.7761 9.5 11.5V9H7C6.72386 9 6.5 8.77614 6.5 8.5ZM14.9497 13.955C17.6834 11.2201 17.6834 6.78601 14.9497 4.05115C12.2161 1.31628 7.78392 1.31628 5.05025 4.05115C2.31658 6.78601 2.31658 11.2201 5.05025 13.955L6.57128 15.4538L8.61408 17.4389L8.74691 17.5567C9.52168 18.1847 10.6562 18.1455 11.3861 17.4391L13.8223 15.0691L14.9497 13.955ZM5.75499 4.75619C8.09944 2.41072 11.9006 2.41072 14.245 4.75619C16.5294 7.04153 16.5879 10.7104 14.4207 13.0667L14.245 13.2499L12.9237 14.5539L10.6931 16.7225L10.6002 16.8021C10.2459 17.0699 9.7543 17.0698 9.40012 16.802L9.30713 16.7224L6.3263 13.817L5.75499 13.2499L5.57927 13.0667C3.41208 10.7104 3.47065 7.04153 5.75499 4.75619Z"
                                     fill="white"/>
                             </svg>}
-                                onClick={() => dispatch({
+                                onClick={() => {
+                                    dispatch({type: "deselect" });
+                                    dispatch({
                                     type: "writeTemp",
                                     payload: {
                                         waypoint_id: -1,
                                         author: -1,
                                         type: WaypointType.NAV,
+                                        details:"",
+                                        date:"",
+                                        time:"",
                                         description: "",
                                         location: {latitude: 0, longitude: 0}
                                     }
-                                })}>New Waypoint</Button>}>
+                                });
+                                
+                                }}>New Waypoint</Button>}>
                         Navigation
                     </DrawerHeaderTitle>
                 </DrawerHeader>
@@ -153,7 +163,7 @@ const WaypointManager: React.FC = () => {
             </InlineDrawer>
             <div className={"waypoints-container"}>
                 <WaypointView {...state} dispatch={dispatch}/>
-                <Divider/>
+                <Divider className="waypoints-container-divider"/>
                 <WaypointMap waypoints={state.waypoints}
                              selected={state.selected}
                              dispatch={dispatch}/>
