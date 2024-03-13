@@ -162,31 +162,32 @@ export default class Waypoints extends Base {
             res.send(response);
             return response;
         }
+        let error = false;
         // @ts-ignore
         const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
-        let message = "Deleted waypoints with ids: [" +
-            waypointsId.reduce((acc, waypointId) => {
+        const current_waypoints = await this.collection.find().toArray();
+        const current_waypoint_ids = current_waypoints.map(waypoint => waypoint.waypoint_id)
+        const requested_waypoints = await this.collection.find({waypoint_id: {$in: waypointsId}}).toArray();
+        const requested_waypoint_ids = requested_waypoints.map(waypoint => waypoint.waypoint_id)
+
+        //calculate diff between original and included
+        toDelete = current_waypoint_ids.filter(x => !requested_waypoint_ids.includes(x));
+
+        let message = "Deleted waypoints with ids: [" + toDelete.reduce((acc, waypointId) => {
+            return acc + waypointId.toString(10) + ', ';
+        }, '').slice(0, -2) + "]";
+
+        //if any waypoint_ids in reqeusted_waypoints are not in current_waypoints, return error
+        let result = requested_waypoint_ids.filter(x => !current_waypoint_ids.includes(x));
+        if(result.length > 0){
+            message = "Could not find waypoints with ids: [" + result.reduce((acc, waypointId) => {
                 return acc + waypointId.toString(10) + ', ';
-            }, '').slice(0, -2) + "]";
-        let error = false;
-        const result = await this.collection.find({waypoint_id: {$in: waypointsId}}).toArray();
-        // If some of the waypoints do not exist in the database
-        if (waypoints.length !== result.length) {
-            const uniqueWpIds = result.map(waypoint => waypoint.waypoint_id);
-            const diff = waypoints.filter(wp => !uniqueWpIds.includes(wp.waypoint_id))
-            message = "Waypoints with ids: [" +
-                diff.reduce((acc, wpId) => {
-                    return acc + wpId.waypoint_id.toString(10) + ', ';
-                }, '').slice(0, -2)
-                + "] do not exist in the database. Deleted waypoints with ids: [" +
-                uniqueWpIds.reduce((acc, wpId) => {
-                    return acc + wpId.toString(10) + ', ';
-                }, '').slice(0, -2) + "]";
+            }
+            , '').slice(0, -2) + "]";
             error = true;
-            toDelete = uniqueWpIds;
-        } else {
-            toDelete = waypointsId;
+            console.error(message);
         }
+
         // delete the remaining waypoints from the database
         const deleteResult = await this.collection.deleteMany({waypoint_id: {$in: toDelete}});
         if (!deleteResult.acknowledged) {
@@ -195,10 +196,7 @@ export default class Waypoints extends Base {
                     return acc + waypoint.waypoint_id.toString(10) + ', ';
                 }, '') + "]";
             error = true;
-            console.error("Could not delete waypoints: " +
-                waypoints.reduce((acc, waypoint) => {
-                    return acc + waypoint.waypoint_id.toString(10) + ', ';
-                }, ''));
+            console.error(message);
         }
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
@@ -241,6 +239,7 @@ export default class Waypoints extends Base {
                     },
                     type: editedWaypoint.type,
                     description: editedWaypoint.description,
+                    details: editedWaypoint.details,
                     author: editedWaypoint.author
                 }
             }
@@ -302,6 +301,7 @@ export default class Waypoints extends Base {
             location: waypoint.location,
             type: waypoint.type,
             description: waypoint.description,
+            details: waypoint.details,
             author: waypoint.author
         }));
         const newWaypointsMessage: WaypointsMessage = {
