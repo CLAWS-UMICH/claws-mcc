@@ -8,6 +8,7 @@ import {
 } from "@fluentui/react-components";
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
 import NavBar from './components/layout/NavBar/NavBar.tsx';
+import CameraView from './components/camera_view/CameraView.tsx';
 
 interface AstronautData {
     heartrate: number;
@@ -46,8 +47,6 @@ function App() {
                 break;
             case 'samplesTab':
                 break;
-            case 'navigationTab':
-                break;
             case 'roverTab':
                 break;
             case 'suitsTab':
@@ -65,7 +64,10 @@ function App() {
     return (
         <FluentProvider theme={theme}>
             <NavBar onTabSelect={handleTabSelect}/>
-            {selectedPage}
+            <div className='debug' style={{display: 'flex', flexDirection: 'row'}}>
+                <CameraView/>
+                {selectedPage}
+            </div>
         </FluentProvider>
 
         // <Button appearance="primary">Hello Fluent UI React</Button>
