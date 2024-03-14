@@ -87,3 +87,34 @@
     padding: 0 5%;
     width: 90%;
 }
+
+/* New view  */
+
+.new-waypoint{
+    font-weight: 500;
+}
+.new-waypoint-header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #666666;
+    height: 20px;
+    padding: 1rem;
+    font-weight: bold;
+    /* background-color: #0A0A0A; */
+  }
+  
+  #new-header-title{
+    margin-right: 5rem;
+  }
+
+  .form-label{
+    width: 100px;
+    padding-left: 25px;
+  }
+
+  .form-input{
+    width: 320px;
+  }
+  /* End new view  */

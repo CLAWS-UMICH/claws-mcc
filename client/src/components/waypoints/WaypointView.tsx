@@ -4,8 +4,8 @@ import {
   ManagerState,
   WaypointType,
 } from "./WaypointManager.tsx";
-import React, { useState } from "react";
-import { isUndefined } from "lodash";
+import React, { useState, useEffect } from "react";
+import { isUndefined, set } from "lodash";
 import {
   Button,
   Checkbox,
@@ -19,6 +19,7 @@ import {
   makeStyles,
 } from "@fluentui/react-components";
 import { log } from "console";
+import Axios from "axios";
 
 type WaypointViewProps = {
   dispatch: React.Dispatch<ManagerAction>;
@@ -29,14 +30,172 @@ type WaypointViewProps = {
  * @param props
  * @constructor
  */
-const NewView: React.FC = (props) => {
-  return <div>TODO:NEW</div>;
+const NewView: React.FC<NewViewProps> = (props) => {
+  const styles = listStyles();
+  const dropDownOptions = Object.keys(WaypointType).filter((key) =>
+    isNaN(Number(key))
+  );
+
+  const [new_waypoint, setNewWaypoint] = useState<BaseWaypoint>({
+    waypoint_id: -1,
+    author: -1,
+    description: "",
+    type: 0,
+    details: "",
+    location: {
+      latitude: 0,
+      longitude: 0,
+    },
+    time: "",
+    date: "",
+  });
+
+  const handleAdd = () => {
+    setNewWaypoint((prev) => ({ ...prev, time: Date.now().toString() }));
+    const new_waypoints = [...props.waypoints, new_waypoint];
+    try{
+      const res = Axios.put("/api/waypoint", {
+        data: {
+          waypoints: new_waypoints
+        }
+      });
+      console.log(res);
+    }catch (error) {
+      console.error(error);
+      return;
+    }
+  };
+
+  const handleCancel = () => {
+    props.dispatch({ type: "clearTemp" });
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h4 style={{paddingLeft: 15}}>New Waypoint</h4>
+        <div
+          style={{
+            display: "flex",
+            width: "50%",
+            justifyContent: "space-around",
+          }}
+        >
+          <Button disabled>Send WayPoint</Button>
+          <Button disabled>Edit</Button>
+          <Button disabled>Delete</Button>
+        </div>
+      </div>
+
+      <form style={{ padding: "0% 2%" }}>
+        <div className={styles.container}>
+          <Label htmlFor={"waypoint-details"}>Details</Label>
+          <Input
+            type="text"
+            id={"waypoint-details"}
+            value={new_waypoint.details}
+            onChange={(e) => {
+              setNewWaypoint((prev) => ({ ...prev, details: e.target.value }));
+            }}
+          />
+        </div>
+        <br />
+        <div className={styles.container2}>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+            <Label htmlFor={"waypoint-type"}>Type</Label>
+            <Dropdown 
+              placeholder={"Select Waypoint Type"}
+              onOptionSelect={(event, data) => {
+                const option = data.optionValue;
+                let type_num = 0; 
+                console.log(option)
+                if(option === "STATION") {
+                  type_num = 0;
+                }
+                else if(option === "NAV") {
+                  type_num = 1;
+                }
+                else if(option === "GEO") {
+                  type_num = 2;
+                }
+                else if(option === "DANGER") {
+                  type_num = 3;
+                }
+                setNewWaypoint((prev) => ({ ...prev, type: type_num}));
+              }}
+              {...props}
+              >
+                {dropDownOptions.map((option) => (
+                  <Option key={option}
+                  >{option}</Option>
+                ))}
+              </Dropdown>
+          </div>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+            <Label htmlFor={"waypoint-location"}>Latitude</Label>
+              <Input
+              type="text"
+              id={"waypoint-location"} 
+              value={new_waypoint.location.latitude + ""}
+              onChange={(e, data) => {
+                  setNewWaypoint((prev) => ({ ...prev, location: {latitude: Number(data.value) , longitude: new_waypoint.location.longitude}}));
+                }}
+            />
+          </div>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+            <Label htmlFor={"waypoint-location"}>Longitude</Label>
+              <Input
+              type="text"
+              id={"waypoint-location"} 
+              value={new_waypoint.location.longitude + ""}
+              onChange={(e, data) => {
+                  setNewWaypoint((prev) => ({ ...prev, location: {latitude: new_waypoint.location.latitude , longitude: Number(data.value)}}));
+                }}
+              />
+          </div>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+            <Label htmlFor={"waypoint-time"}>Time</Label>
+            <Input disabled
+              type="text"
+              id={"waypoint-time"}
+              value={Date.now().toString()}
+            />
+          </div>
+          <div className={styles.container}>
+            <Label htmlFor={"waypoint-date"}>Date</Label>
+            <Input disabled
+              type="text"
+              id={"waypoint-date"}              
+            />
+          </div>
+        </div>
+      </form>
+      <div id={"edit"} className={styles.edit} style={{gap: "10px"}}>
+            <Button onClick={handleAdd} style={{backgroundColor: "green"}}>Create Waypoint</Button>
+            <Button onClick={handleCancel} >Cancel</Button>
+      </div>
+    </div>
+  );
 };
 
 type SelectedViewProps = {
+  waypoints:BaseWaypoint[]
   selected?: BaseWaypoint;
   dispatch: React.Dispatch<ManagerAction>;
 };
+
+type NewViewProps = {
+  waypoints:BaseWaypoint[]
+  selected?: BaseWaypoint;
+  dispatch: React.Dispatch<ManagerAction>;
+};
+
 
 const listStyles = makeStyles({
   container: {
@@ -48,10 +207,13 @@ const listStyles = makeStyles({
   container2: {
     display: "flex",
     justifyContent: "space-between",
+    width: "100%",
   },
   edit: {
     display: "flex",
     justifyContent: "flex-end",
+    width: "100%",
+    paddingTop: "20px",
   },
 });
 
@@ -69,11 +231,84 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
   );
 
   const [isEditing, setIsEditing] = useState(false);
+  const [new_waypoint, setNewWaypoint] = useState<BaseWaypoint>({
+    waypoint_id: -1,
+    author: -1,
+    description: "",
+    type: WaypointType.NAV,
+    details: "",
+    location: {
+      latitude: 0,
+      longitude: 0,
+    },
+    time: "",
+    date: "",
+  });
 
-  const handleEditButtonClick = () => {
+  useEffect(() => {
+    setIsEditing(false);
+    if(!isUndefined(props.selected)) {
+      setNewWaypoint(props.selected);
+    }
+  }, [props.selected]);
+
+  const ToggleEdit = () => {
     setIsEditing(!isEditing);
+    setNewWaypoint(props.selected!);
   };
 
+  const handleSave = ({setIsEditing}) => {
+    const idx = props.waypoints.findIndex((x) => x._id === props.selected?._id);
+    if (idx >= 0) {
+      //update waypoints to the value from input boxes
+      props.waypoints[idx].description = new_waypoint.description;
+      props.waypoints[idx].type = new_waypoint.type;
+      props.waypoints[idx].details = new_waypoint.details;
+      props.waypoints[idx].location.latitude = new_waypoint.location.latitude;
+      props.waypoints[idx].location.longitude = new_waypoint.location.longitude;
+
+      console.log("Updated Waypoint: ");
+      console.log(props.waypoints[idx]);
+      console.log(typeof(props.waypoints))
+      try{
+        const res = Axios.post("/api/waypoint", {
+          data: {
+            waypoints: props.waypoints
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        return;
+      }
+      setIsEditing(false);
+    }
+  }
+
+  const handleDelete = () => {
+    const idx = props.waypoints.findIndex((x) => x._id === props.selected?._id);
+    if (idx >= 0) {
+      let new_waypoints = [...props.waypoints]
+      new_waypoints.splice(idx, 1);
+      console.log(typeof(new_waypoints))
+      try{
+        const res = fetch("/api/waypoint", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: {
+            waypoints: new_waypoints
+          }
+        }),
+        });
+      } catch (error) {
+        console.error(error);
+        return;
+      }
+      props.dispatch({ type: "deselect" });
+    }
+  }
 
   return (
     <div>
@@ -84,7 +319,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
           alignItems: "center",
         }}
       >
-        <h4>Station B</h4>
+        <h4 style={{paddingLeft: 15}}>Waypoint {props.selected?.waypoint_id}</h4>
         <div
           style={{
             display: "flex",
@@ -93,47 +328,129 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
           }}
         >
           <Button appearance="primary">Send WayPoint</Button>
-          {/* <Button>View Route</Button> */}
-          <Button onClick={handleEditButtonClick}>Edit</Button>
-          <Button>Delete</Button>
+          {
+            isEditing ?
+          <Button disabled>Edit</Button>
+          :
+          <Button onClick={ToggleEdit}>Edit</Button>
+          }
+          <Button onClick={handleDelete}>Delete</Button>
         </div>
       </div>
 
-      <Title3>Edit Waypoint</Title3>
-      <form style={{ padding: "0% 2%" }} onSubmit={() => console.log("Hello")}>
+      <form style={{ padding: "0% 2%" }}>
         <div className={styles.container}>
           <Label htmlFor={"waypoint-details"}>Details</Label>
-          <Input
+          {
+            isEditing ? 
+            <Input
             type="text"
             id={"waypoint-details"}
+            value={new_waypoint?.details}
+            onChange={(e) => {
+              if(!new_waypoint) return; 
+              setNewWaypoint((prev) => ({ ...prev, details: e.target.value }));
+            }}
+          /> : 
+            <Input
+            type="text"
+            id={"waypoint-details"}
+            style={{pointerEvents: "none"}}
             value={props.selected?.details}
           />
+        } 
         </div>
         <br />
         <div className={styles.container2}>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%" }}>
             <Label htmlFor={"waypoint-type"}>Type</Label>
-            <Dropdown placeholder="Select station type" {...props}>
-              {dropDownOptions.map((option) => (
-                <Option key={option}>{option}</Option>
-              ))}
-            </Dropdown>
+            {
+              isEditing ?
+              <Dropdown 
+              placeholder={WaypointType[new_waypoint.type]}
+              onOptionSelect={(event, data) => {
+                const option = data.optionValue;
+                let type_num = 0; 
+                console.log(option)
+                if(option === "STATION") {
+                  type_num = 0;
+                }
+                else if(option === "NAV") {
+                  type_num = 1;
+                }
+                else if(option === "GEO") {
+                  type_num = 2;
+                }
+                else if(option === "DANGER") {
+                  type_num = 3;
+                }
+                setNewWaypoint((prev) => ({ ...prev, type: type_num}));
+              }}
+              {...props}
+              >
+                {dropDownOptions.map((option) => (
+                  <Option key={option}
+                  >{option}</Option>
+                ))}
+              </Dropdown>
+              :
+              <Dropdown 
+              placeholder={WaypointType[new_waypoint.type]}
+              style={{pointerEvents: "none"}}
+              {...props}
+              >
+              </Dropdown>
+            }
           </div>
           <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
-            <Label htmlFor={"waypoint-location"}>Location</Label>
-            <Input
+            <Label htmlFor={"waypoint-location"}>Latitude</Label>
+            {
+              isEditing ?
+              <Input
               type="text"
-              id={"waypoint-location"}
-              value={
-                props.selected?.location.latitude +
-                "," +
-                props.selected?.location.longitude
+              id={"waypoint-location"} 
+              value={new_waypoint.location.latitude + ""}
+              onChange={(e, data) => {
+                  setNewWaypoint((prev) => ({ ...prev, location: {latitude: Number(data.value) , longitude: new_waypoint.location.longitude}}));
+                }
               }
             />
+            :
+            <Input
+              type="text"
+              id={"waypoint-location"} 
+              value={new_waypoint.location.latitude + ""}
+              style={{pointerEvents: "none"}}
+            />
+            }
+          </div>
+          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+            <Label htmlFor={"waypoint-location"}>Longitude</Label>
+            {
+              isEditing ?
+              <Input
+              type="text"
+              id={"waypoint-location"} 
+              value={new_waypoint.location.longitude + ""}
+              onChange={(e, data) => {
+                  setNewWaypoint((prev) => ({ ...prev, location: {latitude: new_waypoint.location.latitude , longitude: Number(data.value)}}));
+                }
+              }
+            />
+            :
+            <Input
+              type="text"
+              id={"waypoint-location"} 
+              value={new_waypoint.location.longitude + ""}
+              style={{pointerEvents: "none"}}
+            />
+            }
           </div>
           <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
             <Label htmlFor={"waypoint-time"}>Time</Label>
-            <Input
+            <Input 
+              {...(isEditing ? {disabled: true} : {})}
+              style={{pointerEvents: "none"}}
               type="text"
               id={"waypoint-time"}
               value={props.selected?.time}
@@ -141,18 +458,17 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
           </div>
           <div className={styles.container}>
             <Label htmlFor={"waypoint-date"}>Date</Label>
-            <Input
+            <Input disabled
               type="text"
               id={"waypoint-date"}
               value={props.selected?.date}
             />
           </div>
         </div>
-
         {isEditing ? (
-          <div style={{ margin: "2%" }} id={"edit"} className={styles.edit}>
-            <Button appearance="secondary">Save</Button>
-            <Button onClick={handleEditButtonClick}>Cancel</Button>
+          <div id={"edit"} className={styles.edit} style={{gap: "10px"}}>
+            <Button onClick={()=>handleSave({setIsEditing})} style={{backgroundColor: "green"}}>Save</Button>
+            <Button onClick={ToggleEdit}>Cancel</Button>
           </div>
         ) : (
           <div></div>
@@ -168,7 +484,8 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
  * @constructor
  */
 const EmptyView: React.FC = (props) => {
-  return <div>TODO: Empty</div>;
+
+  return <h1 style={{marginTop:"8%",textAlign:"center"}}>Select or Add </h1>;
 };
 
 /**
@@ -180,7 +497,8 @@ const EmptyView: React.FC = (props) => {
 export const WaypointView: React.FC<WaypointViewProps> = (props) => {
   if (isUndefined(props.temp)) {
     if (isUndefined(props.selected)) return <EmptyView />;
-    return <SelectedView dispatch={props.dispatch} selected={props.selected} />;
+    return <SelectedView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected} />;
   }
-  return <NewView />;
+  return <NewView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected}/>;
 };
+

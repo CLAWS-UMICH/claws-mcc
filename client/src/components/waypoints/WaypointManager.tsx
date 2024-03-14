@@ -127,9 +127,9 @@ export const WaypointManager: React.FC = () => {
         }
     }, [lastMessage, setMessageHistory]);
     return (
-        <div style={{display: "flex", height:"100vh"}}>
-            <InlineDrawer className={'drawer'} separator open>
-                <DrawerHeader>
+        <div style={{display: "flex", height:"100vh", backgroundColor: "#000000"}}>
+            <InlineDrawer style={{backgroundColor: "#0F0F0F"}} className={'drawer'} separator open>
+                <DrawerHeader style={{backgroundColor: "#141414"}}>
                     <DrawerHeaderTitle action={
                         <Button size={"medium"} icon={
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
