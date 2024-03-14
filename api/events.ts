@@ -14,21 +14,8 @@ const eventRegistry: { [key: string]: (data: Message) => void } = {
         console.log(`Received samples message to frontend: ${JSON.stringify(data)}`);
     },
     // Geo Samples message from Hololens
-    "SAMPLES": async (data: Message) => {
+    "Geosamples": (data: Message) => {
         console.log(`Received geosamples message from Hololens: ${JSON.stringify(data)}`);
-        const res = await fetch("/api/geosamples", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                data: data.data
-            })
-        });
-        if (!res.ok) {
-            alert('Error receiving sample message from hololens');
-        }
     },
     // // Geo Samples Zones message from Hololens
     // "SAMPLE_ZONES": async (data: Message) => {
@@ -48,4 +35,23 @@ const eventRegistry: { [key: string]: (data: Message) => void } = {
     //     }
     // }
 };
+
+// // async addGeosamples(req: Request, res: Response) : Promise<{}> {
+// async sendSamples(data: Message) : Promise<string> {
+//     const res = await fetch("/api/geosamples", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "Accept": "application/json"
+//         },
+//         body: JSON.stringify({
+//             data: data.data
+//         })
+//     });
+//     if (!res.ok) {
+//         alert('Error receiving sample message from hololens');
+//     };
+//     return "done";
+// };
+
 export default eventRegistry;

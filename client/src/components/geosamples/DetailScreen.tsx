@@ -137,7 +137,6 @@ interface CompositionVisualizationProps {
 const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sample }) => {
     var total = 0;
     let other = 100 - (sample.data.SiO2 + sample.data.Al2O3 + sample.data.CaO + sample.data.FeO + sample.data.K2O + sample.data.MgO + sample.data.MnO + sample.data.P2O3 + sample.data.TiO2);
-    console.log(other);
     const compositions = {
       "SiO2": sample.data.SiO2, 
       "TiO2": sample.data.TiO2,
@@ -148,7 +147,12 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sam
       "CaO": sample.data.CaO, 
       "K2O": sample.data.K2O, 
       "P2O3": sample.data.P2O3, 
-      "Other": other}
+    }
+
+    if (other > 0) {
+      compositions["Other"] = other
+    }
+
 
     for (var comp in compositions) {
       var value = compositions[comp]
@@ -167,10 +171,10 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sam
         return (
           <div
               key={index}
-              className={classes.join(' ')}
+              className={`${index === 0 ? 'start' : ''} ${index === Object.entries(compositions).length - 1 ? 'end' : ''}`}
               style={{
-                  width: `${wdth}%`,
-                  backgroundColor: comp_colors[index],
+                  width: `${value}%`, // Set width as a percentage
+                  backgroundColor: comp_colors[index % comp_colors.length],
               }}
           />
         );

@@ -32,6 +32,10 @@ export default class Geosamples extends Base {
             type: 'GET_SAMPLES', // to handle incoming messages from frontend
             handler: this.sendSamples.bind(this),
         },
+        // {
+        //     type: 'SEND_SAMPLES', 
+        //     handler: this.
+        // },
     ];
 
     private samplesCollection: Collection<BaseGeosample>;
@@ -150,11 +154,11 @@ export default class Geosamples extends Base {
     private updateARSamples(messageId: number, data: {samples: BaseGeosample[], zones: BaseZone[]}) : void {
         const newGeosampleMessage: SampleMessage = {
             id: messageId,
-            type: 'Messaging', // TODO: implement this
+            type: 'Geosamples',
             use: 'PUT',
             data: {
-                AllSamples: data.samples,
-                AllZones: data.zones,
+                AllGeosamples: data.samples,
+                AllGeosamplezones: data.zones,
             }
         }
         this.dispatch("AR", newGeosampleMessage);
