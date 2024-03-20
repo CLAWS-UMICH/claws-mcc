@@ -1,5 +1,8 @@
 import * as React from "react";
 import { useState, useRef } from "react";
+import SearchBar from "../SearchBar/SearchBar.tsx";
+import "./Card.css";
+
 import {
   Card,
   CardHeader,
@@ -14,20 +17,10 @@ import {
 } from "@fluentui/react-components";
 import { ArrowExpand24Regular, Dismiss24Regular } from "@fluentui/react-icons";
 
-import SearchBar from "../SearchBar/SearchBar.tsx";
-import "./Card.css";
-
 // TODO make image gray on selection, make selection more starkly visible
 // TODO aspect ratio. 1:1 square
 // TODO make the scrollbar invisible or less ugly ? overflow: hidden;
 // BUG in case where need to scroll on main page, make sure you keep that position when scrolling in mini page https://forum.bubble.io/t/tutorial-scroll-within-a-popup-without-scrolling-the-page/144153
-
-const resolveAsset = (asset: string) => {
-  const ASSET_URL =
-    "https://raw.githubusercontent.com/microsoft/fluentui/master/packages/react-components/react-card/stories/assets/";
-
-  return `${ASSET_URL}${asset}`;
-};
 
 const ImageCard = ({ onClick, images, index, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -35,9 +28,6 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
   
   const cardRef = useRef(null); // This ref is specific to this card
 
-  // console.log("data:image/gif;base64," + images[Object.keys(images)[index]].img_binary);
-
-  // Add an onClick handler to call the passed in onClick with this card's ref
   const handleClick = () => {
     if(onClick && !isDialogOpen) {
       onClick(cardRef);
@@ -95,12 +85,10 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
 
       <CardHeader
         header={<Text weight="semibold">{images[Object.keys(images)[index]].title}</Text>}
-        // action={        }
       />
     </Card>
   );
 };
-
 export const CardSelectable = ({onCardClick, images}) => {
   return (
     <div className="cardSelectableContainer">
@@ -111,7 +99,7 @@ export const CardSelectable = ({onCardClick, images}) => {
         {Array.from({ length: images.length }, (_, index) => (
           <ImageCard
             key={index}
-            onClick={(ref) => onCardClick(index, ref)}
+            onClick={(ref) => onCardClick(images[Object.keys(images)[index]].id, ref)}
             images={images}
             index={index}
           />

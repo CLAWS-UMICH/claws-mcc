@@ -5,6 +5,7 @@ import "./SearchBar.css";
 const SearchBar = () => {
   const [searchInput, setSearchInput] = useState("");
 
+  // change this for images
   const Images = [
     { name: "Belgium", continent: "Europe" },
     { name: "India", continent: "Asia" },

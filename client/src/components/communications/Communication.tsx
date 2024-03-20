@@ -8,8 +8,10 @@ import axios from "axios";
  
 export const Communication = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [isButton, setIsButton] = useState(false);
     const [positioningRef, setPositioningRef] = useState(null);
     const [imageArray, setImageArray] = useState([]);
+    const [activeObjectId, setActiveObjectId] = useState(null);
 
     useEffect(() => {
         axios.get(`/api/screens/`)
@@ -21,16 +23,21 @@ export const Communication = () => {
             });
     }, []); // Empty dependency array means it runs once after the initial render
 
+    // handles the case when the button is clicked
     const handleButtonClick = (buttonId, ref) => {
         console.log(buttonId);
         setDropdownVisible(true);
+        setIsButton(true);
         setPositioningRef(ref.current);
+        setActiveObjectId(buttonId);
     };
 
     const handleCardClick = (cardId, ref) => {
         console.log(cardId);
         setDropdownVisible(true);
+        setIsButton(false);
         setPositioningRef(ref.current);
+        setActiveObjectId(cardId);
     };
 
     const handleDropdownChange = (e, data) => {
@@ -54,7 +61,7 @@ export const Communication = () => {
                 </style>
                 <Header/>
                 <ButtonRow onButtonClick={handleButtonClick}/>
-                <DropDown open={dropdownVisible} onOpenChange={handleDropdownChange} positioningRef={positioningRef} />
+                <DropDown open={dropdownVisible} onOpenChange={handleDropdownChange} positioningRef={positioningRef} activeObjectId={activeObjectId} isButton={isButton}/>
                 <CardSelectable onCardClick={handleCardClick} images={imageArray}/>
             </div>
         </div>

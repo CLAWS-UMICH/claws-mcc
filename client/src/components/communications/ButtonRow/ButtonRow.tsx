@@ -10,6 +10,7 @@ import {
 } from "@fluentui/react-icons";
 
 const ButtonRow = ({ onButtonClick }) => {
+  
   const refs = {
     tasks: useRef(null),
     vitals: useRef(null),
@@ -21,27 +22,27 @@ const ButtonRow = ({ onButtonClick }) => {
 
   return (
     <div className="button-row">
-      <button className="row-button" ref={refs.tasks} onClick={() => onButtonClick('Tasks', refs.tasks)}>
+      <button className="row-button" ref={refs.tasks} onClick={() => onButtonClick('0', refs.tasks)}>
         <ClipboardTaskListLtr24Regular />
         Tasks
       </button>
-      <button className="row-button" ref={refs.vitals} onClick={() => onButtonClick('Vitals', refs.vitals)}>
+      <button className="row-button" ref={refs.vitals} onClick={() => onButtonClick('1', refs.vitals)}>
         <BookPulse24Regular />
         Vitals
       </button>
-      <button className="row-button" ref={refs.samples} onClick={() => onButtonClick('Messages', refs.samples)}>
+      <button className="row-button" ref={refs.samples} onClick={() => onButtonClick('2', refs.samples)}>
         <Hexagon24Regular />
         Samples
       </button>
-      <button className="row-button" ref={refs.messages} onClick={() => onButtonClick('Navigation', refs.messages)}>
+      <button className="row-button" ref={refs.messages} onClick={() => onButtonClick('3', refs.messages)}>
         <Chat24Regular />
         Messages
       </button>
-      <button className="row-button" ref={refs.navigation} onClick={() => onButtonClick('Navigation',refs.navigation)}>
+      <button className="row-button" ref={refs.navigation} onClick={() => onButtonClick('4',refs.navigation)}>
         <Location24Regular />
         Navigation
       </button>
-      <button className="row-button" ref={refs.modes} onClick={() => onButtonClick('Modes', refs.modes)}>
+      <button className="row-button" ref={refs.modes} onClick={() => onButtonClick('5', refs.modes)}>
         <GridCircles24Regular />
         Modes
       </button>

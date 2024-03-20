@@ -11,37 +11,103 @@ import {
 import { Send20Regular } from "@fluentui/react-icons";
 import "./DropDown.css";
 
-export const DropDown = ({open, onOpenChange, positioningRef}) => {
-  const [key, setKey] = React.useState(0); // Add a key state to force re-render
+const sendButtonHighlightRequest = (buttonId, astronautId) => {
+  fetch('/api/highlightbutton', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ 
+      data: {
+        buttonID: buttonId,
+        astronautID: astronautId,
+      }
+    }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Button highlight request sent successfully:', data);
+  })
+  .catch((error) => {
+    console.error('Error sending button highlight request:', error);
+  });
+};
+
+const sendSendImageRequest = (imageId, astronautId) => {
+  fetch('/api/sendimage', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ 
+      data: {
+        imageID: imageId,
+        astronautID: astronautId,
+      }
+    }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Send image request sent successfully:', data);
+  })
+  .catch((error) => {
+    console.error('Error sending send image request:', error);
+  });
+};
+
+export const DropDown = ({ open, onOpenChange, positioningRef, activeObjectId, isButton }) => {
+  const [selectedAstronauts, setSelectedAstronauts] = React.useState<string[]>([]);
+
+  const handleAstronautSelection = (value) => {
+    if (selectedAstronauts.includes(value)) {
+      setSelectedAstronauts(selectedAstronauts.filter(id => id !== value));
+    } else {
+      setSelectedAstronauts([...selectedAstronauts, value]);
+    }
+  };
+
+  const handleSendClick = () => {
+    if (isButton){
+      selectedAstronauts.forEach(astronautId => {
+        sendButtonHighlightRequest(activeObjectId, astronautId);
+      });
+    } else {
+      selectedAstronauts.forEach(astronautId => {
+        sendSendImageRequest(activeObjectId, astronautId);
+      });
+    }
+  };
+  
+  const [key, setKey] = React.useState(0);  // Used to force re-render
 
   return (
     <Menu open={open} onOpenChange={(e, data) => {
+      setSelectedAstronauts([]);
       onOpenChange(e, data);
       if (!data.open) {
-        // Reset key to force re-render of MenuItemCheckbox components when menu is closed
         setKey((prevKey) => prevKey + 1);
       }
       }} positioning={{ target: positioningRef }} key={key}>
 
       <MenuPopover className="dropdown-popover">
         <MenuList>
-          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="1">
+          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="0" onClick={() => handleAstronautSelection('0')}>
             Akira
           </MenuItemCheckbox>
-          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="2">
+          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="1" onClick={() => handleAstronautSelection('1')}>
             Emma
           </MenuItemCheckbox>
-          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="3">
+          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="2" onClick={() => handleAstronautSelection('2')}>
             Jamie
           </MenuItemCheckbox>
-          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="4">
+          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="3" onClick={() => handleAstronautSelection('3')}>
             Jenny
           </MenuItemCheckbox>
-          <MenuItemCheckbox className = "dropdown-text" name="Astronaut" value="5">
+          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="4" onClick={() => handleAstronautSelection('4')}>
             Sohavni
           </MenuItemCheckbox>
           <MenuDivider />
-          <MenuItem icon={<Send20Regular />} style={{fontSize: 15}} >Send</MenuItem>
+          <MenuItem icon={<Send20Regular />} style={{fontSize: 15}} onClick={() => handleSendClick()} >Send</MenuItem>
         </MenuList>
       </MenuPopover>
     </Menu>

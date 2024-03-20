@@ -113,10 +113,6 @@ export default class ARWebConnection extends Base {
         {
             type: 'SEND_SCREEN_TO_AR',
             handler: this.sendScreenToAR.bind(this)
-        },
-        {
-            type: 'PUT_HIGHLIGHT_BUTTON',
-            handler: this.sendAllScreensToFrontend.bind(this)
         }
     ]
 
@@ -125,6 +121,16 @@ export default class ARWebConnection extends Base {
             path: '/api/screens',
             method: 'get',
             handler: this.sendAllScreensToFrontend.bind(this)
+        },
+        {
+            path: '/api/sendimage',
+            method: 'post',
+            handler: this.sendScreenToAR.bind(this)
+        },
+        {
+            path: '/api/highlightbutton',
+            method: 'post',
+            handler: this.highlightButton.bind(this)
         }
     ]
     constructor(db: Db) {
@@ -166,67 +172,138 @@ export default class ARWebConnection extends Base {
     
 
     // FUNC: Send a specific ScreenInfo object to AR over our WebSocket
-    public async sendScreenToAR(imageID: string, astronautID: number): Promise<void> {
+    public async sendScreenToAR(req: Request, res: Response): Promise<void> {
+        console.log('imageID: ' + req.body.data["imageID"]);
+        console.log('astronautID: ' + req.body.data["astronautID"]);
+
+        // Parse imageID and astronautID from the request body
+        const imageID = req.body.data["imageID"];
+        const astronautID = parseInt(req.body.data["astronautID"], 20);
+
         try {
             const screensCollection = this.db.collection('screens'); // Get collection of ScreenInfo objects
             const screen = await screensCollection.findOne({ id: imageID }); // Find the screen by ID
+
+            // Additional checks to validate astronautID
+            if (astronautID < 0 || astronautID > 10) {
+                throw new Error('Invalid astronaut ID. Astronaut ID must be between 0 and 10.');
+            }
         
             if (screen) {
                 // Send the screen to the 'AR' WebSocket target
                 this.dispatch('AR', {
-                    id: astronautID, // Assuming astronautID is the ID of the astronaut
+                    id: astronautID,
                     type: 'PICTURE',
                     use: 'PUT',
                     data: {
                         title: screen.title,
-                        img_binary: screen.img_binary                    },
+                        img_binary: screen.img_binary                    
+                    },
                 });
-
-                console.log('Screen sent to AR successfully! Slay!');
+                
+                res.status(200).json({ message: 'Screen sent to AR successfully!' });
             } else {
-                console.error('Screen not found with ID:', imageID);
+                res.status(404).json({ error: 'Screen not found with ID: ' + imageID });
             }
         } catch (error) {
-            console.error('Error sending screen to AR:', error);
-            throw error; // Propagate the error if necessary
+            res.status(500).json({ error: error.message });
         }
     }
 
-    // FUNC: Tell AR to highlight a specific button for a specific astronaut in AR over our WebSocket
-    public async highlightButton(buttonID: number, astronautID: number): Promise<void> {
-        if (buttonID === null) {
-            console.error('Invalid button ID. Cannot highlight a null button.');
+
+    public async highlightButton(req: Request, res: Response): Promise<void> {
+        console.log('buttonID: ' + req.body.data["buttonID"]);
+        console.log('astronautID: ' +req.body.data["astronautID"]);
+
+        // Parse buttonID and astronautID from the request body
+        const buttonID = parseInt(req.body.data["buttonID"], 10);
+        const astronautID = parseInt(req.body.data["astronautID"], 20);
+
+
+        // Check for parsing errors or NaN values
+        if (isNaN(buttonID) || isNaN(astronautID)) {
+            res.status(400).json({ error: 'Invalid button ID or astronaut ID. Must be a number.' });
             return;
         }
-
+    
         try {
             // Additional checks to validate buttonID and astronautID
             if (buttonID < 0 || buttonID > 5) {
-                console.error('Invalid button ID. Button ID must be between 0 and 5.');
-                return;
+                throw new Error('Invalid button ID. Button ID must be between 0 and 5.');
             }
-
-            if (astronautID !== 1 && astronautID !== 2) {
-                console.error('Invalid astronaut ID. Astronaut ID must be either 1 or 2.');
-                return;
+            if (astronautID < 0 || astronautID > 10) {
+                throw new Error('Invalid astronaut ID. Astronaut ID must be between 0 and 10.');
             }
-
+    
             // Send information about the highlighted button to the AR WebSocket target
             this.dispatch('AR', {
-                id: astronautID, // Assuming astronautID is the ID of the astronaut
+                id: astronautID,
                 type: 'BUTTON_HIGHLIGHT',
                 use: 'PUT',
                 data: {
                     button_id: buttonID
                 },
             });
-
-            console.log('Button highlighted in AR successfully!');
+    
+            // If everything is successful, send a success response back
+            res.status(200).json({ message: 'Button highlighted in AR successfully!' });
+    
         } catch (error) {
             console.error('Error highlighting button in AR:', error);
-            throw error; // Propagate the error if necessary
+            res.status(500).json({ error: error.message });
         }
     }
+
+
+    // FUNC: Tell AR to highlight a specific button for a specific astronaut in AR over our WebSocket
+    // This happens when the below function is used:   buttonID: [object Object]
+    //                                                 astronautID: [object Object]
+    //                                                 Invalid button ID. Button ID must be between 0 and 5.
+    // public async highlightButton(buttonID: number, astronautID: number): Promise<void> {
+        
+    //     console.log('buttonID: ' + buttonID);
+    //     console.log('astronautID: ' + astronautID);
+
+    //     if (buttonID === null) {
+    //         console.error('Invalid button ID. Cannot highlight a null button.');
+    //         return;
+    //     }
+
+    //     try {
+    //         // Additional checks to validate buttonID and astronautID
+    //         if (buttonID < 0 || buttonID > 5) {
+    //             console.error('Invalid button ID. Button ID must be between 0 and 5.');
+    //             return;
+    //         }
+
+    //         if (!(buttonID >= 0 && buttonID <= 5)) {
+    //             console.error('Invalid button ID. Button ID must be between 0 and 5.');
+    //             return;
+    //         }
+
+    //         if (astronautID !== 1 && astronautID !== 2) {
+    //             console.error('Invalid astronaut ID. Astronaut ID must be either 1 or 2.');
+    //             return;
+    //         }
+
+    //         // Send information about the highlighted button to the AR WebSocket target
+    //         this.dispatch('AR', {
+    //             id: astronautID, // Assuming astronautID is the ID of the astronaut
+    //             type: 'BUTTON_HIGHLIGHT',
+    //             use: 'PUT',
+    //             data: {
+    //                 button_id: buttonID
+    //             },
+    //         });
+
+    //         console.log('Button highlighted in AR successfully!');
+    //     } catch (error) {
+    //         console.error('Error highlighting button in AR:', error);
+    //         throw error; // Propagate the error if necessary
+    //     }
+    // }
+    
+
     
     // UTIL FUNC: Delete a screen by its ID from the database's screens collection
     // USAGE:  arConnectionObject.deleteScreenById('3mmaCaN7ugg1e');
