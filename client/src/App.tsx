@@ -29,13 +29,6 @@ function App() {
         }
     }
 
-    // Use webDarkTheme by default, but set it to webLightTheme if user prefers light mode.
-    window.addEventListener("load", () => {
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-            setTheme(webLightTheme);
-        }
-    })
-
     const handleTabSelect = (selectedValue : string) => {
         switch (selectedValue) {
             case 'tasktab':
@@ -66,7 +59,9 @@ function App() {
             <NavBar onTabSelect={handleTabSelect}/>
             <div className='debug' style={{display: 'flex', flexDirection: 'row'}}>
                 <CameraView/>
-                {selectedPage}
+                <div className='content-container'>
+                    {selectedPage}
+                </div>
             </div>
         </FluentProvider>
 

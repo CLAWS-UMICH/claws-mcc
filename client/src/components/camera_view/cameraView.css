@@ -1,5 +1,5 @@
 .camera-view-container{
-    width: 33vw;
+    flex: 0 0 25%;
 }
 
 .image{
