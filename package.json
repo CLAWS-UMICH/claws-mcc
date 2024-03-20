@@ -16,13 +16,14 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "redis": "^4.6.10",
-    "typescript": "^5.2.2",
+    "typescript": "^5.4.3",
     "ws": "^8.14.2"
   },
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/api/index.js",
-    "test": "jest"
+    "test": "jest",
+    "dev": "concurrently \"tsc --watch\" \"nodemon ./dist/api/index.js\""
   },
   "name": "web",
   "version": "1.0.0",
