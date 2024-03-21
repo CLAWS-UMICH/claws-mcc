@@ -26,6 +26,8 @@ import {
   Accessibility20Regular,
   Accessibility20Filled,
 } from "@fluentui/react-icons";
+import { Link, useNavigate } from 'react-router-dom';
+import './NavBar.css'
 
 const ClipboardTaskList = bundleIcon(ClipboardTaskListLtr24Filled, ClipboardTaskListLtr24Regular);
 const Book = bundleIcon(BookPulse20Filled, BookPulse20Regular);
@@ -36,62 +38,61 @@ const Truck = bundleIcon(VehicleTruckCube20Filled, VehicleTruckCube20Regular); /
 const Document = bundleIcon(DocumentText20Filled, DocumentText20Regular); // change to guides icon
 const Accessibility = bundleIcon(Accessibility20Filled, Accessibility20Regular); // change to suits icon
 
-interface NavBarProps {
-  onTabSelect: (selectedValue: any) => void;
-}
-
 const useStyles = makeStyles({
   root: {
-    alignItems: "right",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
+    // alignItems: "right",
+    // display: "flex",
+    // flexDirection: "column",
+    // justifyContent: "flex-start",
+    // marginTop: "10px",
+    // ...shorthands.padding("50px", "20px"),
     rowGap: "5px",
     backgroundColor: '#000000',
-    marginLeft: "33.33%",
+    // marginLeft: "33.33%",
+    height: "45px"
   },
   tab: {
     fontSize: '15px',
   },
 });
 
-const NavBar : React.FC<NavBarProps> = ({ onTabSelect }) => {
+const NavBar: React.FC = () => {
   const styles = useStyles();
+  const navigate = useNavigate();
 
-  const handleTabSelect = (_: SelectTabEvent, data: SelectTabData) => {
-    onTabSelect(data.value);
+  const handleTabSelect = (e: SelectTabEvent) => {
+    navigate(e.currentTarget['value']);
   };
 
-  // need to change the default page to something
   return (
     <div className={styles.root}>
-      <TabList onTabSelect={handleTabSelect} defaultSelectedValue='taskTab'>        
-        <Tab icon={<ClipboardTaskList />} value='taskTab'>
-          Tasks
+      <TabList className="NavBar" defaultSelectedValue='taskTab'>
+        <Tab onClick={handleTabSelect} icon={<ClipboardTaskList />} value='/tasks'>
+          <span>Tasks</span>
         </Tab>
-        <Tab icon={<Book />} value='vitalsTab'>
-          Vitals
+        <Tab onClick={handleTabSelect} icon={<Book />} value='/vitals'>
+          <span>Vitals</span>
         </Tab>
-        <Tab icon={<Hexagon />} value='samplesTab'>
-          Samples
+        <Tab onClick={handleTabSelect} icon={<Hexagon />} value='/samples'>
+          <span>Samples</span>
         </Tab>
-        <Tab icon={<Location />} value='navigationTab'>
-          Navigation
+        <Tab onClick={handleTabSelect} icon={<Location />} value='/navigation'>
+          <span>Navigation</span>
         </Tab>
-        <Tab icon={<Truck />} value='roverTab'>
-          Rover
+        <Tab onClick={handleTabSelect} icon={<Truck />} value='/rover'>
+          <span>Rover</span>
         </Tab>
-        <Tab icon={<Accessibility />} value='suitsTab'>
+        <Tab onClick={handleTabSelect} icon={<Accessibility />} value='/suits'>
           Suits
         </Tab>
-        <Tab icon={<Chat />} value='messagesTab'>
-          Messages
+        <Tab onClick={handleTabSelect} icon={<Chat />} value='/messages'>
+          <span>Messages</span>
         </Tab>
-        <Tab icon={<Document />} value='connectTab'>
-          Connect
+        <Tab onClick={handleTabSelect} icon={<Document />} value='/connect'>
+          <span>Connect</span>
         </Tab>
       </TabList>
-      <Divider/>
+      <Divider />
     </div>
   );
 };

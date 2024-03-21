@@ -37,3 +37,16 @@
         transform: rotate(360deg);
     }
 }
+
+.content-container {
+    flex: 0 0 75%;
+}
+
+.content {
+    margin-top: 20px;
+}
+
+body {
+    /* rgb(41, 41, 41) */
+    background: rgb(41, 41, 41);
+}

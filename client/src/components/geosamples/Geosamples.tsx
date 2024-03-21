@@ -290,13 +290,6 @@ const GeosampleManager: React.FC = () => {
 
     return (
         <div className={styles.root}>
-            <InlineDrawer style={{width:"33.33%"}}separator open>
-                <DrawerHeader className={styles.header}>
-                    <DrawerHeaderTitle>
-                        <b>temp section for camera view</b>
-                    </DrawerHeaderTitle>
-                </DrawerHeader>
-            </InlineDrawer>
             <InlineDrawer style={{width:"220px"}}separator open>
                 <DrawerHeader className={styles.header}>
                     <DrawerHeaderTitle action={<Button size="medium" icon={<Search20Regular/>} onClick={() => setShowSearchBar(!showSearchBar)}></Button>}>

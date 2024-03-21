@@ -1,88 +1,56 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import axios from 'axios';
-import {
-    FluentProvider, 
-    webDarkTheme, 
-    webLightTheme, 
-} from "@fluentui/react-components";
+import { FluentProvider, webDarkTheme, webLightTheme } from "@fluentui/react-components";
+import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
 import GeosampleManager from './components/geosamples/Geosamples.tsx';
 import NavBar from './components/layout/NavBar/NavBar.tsx';
 import Communication from './components/communications/Communication.tsx';
+import CameraView from './components/camera_view/CameraView.tsx';
+import EmptyComponent from './components/common/EmptyComponent.tsx';
 
 interface AstronautData {
-    heartrate: number;
-    // Add more properties if needed
+  heartrate: number;
 }
 
 function App() {
-    const [theme, setTheme] = useState(webDarkTheme);
-    const [astronaut, setAstronaut] = useState<string | undefined>(undefined);
-    const [selectedPage, setSelectedPage] = useState<any>(undefined);
+  const [theme, setTheme] = useState(webDarkTheme);
+  const [astronaut, setAstronaut] = useState<string | undefined>(undefined);
 
-
-    function getAstronaut() {
-        if (astronaut) {
-            axios.get<AstronautData>(`/api/getAstronaut/${astronaut}`).then((res) => {
-                alert(`This astronaut's heartrate is ${res.data.heartrate}`);
-            });
-        }
+  function getAstronaut() {
+    if (astronaut) {
+      axios.get<AstronautData>(`/api/getAstronaut/${astronaut}`).then((res) => {
+        alert(`This astronaut's heartrate is ${res.data.heartrate}`);
+      });
     }
+  }
 
-    // Use webDarkTheme by default, but set it to webLightTheme if user prefers light mode.
-    window.addEventListener("load", () => {
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-            setTheme(webLightTheme);
-        }
-    })
-
-    const handleTabSelect = (selectedValue : string) => {
-        switch (selectedValue) {
-            case 'tasktab':
-                break;
-            case 'navigationTab':
-                setSelectedPage(<WaypointManager />);
-                break;
-            case 'vitalsTab':
-                break;
-            case 'samplesTab':
-                setSelectedPage(<GeosampleManager />);
-                break;
-            case 'navigationTab':
-                break;
-            case 'roverTab':
-                break;
-            case 'suitsTab':
-                break;
-            case 'messagesTab':
-                break;
-            case 'connectTab':
-                setSelectedPage(<Communication/>);
-                break;
-            default:
-                setSelectedPage(undefined);
-                break;
-        }
-    }
-
-    return (
-        <FluentProvider theme={theme}>
-            <NavBar onTabSelect={handleTabSelect}/>
-            {selectedPage}
-        </FluentProvider>
-
-        // <Button appearance="primary">Hello Fluent UI React</Button>
-        /* UNCOMMENT THIS SECTION IF YOU NEED THE INPUT AND BUTTON PART
-          <div className="App">
-            <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <input onChange={(e) => setAstronaut(e.target.value)} />
-              <button onClick={getAstronaut}>Get Astronaut</button>
-            </header>
-          </div>
-        */
-    );
+  return (
+    <FluentProvider theme={theme}>
+        <BrowserRouter>
+            <div className='debug' style={{ display: 'flex', flexDirection: 'row' }}>
+                <CameraView />
+                <div className='content-container'>
+                    <NavBar />
+                    <div className='content'>
+                      <Routes>
+                          <Route path="/" element={<EmptyComponent />} />
+                          <Route path="/tasks" element={<EmptyComponent />} />
+                          <Route path="/vitals" element={<EmptyComponent />} />
+                          <Route path="/samples" element={<GeosampleManager />} />
+                          <Route path="/navigation" element={<WaypointManager />} />
+                          <Route path="/rover" element={<EmptyComponent />} />
+                          <Route path="/suits" element={<EmptyComponent />} />
+                          <Route path="/messages" element={<EmptyComponent />} />
+                          <Route path="/connect" element={<Communication />} />
+                      </Routes>
+                    </div>
+                </div>
+            </div>
+        </BrowserRouter>
+    </FluentProvider>
+  );
 }
 
 export default App;
