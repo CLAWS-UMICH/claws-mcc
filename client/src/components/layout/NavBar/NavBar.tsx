@@ -26,6 +26,7 @@ import {
   PersonStanding16Regular,
   PersonStanding16Filled,
 } from "@fluentui/react-icons";
+import { Link } from 'react-router-dom';
 
 const ClipboardTaskList = bundleIcon(ClipboardTaskList16Filled, ClipboardTaskList16Regular);
 const Book = bundleIcon(Book16Filled, Book16Regular);
@@ -36,59 +37,50 @@ const Truck = bundleIcon(VehicleTruckCube20Filled, VehicleTruckCube20Regular); /
 const Document = bundleIcon(DocumentText16Filled, DocumentText16Regular); // change to guides icon
 const Person = bundleIcon(PersonStanding16Filled, PersonStanding16Regular); // change to suits icon
 
-interface NavBarProps {
-  onTabSelect: (selectedValue: any) => void;
-}
-
 const useStyles = makeStyles({
   root: {
-    alignItems: "right",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
+    // alignItems: "right",
+    // display: "flex",
+    // flexDirection: "column",
+    // justifyContent: "flex-start",
     // marginTop: "10px",
     // ...shorthands.padding("50px", "20px"),
     rowGap: "5px",
   },
 });
 
-const NavBar : React.FC<NavBarProps> = ({ onTabSelect }) => {
+const NavBar: React.FC = () => {
   const styles = useStyles();
 
-  const handleTabSelect = (_: SelectTabEvent, data: SelectTabData) => {
-    onTabSelect(data.value);
-  };
-
-  // need to change the default page to something
   return (
     <div className={styles.root}>
-      <TabList onTabSelect={handleTabSelect} defaultSelectedValue='taskTab'>        
+      <TabList className="NavBar" defaultSelectedValue='taskTab'>
         <Tab icon={<ClipboardTaskList />} value='taskTab'>
-          Tasks
+          <Link to="/tasks">Tasks</Link>
         </Tab>
         <Tab icon={<Book />} value='vitalsTab'>
-          Vitals
+          <Link to="/vitals">Vitals</Link>
         </Tab>
         <Tab icon={<Hexagon />} value='samplesTab'>
-          Samples
+          <Link to="/samples">Samples</Link>
         </Tab>
         <Tab icon={<Location />} value='navigationTab'>
-          Navigation
+          <Link to="/navigation">Navigation</Link>
         </Tab>
         <Tab icon={<Truck />} value='roverTab'>
-          Rover
+          <Link to="/rover">Rover</Link>
         </Tab>
         <Tab icon={<Person />} value='suitsTab'>
-          Suits
+          <Link to="/suits">Suits</Link>
         </Tab>
         <Tab icon={<Chat />} value='messagesTab'>
-          Messages
+          <Link to="/messages">Messages</Link>
         </Tab>
         <Tab icon={<Document />} value='connectTab'>
-          Connect
+          <Link to="/connect">Connect</Link>
         </Tab>
       </TabList>
-      <Divider/>
+      <Divider />
     </div>
   );
 };
