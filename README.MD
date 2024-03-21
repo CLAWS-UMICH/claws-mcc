@@ -6,26 +6,10 @@ mission control systems.
 ## Quick Setup
 Setup is made easy by running the following commands:
 ```bash
-chmod +x setup.sh
-./setup.sh
+npm run setup
 ```
 
-## Backend
-
-The server's backend is written in Typescript. To run it, run the following commands:
-
+## Running the Application
 ```bash
-npm run install
-npm run start
+npm run app
 ```
-
-## Frontend
-
-The frontend is also written in Typescript and uses React. To run it, run the following commands:
-
-```bash
-cd client
-npm run install
-npm run start
-```
-

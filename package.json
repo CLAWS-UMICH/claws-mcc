@@ -26,7 +26,9 @@
     "build": "tsc",
     "start": "node ./dist/api/index.js",
     "test": "jest",
-    "dev": "concurrently \"tsc --watch\" \"nodemon ./dist/api/index.js\""
+    "dev": "concurrently \"tsc --watch\" \"nodemon ./dist/api/index.js\"",
+    "setup": "npm install && cd client && npm install && cd ..",
+    "app": "concurrently \"npm run dev\" \"cd client && npm start\""
   },
   "name": "web",
   "version": "1.0.0",
