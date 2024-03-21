@@ -1,5 +1,4 @@
 import React from 'react';
-import './Waypoints.css'
 import {GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader} from '@react-google-maps/api';
 import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "../waypoints/WaypointManager.tsx";
 import {Body1, Body1Stronger} from "@fluentui/react-components";
@@ -7,6 +6,7 @@ import {ComposeFilled} from "@fluentui/react-icons";
 import {WaypointForm} from "../waypoints/WaypointList.tsx";
 import waypointImage from '../../assets/waypoint.png';
 import {isEqual} from "lodash";
+import { BaseGeosample, ManagerAction } from './Geosamples.tsx';
 
 const key = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
 
@@ -108,14 +108,14 @@ function makeMarsMapType(m: MapObject): google.maps.ImageMapType {
     return new google.maps.ImageMapType(opts);
 }
 
-interface WaypointMapProps {
+interface GeosampleMapProps {
     temp?: BaseWaypoint
-    waypoints: BaseWaypoint[];
-    selected?: BaseWaypoint;
-    dispatch: React.Dispatch<MapAction>;
+    geosamples: BaseGeosample[];
+    selected?: BaseGeosample;
+    dispatch: React.Dispatch<ManagerAction>;
 }
 
-export const WaypointMap: React.FC<WaypointMapProps> = props => {
+export const GeosampleMap: React.FC<GeosampleMapProps> = props => {
     const [infoWindow, setInfoWindow] = React.useState<React.ReactNode | null>(null);
     const [tempWindow, setTempWindow] = React.useState<React.ReactNode | null>(null);
     const {isLoaded} = useJsApiLoader({
@@ -142,7 +142,7 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                         <Body1Stronger>Longitude: </Body1Stronger>
                         <Body1>{latLng.lng().toFixed(5)}</Body1>
                     </div>
-                    <WaypointForm
+                    {/* <WaypointForm
                         afterSubmit={() => setTempWindow(null)}
                         waypoint={props.temp!}
                         temp={{
@@ -157,7 +157,7 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                         }}
                         dispatch={props.dispatch}
                         text={"Create Waypoint"}
-                        buttonProps={{icon: <ComposeFilled/>}}/>
+                        buttonProps={{icon: <ComposeFilled/>}}/> */}
                 </div>
             </InfoWindow>
         );
@@ -174,12 +174,12 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                     streetViewControl: false,
                     mapTypeControlOptions: {mapTypeIds: ['elevation', 'visible', 'infrared']}
                 }}>
-                {props.waypoints.map(marker => {
+                {props.geosamples.map(marker => {
                     const position = {lat: marker.location.latitude, lng: marker.location.longitude};
                     return (
-                        <div key={marker.waypoint_id}>
+                        <div key={marker.geosample_id}>
                             <Marker position={position} clickable={false}
-                                    label={{text: intToChar(marker.waypoint_id), color: "white", fontWeight: "bold"}}
+                                    label={{text: intToChar(marker.geosample_id), color: "white", fontWeight: "bold"}}
                                     icon={waypointImage}/>
                             <InfoBox
                                 position={new google.maps.LatLng(marker.location.latitude, marker.location.longitude)}
@@ -192,7 +192,7 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                                 onCloseClick={() => setInfoWindow(null)}>
                                 <div className={'info-box'}
                                      style={{backgroundColor: isEqual(props.selected, marker) ? "grey" : undefined}}>
-                                    <Body1Stronger>Waypoint {marker.waypoint_id}</Body1Stronger>
+                                    <Body1Stronger>Waypoint {marker.geosample_id}</Body1Stronger>
                                     <Body1>{marker.description}</Body1>
                                 </div>
                             </InfoBox>

@@ -11,7 +11,7 @@ import {
     makeStyles
 } from '@fluentui/react-components';
 import { ChevronUp16Regular, ChevronDown16Regular } from '@fluentui/react-icons';
-import { BaseGeosample, BaseZone, ManagerAction } from './Geosamples';
+import { BaseGeosample, BaseZone, ManagerAction } from './Geosamples.tsx';
 import './Geosamples.css'
 import StarredSample from './StarredImage.tsx';
 import SampleImage from './SampleImage.tsx';
@@ -51,25 +51,25 @@ const useStyles = makeStyles({
         marginTop: "-29.5px",
         marginLeft: "6px"
     },
-})
+});
 
 interface SampleListProps {
     sample_zones: BaseZone[];
     selected?: BaseGeosample;
     dispatch: React.Dispatch<ManagerAction>;
     ready: boolean;
-}
+};
 
 const GeosampleList: React.FC<SampleListProps> = props => {
     const styles = useStyles();
-    const [openItems, setOpenItems] = React.useState(["1"]);
+    const [openItems, setOpenItems] = React.useState(props.sample_zones.map(zone => zone.zone_id));
 
     const handleToggle: AccordionToggleEventHandler<string> = (event, data) => {
         setOpenItems(data.openItems);
     };
 
     const handleSelect = (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
-        if (geosample && props.selected?.eva_data.id === geosample.eva_data.id) {
+        if (geosample && props.selected?.geosample_id === geosample.geosample_id) {
             dispatch({type: 'deselect'});
         }
         else if (geosample) {

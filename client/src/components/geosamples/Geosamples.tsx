@@ -11,18 +11,18 @@ import {
     makeStyles,
     shorthands,
 } from "@fluentui/react-components";
-import { Search20Regular, Edit16Regular, Delete16Regular, Map16Regular, Star16Regular, Star16Filled } from "@fluentui/react-icons";
+import { Search20Regular } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
 import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
 import "./Geosamples.css"
-// import { GeosampleMap } from './GeosampleMap.tsx';
-import { WaypointMap } from '../waypoints/WaypointMap.tsx';
+import { GeosampleMap } from './GeosampleMap.tsx';
+// import { WaypointMap } from '../waypoints/WaypointMap.tsx';
 
 type ARLocation = {
     latitude: number;
     longitude: number;
-}
+};
 
 export type EvaData = {
     name: string;
@@ -38,7 +38,7 @@ export type EvaData = {
         K2O: number;
         P2O3: number;
     }
-}
+};
 
 export type BaseGeosample = {
     _id?: number;
@@ -55,20 +55,20 @@ export type BaseGeosample = {
     author: number;
     description: string;
     image: string;
-}
+};
 
 export type BaseZone = {
     zone_id: string;
     geosample_ids: BaseGeosample[];
     location: ARLocation;
     radius: number;
-}
+};
 
 export type ManagerState = {
     sample_zones: BaseZone[];
     geosamples: BaseGeosample[];
     selected?: BaseGeosample;
-}
+};
 
 export type ManagerAction =
     { type: 'set', payload: {zones: BaseZone[], samples: BaseGeosample[]} } | // Should only be used by ServerListener
@@ -151,101 +151,94 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
         default:
             return state;
     }
-}
-var geosample: BaseGeosample = {
-    geosample_id: 1, 
-    zone_id: "A", 
-    starred: true, 
-    eva_data: {
-        name: "Geo Sample 1",
-        id: 2394,
-        data: {
-            SiO2: 10.00,
-            TiO2: 10.00,
-            Al2O3: 10.00,
-            FeO: 10.00,
-            MnO: 10.00,
-            MgO: 10.00,
-            CaO: 10.00,
-            K2O: 10.00,
-            P2O3: 10.00,
-        }
-    },
-    time: "14:23:27",
-    date: "3/20/2025",
-    color: "Brown",
-    shape: "Square",
-    rock_type: "Basalt",
-    location: {
-        latitude: 108.1442,
-        longitude: 199.2442
-    },
-    author: 2,
-    description: "this is a description",
-    image: "../../assets/temp_sample_pic.png"
-}
+};
 
-var geosample2: BaseGeosample = {
-    geosample_id: 2, 
-    zone_id: "A", 
-    starred: false, 
-    eva_data: {
-        name: "Geo Sample 2",
-        id: 4924,
-        data: { 
-            SiO2: 11.72,
-            TiO2: 8.70,
-            Al2O3: 1.75,
-            FeO: 7.21,
-            MnO: 17.28,
-            MgO: 10.70,
-            CaO: 16.92,
-            K2O: 4.12,
-            P2O3: 20.87,
-        }
-    },
-    time: "19:29:33",
-    date: "3/13/2025",
-    color: "Black",
-    shape: "Hexagon",
-    rock_type: "Limestone",
-    location: {
-        latitude: 104.1442,
-        longitude: 219.3333
-    },
-    author: 1,
-    description: "ohhhhoo",
-    image: "../../assets/temp_sample_pic.png"
-}
-
-var zones: BaseZone[] = [{zone_id: "A",
-                            geosample_ids: [geosample, geosample2],
-                            location: {
-                                latitude: 100.2321,
-                                longitude: 205.2345
-                            },
-                            radius: 15.3249},
-                            {zone_id: "B",
-                            geosample_ids: [{
-                                geosample_id: 3, 
-                                zone_id: "B", 
-                                starred: false, 
+var geosample0: BaseGeosample = {
+                                geosample_id: 0, 
+                                zone_id: "A", 
                                 eva_data: {
                                     name: "Geo Sample 1",
-                                    id: 3937,
-                                    data: { 
-                                        SiO2: 10.20,
-                                        TiO2: 7.80,
-                                        Al2O3: 3.30,
-                                        FeO: 9.30,
-                                        MnO: 13.27,
-                                        MgO: 6.13,
-                                        CaO: 18.65,
-                                        K2O: 29.35,
-                                        P2O3: 2.00,
+                                    id: 2394,
+                                    data: {
+                                        SiO2: 10.00,
+                                        TiO2: 10.00,
+                                        Al2O3: 10.00,
+                                        FeO: 10.00,
+                                        MnO: 10.00,
+                                        MgO: 10.00,
+                                        CaO: 10.00,
+                                        K2O: 10.00,
+                                        P2O3: 10.00,
                                     }
                                 },
-                                time: "13:43:27",
+                                time: "8:00 PM",
+                                date: "3/20/2025",
+                                color: "Brown",
+                                shape: "Crystalline",
+                                starred: true, 
+                                rock_type: "Basalt",
+                                location: {
+                                    latitude: 29.5642,
+                                    longitude: 199.2442
+                                },
+                                author: 1,
+                                description: "this is a description",
+                                image: "../../assets/temp_sample_pic.png"
+                            };
+
+var geosample1: BaseGeosample = {
+                                geosample_id: 1, 
+                                zone_id: "A", 
+                                eva_data: {
+                                    name: "Geo Sample 2",
+                                    id: 4924,
+                                    data: { 
+                                        SiO2: 11.72,
+                                        TiO2: 8.70,
+                                        Al2O3: 1.75,
+                                        FeO: 7.21,
+                                        MnO: 17.28,
+                                        MgO: 10.70,
+                                        CaO: 16.92,
+                                        K2O: 4.12,
+                                        P2O3: 20.87,
+                                    }
+                                },
+                                time: "7:00 PM",
+                                date: "3/13/2025",
+                                color: "Black",
+                                shape: "Hexagon",
+                                starred: false, 
+                                rock_type: "Limestone",
+                                location: {
+                                    latitude: 104.1442,
+                                    longitude: 219.3333
+                                },
+                                author: 1,
+                                description: "ohhhhoo",
+                                image: "../../assets/temp_sample_pic.png"
+                            };
+
+var geosample2: BaseGeosample = {
+                            geosample_id: 3, 
+                            zone_id: "B", 
+                            starred: false, 
+                            eva_data: {
+                                name: "Geo Sample 1",
+                                id: 3937,
+                                data: { 
+                                    SiO2: 10.20,
+                                    TiO2: 7.80,
+                                    Al2O3: 3.30,
+                                    FeO: 9.30,
+                                    MnO: 13.27,
+                                    MgO: 6.13,
+                                    CaO: 18.65,
+                                    K2O: 29.35,
+                                    P2O3: 2.00,
+                                }
+                            },
+                                time: "11:00 AM",
                                 date: "3/10/2025",
                                 color: "Red",
                                 shape: "Circle",
@@ -257,15 +250,25 @@ var zones: BaseZone[] = [{zone_id: "A",
                                 author: 1,
                                 description: "ohhhhoo",
                                 image: "../../assets/temp_sample_pic.png"
-                            }],
-                                                        location: {
+                            };
+
+var zoneA: BaseZone = {zone_id: "A",
+                            geosample_ids: [geosample0, geosample1],
+                            location: {
                                 latitude: 100.2321,
                                 longitude: 205.2345
                             },
-                            radius: 15.3249},
-                        ]
+                            radius: 3};
 
-const initialState: ManagerState = {geosamples: [geosample, geosample2], sample_zones: zones, selected: undefined}
+var zoneB: BaseZone = {zone_id: "B",
+                        geosample_ids: [geosample2],
+                        location: {
+                                latitude: 100.2321,
+                                longitude: 205.2345
+                            },
+                            radius: 4};
+
+const initialState: ManagerState = {geosamples: [geosample0, geosample1, geosample2], sample_zones: [zoneA, zoneB], selected: undefined}
 
 const GeosampleManager: React.FC = () => { 
     const styles = useStyles();   
@@ -316,9 +319,9 @@ const GeosampleManager: React.FC = () => {
             <DrawerBody>
                 <DetailScreen geosample={state.selected} dispatch={dispatch}/>
                 <div className={styles.mapContainer}>
-                    {/* <div style={{alignItems:"center", height: "400px", width:"750px"}}>
-                        <WaypointMap waypoints={state.waypoints} selected={state.selected} dispatch={dispatch}/>
-                    </div> */}
+                    <div style={{alignItems:"center", height: "400px", width:"750px"}}>
+                        <GeosampleMap geosamples={state.geosamples} selected={state.selected} dispatch={dispatch}/>
+                    </div>
                 </div>
             </DrawerBody>
         </div>
