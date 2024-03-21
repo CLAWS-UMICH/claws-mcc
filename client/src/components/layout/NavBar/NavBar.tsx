@@ -26,7 +26,8 @@ import {
   Accessibility20Regular,
   Accessibility20Filled,
 } from "@fluentui/react-icons";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import './NavBar.css'
 
 const ClipboardTaskList = bundleIcon(ClipboardTaskListLtr24Filled, ClipboardTaskListLtr24Regular);
 const Book = bundleIcon(BookPulse20Filled, BookPulse20Regular);
@@ -47,7 +48,8 @@ const useStyles = makeStyles({
     // ...shorthands.padding("50px", "20px"),
     rowGap: "5px",
     backgroundColor: '#000000',
-    marginLeft: "33.33%",
+    // marginLeft: "33.33%",
+    height: "45px"
   },
   tab: {
     fontSize: '15px',
@@ -56,33 +58,38 @@ const useStyles = makeStyles({
 
 const NavBar: React.FC = () => {
   const styles = useStyles();
+  const navigate = useNavigate();
+
+  const handleTabSelect = (e: SelectTabEvent) => {
+    navigate(e.currentTarget['value']);
+  };
 
   return (
     <div className={styles.root}>
       <TabList className="NavBar" defaultSelectedValue='taskTab'>
-        <Tab icon={<ClipboardTaskList />} value='taskTab'>
-          <Link to="/tasks">Tasks</Link>
+        <Tab onClick={handleTabSelect} icon={<ClipboardTaskList />} value='/tasks'>
+          <span>Tasks</span>
         </Tab>
-        <Tab icon={<Book />} value='vitalsTab'>
-          <Link to="/vitals">Vitals</Link>
+        <Tab onClick={handleTabSelect} icon={<Book />} value='/vitals'>
+          <span>Vitals</span>
         </Tab>
-        <Tab icon={<Hexagon />} value='samplesTab'>
-          <Link to="/samples">Samples</Link>
+        <Tab onClick={handleTabSelect} icon={<Hexagon />} value='/samples'>
+          <span>Samples</span>
         </Tab>
-        <Tab icon={<Location />} value='navigationTab'>
-          <Link to="/navigation">Navigation</Link>
+        <Tab onClick={handleTabSelect} icon={<Location />} value='/navigation'>
+          <span>Navigation</span>
         </Tab>
-        <Tab icon={<Truck />} value='roverTab'>
-          <Link to="/rover">Rover</Link>
+        <Tab onClick={handleTabSelect} icon={<Truck />} value='/rover'>
+          <span>Rover</span>
         </Tab>
-        <Tab icon={<Accessibility />} value='suitsTab'>
+        <Tab onClick={handleTabSelect} icon={<Accessibility />} value='/suits'>
           Suits
         </Tab>
-        <Tab icon={<Chat />} value='messagesTab'>
-          <Link to="/messages">Messages</Link>
+        <Tab onClick={handleTabSelect} icon={<Chat />} value='/messages'>
+          <span>Messages</span>
         </Tab>
-        <Tab icon={<Document />} value='connectTab'>
-          <Link to="/connect">Connect</Link>
+        <Tab onClick={handleTabSelect} icon={<Document />} value='/connect'>
+          <span>Connect</span>
         </Tab>
       </TabList>
       <Divider />

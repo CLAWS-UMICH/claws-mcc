@@ -29,20 +29,22 @@ function App() {
     <FluentProvider theme={theme}>
         <BrowserRouter>
             <div className='debug' style={{ display: 'flex', flexDirection: 'row' }}>
-                <NavBar />
                 <CameraView />
                 <div className='content-container'>
-                    <Routes>
-                        <Route path="/" element={<EmptyComponent />} />
-                        <Route path="/tasks" element={<EmptyComponent />} />
-                        <Route path="/vitals" element={<EmptyComponent />} />
-                        <Route path="/samples" element={<GeosampleManager />} />
-                        <Route path="/navigation" element={<WaypointManager />} />
-                        <Route path="/rover" element={<EmptyComponent />} />
-                        <Route path="/suits" element={<EmptyComponent />} />
-                        <Route path="/messages" element={<EmptyComponent />} />
-                        <Route path="/connect" element={<EmptyComponent />} />
-                    </Routes>
+                    <NavBar />
+                    <div className='content'>
+                      <Routes>
+                          <Route path="/" element={<EmptyComponent />} />
+                          <Route path="/tasks" element={<EmptyComponent />} />
+                          <Route path="/vitals" element={<EmptyComponent />} />
+                          <Route path="/samples" element={<GeosampleManager />} />
+                          <Route path="/navigation" element={<WaypointManager />} />
+                          <Route path="/rover" element={<EmptyComponent />} />
+                          <Route path="/suits" element={<EmptyComponent />} />
+                          <Route path="/messages" element={<EmptyComponent />} />
+                          <Route path="/connect" element={<EmptyComponent />} />
+                      </Routes>
+                    </div>
                 </div>
             </div>
         </BrowserRouter>

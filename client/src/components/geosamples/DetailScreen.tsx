@@ -65,8 +65,9 @@ const useStyles = makeStyles({
   line: {
     display: "flex",
     marginBottom: "1rem",
-    alignContent:"center", 
-    justifyContent:"space-between"
+    alignContent:"center",
+    columnGap: "15px",
+    // justifyContent:"space-between"
   },
 });
 
@@ -362,7 +363,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
   return (
     <div style={{width: "100%"}}>
         <div>
-          <h4 style={{marginTop:'.7rem', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+          <h4 style={{marginTop:'.7rem', display:'flex', alignItems:'center', gap:'15px'}}>
               <div style={{ display: 'flex', alignItems: 'center', gap:'10px' }}>
                 <Input style={{border: "0px", width: "150px", fontSize: "17.5px", font: "bold", marginLeft:"-10px", marginRight: "0px"}} 
                        appearance="outline" 
@@ -405,7 +406,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           </h4>
           <Divider style={{marginLeft:'-24px', marginTop:'-9.1px', marginBottom:'.75rem', width:'1120px'}}></Divider>
         </div>
-        <div style={{display:"flex", marginBottom:'1rem', justifyContent: 'space-between'}}>
+        <div style={{display:"flex", marginBottom:'1rem', gap: '15px'}}>
           <div className={styles.root}>
               <Label htmlFor="shape_dropdown">Shape</Label>
               {edit ? (              
@@ -466,7 +467,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           </div>
           <img src={props.geosample.image} height={134.5} width={220}/>
         </div>
-        <div style={{gap: "10px"}} className={styles.line}>
+        <div style={{gap: "50px"}} className={styles.line}>
           <CompositionVisualization sample={props.geosample.eva_data}/>
           <div className={styles.quad} style={{marginLeft: "-22.5px"}}>
             <Label htmlFor="location">Location<sub></sub></Label>
