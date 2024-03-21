@@ -9,33 +9,33 @@ import {
 } from "@fluentui/react-components";
 import {
   bundleIcon,
-  ClipboardTaskList16Regular,
-  ClipboardTaskList16Filled,
-  Book16Regular,
-  Book16Filled,
-  Hexagon16Regular,
-  Hexagon16Filled,
-  Chat16Regular,
-  Chat16Filled,
-  Location16Regular,
-  Location16Filled,
+  ClipboardTaskListLtr24Regular,
+  ClipboardTaskListLtr24Filled,
+  BookPulse20Regular,
+  BookPulse20Filled,
+  Hexagon20Regular,
+  Hexagon20Filled,
+  Chat20Regular,
+  Chat20Filled,
+  Location20Regular,
+  Location20Filled,
   VehicleTruckCube20Regular,
   VehicleTruckCube20Filled,
-  DocumentText16Regular,
-  DocumentText16Filled,
-  PersonStanding16Regular,
-  PersonStanding16Filled,
+  DocumentText20Regular,
+  DocumentText20Filled,
+  Accessibility20Regular,
+  Accessibility20Filled,
 } from "@fluentui/react-icons";
 import { Link } from 'react-router-dom';
 
-const ClipboardTaskList = bundleIcon(ClipboardTaskList16Filled, ClipboardTaskList16Regular);
-const Book = bundleIcon(Book16Filled, Book16Regular);
-const Hexagon = bundleIcon(Hexagon16Filled, Hexagon16Regular);
-const Chat = bundleIcon(Chat16Filled, Chat16Regular);
-const Location = bundleIcon(Location16Filled, Location16Regular);
+const ClipboardTaskList = bundleIcon(ClipboardTaskListLtr24Filled, ClipboardTaskListLtr24Regular);
+const Book = bundleIcon(BookPulse20Filled, BookPulse20Regular);
+const Hexagon = bundleIcon(Hexagon20Filled, Hexagon20Regular);
+const Chat = bundleIcon(Chat20Filled, Chat20Regular);
+const Location = bundleIcon(Location20Filled, Location20Regular);
 const Truck = bundleIcon(VehicleTruckCube20Filled, VehicleTruckCube20Regular); // change to rover icon
-const Document = bundleIcon(DocumentText16Filled, DocumentText16Regular); // change to guides icon
-const Person = bundleIcon(PersonStanding16Filled, PersonStanding16Regular); // change to suits icon
+const Document = bundleIcon(DocumentText20Filled, DocumentText20Regular); // change to guides icon
+const Accessibility = bundleIcon(Accessibility20Filled, Accessibility20Regular); // change to suits icon
 
 const useStyles = makeStyles({
   root: {
@@ -46,6 +46,11 @@ const useStyles = makeStyles({
     // marginTop: "10px",
     // ...shorthands.padding("50px", "20px"),
     rowGap: "5px",
+    backgroundColor: '#000000',
+    marginLeft: "33.33%",
+  },
+  tab: {
+    fontSize: '15px',
   },
 });
 
@@ -70,8 +75,8 @@ const NavBar: React.FC = () => {
         <Tab icon={<Truck />} value='roverTab'>
           <Link to="/rover">Rover</Link>
         </Tab>
-        <Tab icon={<Person />} value='suitsTab'>
-          <Link to="/suits">Suits</Link>
+        <Tab icon={<Accessibility />} value='suitsTab'>
+          Suits
         </Tab>
         <Tab icon={<Chat />} value='messagesTab'>
           <Link to="/messages">Messages</Link>

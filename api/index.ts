@@ -39,7 +39,7 @@ client.connect().then(() => {
             const routeInstances: Route[] = [];
 
             for (const file of files) {
-                if (path.extname(file) === '.js') {
+                if (path.extname(file) === '.ts') {
                     try {
                         const RouteClass = require(path.join(routesDirectory, file)).default;
 
@@ -62,6 +62,7 @@ client.connect().then(() => {
                     }
                 }
             }
+            console.log(eventRegistry);
 
             app.get('/api/test', (req, res) => {
                 res.send('Hello from the server!');
@@ -105,7 +106,6 @@ client.connect().then(() => {
                     const data = JSON.parse(message.toString());
 
                     console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
-
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
                         eventRegistry[data.type](data.data);
@@ -116,19 +116,29 @@ client.connect().then(() => {
             // Frontend doesn't dispatch events to the backend, so we don't need to register any event handlers
 
             // Initialize HoloLens WS server
-            wssHoloLens.on('connection', () => {
+            wssHoloLens.on('connection', (sock, request) => {
                 console.log('HoloLens WebSocket connection established');
-            });
-            wssHoloLens.on('message', (message) => {
-                const data = JSON.parse(message.toString());
+                sock.on('message', (message) => {
+                    const data = JSON.parse(message.toString());
 
-                console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
+                    console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
 
-                // call the handler for the event type
-                if (eventRegistry[data.type.toUpperCase()]) {
-                    eventRegistry[data.type](data.data);
-                }
+                    // call the handler for the event type
+                    if (eventRegistry[data.type.toUpperCase()]) {
+                        eventRegistry[data.type](data.data);
+                    }
+                })
             });
+            // wssHoloLens.on('message', (message) => {
+            //     const data = JSON.parse(message.toString());
+
+            //     console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
+
+            //     // call the handler for the event type
+            //     if (eventRegistry[data.type.toUpperCase()]) {
+            //         eventRegistry[data.type](data.data);
+            //     }
+            // });
 
             // Set the WebSocket instances on each route instance
             for (const routeInstance of routeInstances) {

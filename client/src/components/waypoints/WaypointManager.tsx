@@ -59,7 +59,7 @@ export const useAstronaut = (idOrName: string | number) => {
     return astronaut;
 }
 
-const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerState => {
+export const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerState => {
     switch (action.type) {
         case 'add':
             return {
@@ -114,7 +114,7 @@ const waypointsReducer = (state: ManagerState, action: ManagerAction): ManagerSt
 
 const initialState: ManagerState = {waypoints: []}
 
-const WaypointManager: React.FC = () => {
+export const WaypointManager: React.FC = () => {
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {

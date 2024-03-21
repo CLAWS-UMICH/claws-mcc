@@ -27,3 +27,5 @@ export const ButtonTemplate = <T extends React.ReactNode>(props: CustomProps<T>,
 //     Fill Out Later
 //   </Button>
 // );
+
+export default ButtonTemplate;

@@ -1,0 +1,21 @@
+  .chart {
+    height: .65rem;
+    width: 24.10rem;
+  }
+
+  .chart div {
+    height: 100%;
+    float: left;
+    transition-property: width;
+    transition-duration: 0.5s;
+  }
+
+  .chart .start {
+      border-top-left-radius: 1.5rem;
+      border-bottom-left-radius: 1.5rem;
+  }
+
+  .chart .end {
+      border-top-right-radius: 1.5rem;
+      border-bottom-right-radius: 1.5rem;
+  }
