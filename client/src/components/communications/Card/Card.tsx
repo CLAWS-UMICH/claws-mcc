@@ -1,6 +1,4 @@
-import * as React from "react";
-import { useState, useRef } from "react";
-import SearchBar from "../SearchBar/SearchBar.tsx";
+import React, { useState, useRef } from "react";
 import "./Card.css";
 
 import {
@@ -25,8 +23,7 @@ import { ArrowExpand24Regular, Dismiss24Regular } from "@fluentui/react-icons";
 const ImageCard = ({ onClick, images, index, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  const cardRef = useRef(null); // This ref is specific to this card
+  const cardRef = useRef(null);
 
   const handleClick = () => {
     if(onClick && !isDialogOpen) {
@@ -51,13 +48,13 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
           <Dialog open={isDialogOpen} onOpenChange={(_, data) => setIsDialogOpen(data.open)} >
             <DialogTrigger>
               <div onClick={handleIconClick}>
-              <ArrowExpand24Regular className="iconExpand" />
+                <ArrowExpand24Regular className="iconExpand" />
               </div>
             </DialogTrigger>
             <DialogSurface className="dialogSurface">
               <DialogBody>
                 <DialogTitle className="dialogTitle">
-                  Image Name
+                  {images[Object.keys(images)[index]].title}
                   <DialogTrigger disableButtonEnhancement>
                     <div>
                     <Dismiss24Regular className="iconDismiss" />
@@ -89,18 +86,20 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
     </Card>
   );
 };
-export const CardSelectable = ({onCardClick, images}) => {
+
+export const CardSelectable = ({onCardClick, images, searchInput}) => {
+  const filteredImages = images.filter(image =>
+    image.title.toLowerCase().includes(searchInput.toLowerCase())
+  );
+  
   return (
     <div className="cardSelectableContainer">
-      <div className="searchBarContainer">
-        <SearchBar />
-      </div>
       <div className="main">
-        {Array.from({ length: images.length }, (_, index) => (
+      {filteredImages.map((image, index) => (
           <ImageCard
             key={index}
-            onClick={(ref) => onCardClick(images[Object.keys(images)[index]].id, ref)}
-            images={images}
+            onClick={(ref) => onCardClick(image.id, ref)}
+            images={filteredImages}
             index={index}
           />
         ))}

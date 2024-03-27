@@ -4,6 +4,7 @@ import { CardSelectable } from "./Card/Card.tsx";
 import ButtonRow from "./ButtonRow/ButtonRow.tsx";
 import DropDown from "./DropDown/DropDown.tsx";
 import Header from "./Header/Header.tsx";
+import SearchBar from "./SearchBar/SearchBar.tsx";
 import axios from "axios";
  
 export const Communication = () => {
@@ -12,6 +13,7 @@ export const Communication = () => {
     const [positioningRef, setPositioningRef] = useState(null);
     const [imageArray, setImageArray] = useState([]);
     const [activeObjectId, setActiveObjectId] = useState(null);
+    const [searchInput, setSearchInput] = useState("");
 
     useEffect(() => {
         axios.get(`/api/screens/`)
@@ -25,7 +27,6 @@ export const Communication = () => {
 
     // handles the case when the button is clicked
     const handleButtonClick = (buttonId, ref) => {
-        console.log(buttonId);
         setDropdownVisible(true);
         setIsButton(true);
         setPositioningRef(ref.current);
@@ -33,7 +34,6 @@ export const Communication = () => {
     };
 
     const handleCardClick = (cardId, ref) => {
-        console.log(cardId);
         setDropdownVisible(true);
         setIsButton(false);
         setPositioningRef(ref.current);
@@ -61,8 +61,11 @@ export const Communication = () => {
                 </style>
                 <Header/>
                 <ButtonRow onButtonClick={handleButtonClick}/>
+                <div style ={{margin: "32px 0 32px 20px"}}>
+                    <SearchBar searchInput={searchInput} setSearchInput={setSearchInput}/>
+                </div>
                 <DropDown open={dropdownVisible} onOpenChange={handleDropdownChange} positioningRef={positioningRef} activeObjectId={activeObjectId} isButton={isButton}/>
-                <CardSelectable onCardClick={handleCardClick} images={imageArray}/>
+                <CardSelectable onCardClick={handleCardClick} images={imageArray} searchInput={searchInput}/>
             </div>
         </div>
     )
