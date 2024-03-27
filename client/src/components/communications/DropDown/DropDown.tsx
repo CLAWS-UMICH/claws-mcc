@@ -107,7 +107,7 @@ export const DropDown = ({ open, onOpenChange, positioningRef, activeObjectId, i
             Sohavni
           </MenuItemCheckbox>
           <MenuDivider />
-          <MenuItem icon={<Send20Regular />} style={{fontSize: 15, backgroundColor: '#111111'}} onClick={() => handleSendClick()} >Send</MenuItem>
+          <MenuItem className="dropdown-send" icon={<Send20Regular />} onClick={() => handleSendClick()} >Send</MenuItem>
         </MenuList>
       </MenuPopover>
     </Menu>

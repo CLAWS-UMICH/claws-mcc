@@ -20,7 +20,7 @@ import { ArrowExpand24Regular, Dismiss24Regular } from "@fluentui/react-icons";
 // TODO make the scrollbar invisible or less ugly ? overflow: hidden;
 // BUG in case where need to scroll on main page, make sure you keep that position when scrolling in mini page https://forum.bubble.io/t/tutorial-scroll-within-a-popup-without-scrolling-the-page/144153
 
-const ImageCard = ({ onClick, images, index, ...props }) => {
+const ImageCard = ({ onClick, image, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const cardRef = useRef(null);
@@ -38,7 +38,7 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
   };
 
   return (
-    <Card className="card" {...props} onClick={handleClick} ref={cardRef} style ={{backgroundColor: "#000000", alignItems:"center"}}>
+    <Card className="card" {...props} onClick={handleClick} ref={cardRef}>
       <CardPreview
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -54,7 +54,7 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
             <DialogSurface className="dialogSurface">
               <DialogBody>
                 <DialogTitle className="dialogTitle">
-                  {images[Object.keys(images)[index]].title}
+                  {image.title}
                   <DialogTrigger disableButtonEnhancement>
                     <div>
                     <Dismiss24Regular className="iconDismiss" />
@@ -63,7 +63,7 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
                 </DialogTitle>
                 <DialogContent>
                   <img
-                    src={"data:image/gif;base64," + images[Object.keys(images)[index]].img_binary}
+                    src={`data:image/gif;base64,${image.img_binary}`}
                     className="imageContent"
                     alt="alt"
                   />
@@ -76,12 +76,11 @@ const ImageCard = ({ onClick, images, index, ...props }) => {
         <img
           style={{ aspectRatio: 1, objectFit: "cover" }}
           className="reviewImage"
-          src={"data:image/gif;base64," + images[Object.keys(images)[index]].img_binary}
+          src={`data:image/gif;base64,${image.img_binary}`}
         />
       </CardPreview>
-
       <CardHeader
-        header={<Text weight="semibold">{images[Object.keys(images)[index]].title}</Text>}
+        header={<Text weight="semibold">{image.title}</Text>}
       />
     </Card>
   );
@@ -95,12 +94,11 @@ export const CardSelectable = ({onCardClick, images, searchInput}) => {
   return (
     <div className="cardSelectableContainer">
       <div className="main">
-      {filteredImages.map((image, index) => (
+        {filteredImages.map((image) => (
           <ImageCard
-            key={index}
+            key={image.id}
             onClick={(ref) => onCardClick(image.id, ref)}
-            images={filteredImages}
-            index={index}
+            image={image}
           />
         ))}
       </div>

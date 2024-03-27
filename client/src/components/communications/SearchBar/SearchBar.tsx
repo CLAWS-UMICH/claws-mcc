@@ -9,19 +9,6 @@ const SearchBar = ({searchInput, setSearchInput}) => {
     setSearchInput(e.target.value);
   };
 
-  // const Images = Object.keys(imageSet).map(key => ({
-  //   name: imageSet[key].title, 
-  //   imageID: imageSet[key].id
-  // }));
-
-
-  // let FilteredImages =
-  //   searchInput.length > 0
-  //     ? Images.filter((image) =>
-  //         image.name.toLowerCase().includes(searchInput.toLowerCase())
-  //       )
-  //     : Images;
-
   return (
     // Use a fragment to wrap adjacent elements
     <>
