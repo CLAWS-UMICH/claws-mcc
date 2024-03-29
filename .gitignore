@@ -1,5 +1,8 @@
 node_modules
 dist
+build
+api
 .env
 .history
 .DS_STORE
+*.pem
