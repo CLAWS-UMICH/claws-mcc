@@ -3,7 +3,6 @@ import * as path from "path";
 import * as fs from "fs";
 import Route from "./Base";
 import { Server as WebSocketServer } from "ws";
-import eventRegistry from "./events";
 import { URL } from 'url';
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
@@ -40,9 +39,10 @@ client.connect().then(() => {
         });
 
         const routeInstances: Route[] = [];
+        const eventRegistry: { [key: string]: (data: any) => void } = {};
 
         for (const file of files) {
-            if (path.extname(file) === '.ts') {
+            if (path.extname(file) === '.js') {
                 try {
                     const RouteClass = require(path.join(routesDirectory, file)).default;
 
@@ -122,6 +122,12 @@ client.connect().then(() => {
         wssHoloLens.on('connection', (sock, request) => {
             console.log('HoloLens WebSocket connection established');
             sock.on('message', (message) => {
+                if (message.toString() == 'ping') {
+                    console.log(`Received ping from HoloLens`)
+                    sock.send('pong');
+                    return;
+                }
+
                 const data = JSON.parse(message.toString());
 
                 console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
