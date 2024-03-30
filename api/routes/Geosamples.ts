@@ -48,7 +48,6 @@ export default class Geosamples extends Base {
     };
 
     async sendSamples() {
-        console.log("why not received?")
         const allSamples = this.samplesCollection.find();
         const allZones = this.zonesCollection.find();
         const sampleData = await allSamples.toArray();
@@ -57,7 +56,7 @@ export default class Geosamples extends Base {
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'SEND_SAMPLES',
-            use: 'POST', // TODO: what to put here
+            use: 'POST',
             data: {
                 samples: sampleData,
                 zones: zoneData
@@ -67,7 +66,7 @@ export default class Geosamples extends Base {
     }
 
     async addGeosamples(req: Request, res: Response) : Promise<{}> {
-        const data = req.body.data;
+        console.log(data)
         try {
             var operations = data['samples'].map((sample: BaseGeosample) => ({
                 replaceOne: {
@@ -137,6 +136,7 @@ export default class Geosamples extends Base {
     }
 
     async editGeosample(req: Request, res: Response) : Promise<string> {
+        const data = req.body.data;
         const sample = req.body.data;
         try {
             const allSamples = this.samplesCollection.replaceOne({geosample_id: sample.geosample_id}, sample, {upsert: true});
