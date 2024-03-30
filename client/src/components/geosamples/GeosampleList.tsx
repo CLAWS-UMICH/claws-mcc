@@ -20,31 +20,26 @@ const useStyles = makeStyles({
     container: {
         marginLeft: ".2rem",
     },
-
     header: {
         marginLeft: "-15px",
         marginRight: "-15px"
     },
-
     sample: {
         fontSize: "14px",
         marginTop: ".25rem",
         marginBottom: "0px"
     },
-
     type: {
         fontSize: "12.25px",
         marginTop: "-20px",
         marginBottom: "17.5px",
         marginLeft: "32.5px"
     },
-
     sampleContainer: {
       display: "flex",
       alignItems: "left",
       cursor: "pointer",
     },
-
     imageText: {
         fontSize: "12.5px",
         position: "absolute",
@@ -55,21 +50,23 @@ const useStyles = makeStyles({
 
 interface SampleListProps {
     sample_zones: BaseZone[];
-    selected?: BaseGeosample;
     dispatch: React.Dispatch<ManagerAction>;
     ready: boolean;
+    selected?: BaseGeosample;
 };
 
-const GeosampleList: React.FC<SampleListProps> = props => {
+const GeosampleList: React.FC<SampleListProps> = ({sample_zones, dispatch, ready, selected}) => {
     const styles = useStyles();
-    const [openItems, setOpenItems] = React.useState(props.sample_zones.map(zone => zone.zone_id));
+    const [openItems, setOpenItems] = React.useState<string[]>(sample_zones.map(zone => zone.zone_id));
 
+    // Maintain state of accordion panels
     const handleToggle: AccordionToggleEventHandler<string> = (event, data) => {
         setOpenItems(data.openItems);
     };
 
+    // Handle selecting sample from list & displaying corresponding detail screen
     const handleSelect = (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
-        if (geosample && props.selected?.geosample_id === geosample.geosample_id) {
+        if (geosample && selected?.geosample_id === geosample.geosample_id) { // change to id after finishing with front & back end
             dispatch({type: 'deselect'});
         }
         else if (geosample) {
@@ -77,23 +74,24 @@ const GeosampleList: React.FC<SampleListProps> = props => {
         }
     };
 
-    if (!props.ready || !props.sample_zones || props.sample_zones.length === 0) {
+    // If no zones are available or page is not ready, return empty list
+    if (!ready || !sample_zones || sample_zones.length === 0) {
         return <Skeleton />
     };
  
-    // TODO: add hovering effect with select dispatch event
     return (
         <Accordion className={styles.container} onToggle={handleToggle} openItems={openItems} multiple collapsible>
-            {props.sample_zones.map((zone) =>             
+            {sample_zones.map((zone) =>             
                 <AccordionItem key={zone.zone_id} value={zone.zone_id}>
-                    <AccordionHeader key={zone.zone_id} className={styles.header} size="large" expandIcon={openItems.includes(zone.zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
-                        <b style={{fontSize:"15px"}}>Zone {zone.zone_id}</b>
-                    </AccordionHeader>
+                    {zone.geosample_ids.length > 0 &&
+                        <AccordionHeader key={zone.zone_id} className={styles.header} size="large" expandIcon={openItems.includes(zone.zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
+                            <b style={{fontSize:"15px"}}>Zone {zone.zone_id}</b>
+                        </AccordionHeader>}
                     {zone.geosample_ids && zone.geosample_ids.map((sample, index) => (
                         <AccordionPanel style={{marginLeft: "-15px", marginRight: "-12px", marginBottom: "1px"}} className={styles.sampleContainer} key={index}>
                             <CompoundButton
                                 style={{fontSize: "13px", width: "210px", height: "45px", border: "0px"}}
-                                onClick={() => handleSelect(props.dispatch, sample)}
+                                onClick={() => handleSelect(dispatch, sample)}
                                 shape='circular'
                                 secondaryContent={sample.rock_type}
                                 icon={!sample.starred ? <SampleImage sample={sample} index={index}/> : <StarredSample sample={sample} index={index}/>}
