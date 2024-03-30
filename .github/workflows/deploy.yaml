@@ -33,7 +33,8 @@ jobs:
       run: |
         echo "$KEY" > key.pem
         chmod 400 key.pem
-        scp -o StrictHostKeyChecking=no -i key.pem -r ./client/build/* ${USERNAME}@${HOST}:/var/www/claws-mcc/build
+        ls
+        scp -o StrictHostKeyChecking=no -i key.pem -r client/build/* ${USERNAME}@${HOST}:/var/www/claws-mcc/build
         ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} '
           cd /home/ubuntu/claws-mcc/client
           git pull
