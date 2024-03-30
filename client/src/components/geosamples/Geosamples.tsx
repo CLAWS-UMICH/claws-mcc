@@ -15,10 +15,6 @@ import { Search20Regular } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
 import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
-import "./Geosamples.css"
-import { GeosampleMap } from './GeosampleMap.tsx';
-import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
-// import { WaypointMap } from '../waypoints/WaypointMap.tsx';
 
 type ARLocation = {
     latitude: number;
@@ -87,25 +83,23 @@ const useStyles = makeStyles({
     backgroundColor: "#fff",
   },
   dividerContainer: {
-    width: "100%"
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    ...shorthands.gap("10px"),
   },
   divider: {
-    marginTop: "15px",
-    marginBottom: "15px"
+    // marginTop: "15px",
+    // marginBottom: "15px"
   },
   dividerTop: {
-    marginTop: "10px",
+    // marginTop: "10px",
   },
   header: {
-    marginTop: "-14px",
-    marginBottom: "-7.5px"
-  },
-  mapContainer: {
-    ...shorthands.flex(1),
-    ...shorthands.padding("16px"),
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    // marginBottom: "-7.5px",
+    paddingTop: "11px",
+    paddingBottom: "11px",
   },
 });
 
@@ -154,122 +148,7 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
     }
 };
 
-var geosample0: BaseGeosample = {
-                                geosample_id: 0, 
-                                zone_id: "A", 
-                                eva_data: {
-                                    name: "Geo Sample 1",
-                                    id: 2394,
-                                    data: {
-                                        SiO2: 10.00,
-                                        TiO2: 10.00,
-                                        Al2O3: 10.00,
-                                        FeO: 10.00,
-                                        MnO: 10.00,
-                                        MgO: 10.00,
-                                        CaO: 10.00,
-                                        K2O: 10.00,
-                                        P2O3: 10.00,
-                                    }
-                                },
-                                time: "8:00 PM",
-                                date: "3/20/2025",
-                                color: "Brown",
-                                shape: "Crystalline",
-                                starred: true, 
-                                rock_type: "Basalt",
-                                location: {
-                                    latitude: 29.5642,
-                                    longitude: 199.2442
-                                },
-                                author: 1,
-                                description: "this is a description",
-                                image: "../../assets/temp_sample_pic.png"
-                            };
-
-var geosample1: BaseGeosample = {
-                                geosample_id: 1, 
-                                zone_id: "A", 
-                                eva_data: {
-                                    name: "Geo Sample 2",
-                                    id: 4924,
-                                    data: { 
-                                        SiO2: 11.72,
-                                        TiO2: 8.70,
-                                        Al2O3: 1.75,
-                                        FeO: 7.21,
-                                        MnO: 17.28,
-                                        MgO: 10.70,
-                                        CaO: 16.92,
-                                        K2O: 4.12,
-                                        P2O3: 20.87,
-                                    }
-                                },
-                                time: "7:00 PM",
-                                date: "3/13/2025",
-                                color: "Black",
-                                shape: "Hexagon",
-                                starred: false, 
-                                rock_type: "Limestone",
-                                location: {
-                                    latitude: 104.1442,
-                                    longitude: 219.3333
-                                },
-                                author: 1,
-                                description: "ohhhhoo",
-                                image: "../../assets/temp_sample_pic.png"
-                            };
-
-var geosample2: BaseGeosample = {
-                            geosample_id: 3, 
-                            zone_id: "B", 
-                            starred: false, 
-                            eva_data: {
-                                name: "Geo Sample 1",
-                                id: 3937,
-                                data: { 
-                                    SiO2: 10.20,
-                                    TiO2: 7.80,
-                                    Al2O3: 3.30,
-                                    FeO: 9.30,
-                                    MnO: 13.27,
-                                    MgO: 6.13,
-                                    CaO: 18.65,
-                                    K2O: 29.35,
-                                    P2O3: 2.00,
-                                }
-                            },
-                                time: "11:00 AM",
-                                date: "3/10/2025",
-                                color: "Red",
-                                shape: "Circle",
-                                rock_type: "Granite",
-                                location: {
-                                    latitude: 95.1442,
-                                    longitude: 100.3333
-                                },
-                                author: 1,
-                                description: "ohhhhoo",
-                                image: "../../assets/temp_sample_pic.png"
-                            };
-
-var zoneA: BaseZone = {zone_id: "A",
-                            geosample_ids: [geosample0, geosample1],
-                            location: {
-                                latitude: 100.2321,
-                                longitude: 205.2345
-                            },
-                            radius: 3};
-
-var zoneB: BaseZone = {zone_id: "B",
-                        geosample_ids: [geosample2],
-                        location: {
-                                latitude: 100.2321,
-                                longitude: 205.2345
-                            },
-                            radius: 4};
-
-const initialState: ManagerState = {geosamples: [geosample0, geosample1, geosample2], sample_zones: [zoneA, zoneB], selected: undefined}
+const initialState: ManagerState = {geosamples: [], sample_zones: [], selected: undefined};
 
 const GeosampleManager: React.FC = () => { 
     const styles = useStyles();   
@@ -277,10 +156,8 @@ const GeosampleManager: React.FC = () => {
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const [showSearchBar, setShowSearchBar] = useState(false);
 
-    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
-        onOpen: () => {
-            sendMessage(JSON.stringify({type: 'GET_SAMPLES'}));
-        }
+    const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
+        onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'}))
     });
     useEffect(() => {
         if (lastMessage !== null) {
@@ -298,11 +175,9 @@ const GeosampleManager: React.FC = () => {
                     </DrawerHeaderTitle>
                 </DrawerHeader>
                 <div className={styles.dividerContainer}>
-                    <Divider className={styles.dividerTop}></Divider>
-                    {showSearchBar && (<div>               
-                                            <DrawerBody>
-                                                <SearchBox handleDismiss={() => setShowSearchBar(!showSearchBar)}/>
-                                            </DrawerBody>
+                    <Divider></Divider>
+                    {showSearchBar && (<div style={{flexGrow: "1"}}>               
+                                            <SearchBox handleDismiss={() => setShowSearchBar(!showSearchBar)}/>
                                             <Divider className={styles.divider}></Divider>
                                         </div>)}
                 </div>
@@ -310,13 +185,8 @@ const GeosampleManager: React.FC = () => {
                     <GeosampleList sample_zones={state.sample_zones} selected={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
                 </DrawerBody>
             </InlineDrawer>
-            <DrawerBody>
+            <DrawerBody style={{paddingLeft: '0px', paddingRight: '0px'}}>
                 <DetailScreen geosample={state.selected} dispatch={dispatch}/>
-                <div className={styles.mapContainer}>
-                    <div style={{alignItems:"center", height: "400px", width:"750px"}}>
-                        <GeosampleMap geosamples={state.geosamples} selected={state.selected} dispatch={dispatch}/>
-                    </div>
-                </div>
             </DrawerBody>
         </div>
     );

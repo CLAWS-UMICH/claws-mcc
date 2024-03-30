@@ -12,7 +12,8 @@ import {
   Popover,
   PopoverTrigger,
   PopoverSurface,
-  PopoverProps
+  PopoverProps,
+  Skeleton
 } from "@fluentui/react-components";
 import { 
   Edit16Regular, 
@@ -29,33 +30,31 @@ import {
   Calendar16Regular, 
   Clock16Regular,
   Dismiss16Regular,
-  Save16Regular
+  Save16Regular,
+  Tag16Regular
 } from "@fluentui/react-icons";
 import './Geosamples.css';
 import { BaseGeosample, EvaData, ManagerAction } from "./Geosamples";
+import { GeosampleMap } from "./GeosampleMap.tsx"
 
 const useStyles = makeStyles({
   root: {
-    display: "grid",
-    gridTemplateRows: "repeat(1fr)",
-    justifyItems: "start",
-    ...shorthands.gap("2px"),
-    maxWidth: "350px",
+    ...shorthands.gap("3.5px"),
+    display: "flex",
+    flexDirection: "column",
+    flexGrow: "1"
   },
   field: {
     display: "flex",
     flexDirection: "column",
-    width: "160px"
-  },
-  quad: {
-    display: "flex",
-    flexDirection: "column",
-    width: "135px"
+    flexGrow: "1"
   },
   composition: {
     display: "flex",
     flexDirection: "column",
-    width: "39px",
+    minWidth: "2.4375rem",
+    flexGrow: "1",
+    flexBasis: "10%",
     alignContent: "center",
   },
   dropdown: { 
@@ -65,9 +64,11 @@ const useStyles = makeStyles({
   line: {
     display: "flex",
     marginBottom: "1rem",
+    paddingLeft:'1rem', 
+    paddingRight:'1rem',
     alignContent:"center",
-    columnGap: "15px",
-    // justifyContent:"space-between"
+    justifyContent:"space-between",
+    ...shorthands.gap("15px"),
   },
 });
 
@@ -80,7 +81,7 @@ const CompositionValues : React.FC<CompositionValuesProps> = ({sample}) => {
   let other = 100 - (sample.data.SiO2 + sample.data.Al2O3 + sample.data.CaO + sample.data.FeO + sample.data.K2O + sample.data.MgO + sample.data.MnO + sample.data.P2O3 + sample.data.TiO2);
 
   return (
-    <div style={{display: "flex"}}>
+    <div style={{display: "flex", flexWrap: "wrap", flexGrow: "1", flexBasis: "50%", minWidth: "390px"}}>
       <div className={styles.composition}>
           <Label style={{color: "#BB6BD9", fontSize: "12.5px", textAlign: "center"}} htmlFor="sio2">SiO<sub>2</sub></Label>
           <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="sio2" readOnly={true} value={sample.data.SiO2.toString()} />
@@ -182,8 +183,8 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sam
     });
 
     return (
-      <div style={{marginRight:"-14px"}}>
-        <p style={{ marginTop:"0rem"}}>Composition</p>
+      <div style={{display: "flex", flexDirection: "column", flexGrow: "1", flexBasis: "50%", minWidth: "390px"}}>
+        <p style={{ marginTop:"0rem" }}>Composition</p>
           <div className="chart">
             {components}
           </div>
@@ -211,11 +212,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
 
   if (!props.geosample) {
     return (
-        <div style={{width: "100%"}}>
-          <div>
-            <Divider style={{marginLeft:'-24px', marginTop:'-9.1px', marginBottom:'.75rem', width:'1120px'}}></Divider>
-          </div>
-        </div>
+        <Skeleton/>
     )
   }
 
@@ -361,18 +358,18 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
   };
 
   return (
-    <div style={{width: "100%"}}>
+    <div>
         <div>
-          <h4 style={{marginTop:'.7rem', display:'flex', alignItems:'center', gap:'15px'}}>
+          <h4 style={{paddingLeft:'1rem', paddingRight:'1rem', display:'flex', justifyContent: 'space-between', marginTop: "11px", marginBottom: "11px"}}>
               <div style={{ display: 'flex', alignItems: 'center', gap:'10px' }}>
-                <Input style={{border: "0px", width: "150px", fontSize: "17.5px", font: "bold", marginLeft:"-10px", marginRight: "0px"}} 
+                <Input style={{border: "0px", flexGrow: "1", fontSize: "17.5px", font: "bold", marginLeft:"-10px"}} 
                        appearance="outline" 
                        id="geosample_name" 
                        readOnly={!edit} 
                        defaultValue={props.geosample.eva_data.name}
                        value={edit ? editedSample?.eva_data.name : currentSample?.eva_data.name || ''} 
                        onChange={(e) => handleChange('eva_data', e.target.value)} />
-                <Button icon={props.geosample.starred ? <Star16Filled style={{color:"#EAA300"}}/> : <Star16Regular />} onClick={() => handleFavoriting(props.dispatch, props.geosample)}></Button>
+                <Button icon={props.geosample.starred ? <Star16Filled style={{color:"#EAA300", flexGrow: "1"}}/> : <Star16Regular />} onClick={() => handleFavoriting(props.dispatch, props.geosample)}></Button>
               </div>
               <div style={{display:'flex', gap:'10px'}}>
                   <Button icon={<Map16Regular/>}>View on map</Button>
@@ -404,9 +401,9 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                 </Popover>
               </div>
           </h4>
-          <Divider style={{marginLeft:'-24px', marginTop:'-9.1px', marginBottom:'.75rem', width:'1120px'}}></Divider>
+          <Divider style={{marginBottom:'.75rem'}}></Divider>
         </div>
-        <div style={{display:"flex", marginBottom:'1rem', gap: '15px'}}>
+        <div className={styles.line}>
           <div className={styles.root}>
               <Label htmlFor="shape_dropdown">Shape</Label>
               {edit ? (              
@@ -432,7 +429,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                   <Option text="Unknown">
                       <Question16Regular/> Unknown
                   </Option>
-              </Dropdown> ) : <Input style={{width: "160px"}} appearance="outline" id="shape_dropdown" readOnly={true} value={currentSample ? currentSample?.shape.charAt(0).toUpperCase() + currentSample?.shape.slice(1) : ""} />}
+              </Dropdown> ) : <Input style={{}} appearance="outline" id="shape_dropdown" readOnly={true} value={currentSample ? currentSample?.shape.charAt(0).toUpperCase() + currentSample?.shape.slice(1) : ""} />}
           </div>
           <div className={styles.root}>
               <Label htmlFor="color_dropdown">Color</Label>
@@ -449,7 +446,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                         {option}
                     </Option>
                   ))}
-                </Dropdown>) : <Input style={{width: "160px"}} appearance="outline" id="color_dropdown" readOnly={true} value={currentSample ? currentSample?.color.charAt(0).toUpperCase() + currentSample?.color.slice(1) : ""} /> }
+                </Dropdown>) : <Input style={{}} appearance="outline" id="color_dropdown" readOnly={true} value={currentSample ? currentSample?.color.charAt(0).toUpperCase() + currentSample?.color.slice(1) : ""} /> }
           </div>
           <div className={styles.field}>
             <Label htmlFor="rock_type">Rock Type<sub></sub></Label>
@@ -461,43 +458,40 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           </div>
         </div>
         <div className={styles.line}>
-          <div style={{display: "flex", flexDirection: "column"}}>
+          <div style={{display: "flex", flexDirection: "column", flexGrow: "1"}}>
             <Label htmlFor="description">Description<sub></sub></Label>
-            <Input style={{width: "452.5px", height: "110px"}} appearance="outline" id="description" readOnly={!edit} defaultValue={props.geosample.description} value={edit ? editedSample?.description : currentSample?.description || ''}  onChange={(e) => handleChange('description', e.target.value)} />
+            <Input style={{height: "120px"}} appearance="outline" id="description" readOnly={!edit} defaultValue={props.geosample.description} value={edit ? editedSample?.description : currentSample?.description || ''}  onChange={(e) => handleChange('description', e.target.value)} />
           </div>
-          <img src={props.geosample.image} height={134.5} width={220}/>
+          <img src={props.geosample.image} height={143.8} width={230}/>
         </div>
-        <div style={{gap: "50px"}} className={styles.line}>
+        <div className={styles.line}>
           <CompositionVisualization sample={props.geosample.eva_data}/>
-          <div className={styles.quad} style={{marginLeft: "-22.5px"}}>
-            <Label htmlFor="location">Location<sub></sub></Label>
-            <Input contentBefore={<Location16Regular/>} appearance="outline" id="location" readOnly={true} value={location_string} />
-          </div>
-          <div className={styles.quad}>
-            <Label htmlFor="time">Time<sub></sub></Label>
-            <Input contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={props.geosample.time} />
-          </div>
-        </div>
-        <div style={{display: "flex", marginTop: "-2.5px"}}>
-          <div className={styles.line}>
-            <CompositionValues sample={props.geosample.eva_data} />
-            <div style={{marginLeft: "17.5px", display:"flex", gap: "15px"}}>
-              <div className={styles.quad}>
-                <Label htmlFor="date">Date<sub></sub></Label>
-                <Input contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={props.geosample.date} />
-              </div>
-              <div className={styles.quad}>
-                <Label htmlFor="zone">Zone<sub></sub></Label>
-                <Input appearance="outline" id="zone" readOnly={true} value={props.geosample.zone_id} />
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "30%" }}>              
+              <Label htmlFor="location">Location<sub></sub></Label>
+              <Input contentBefore={<Location16Regular/>} appearance="outline" id="location" readOnly={true} value={location_string} />
             </div>
-          </div>
+           <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
+              <Label htmlFor="time">Time<sub></sub></Label>
+              <Input contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={props.geosample.time} />
+            </div>
         </div>
-        { edit && <div style={{display: "flex", float: "right", gap: "15px", marginBottom: "1rem"}}>
+        <div className={styles.line}>
+          <CompositionValues sample={props.geosample.eva_data} />
+           <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "30%" }}>
+              <Label htmlFor="date">Date<sub></sub></Label>
+              <Input contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={props.geosample.date} />
+            </div>
+           <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
+              <Label htmlFor="zone">Zone<sub></sub></Label>
+              <Input contentBefore={<Tag16Regular/>} appearance="outline" id="zone" readOnly={true} value={props.geosample.zone_id} />
+            </div>
+        </div>
+        { edit && <div style={{paddingRight: "1rem", display: "flex", float: "right", gap: "15px", marginBottom: "1rem"}}>
                     <Button style={{background: "#009B00"}} iconPosition="before" icon={<Save16Regular/>} onClick={() => handleSave(props.dispatch, editedSample)}>Save</Button>
                     <Button onClick={() => handleCancel()}>Cancel</Button>
                  </div>
         }
+        <GeosampleMap geosamples={[props.geosample]} dispatch={props.dispatch}/>
     </div>
   );
 };

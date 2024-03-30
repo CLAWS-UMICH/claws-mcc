@@ -2,8 +2,8 @@ import express from "express";
 import * as path from "path";
 import * as fs from "fs";
 import Route from "./Base";
-import { Server as WebSocketServer } from "ws";
-import { URL } from 'url';
+import {Server as WebSocketServer} from "ws";
+import {URL} from 'url';
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import morgan from 'morgan';
@@ -45,20 +45,30 @@ client.connect().then(() => {
             if (path.extname(file) === '.js') {
                 try {
                     const RouteClass = require(path.join(routesDirectory, file)).default;
+            const routeInstances: Route[] = [];
+            const eventRegistry: any = {};
 
-                    // Instantiate the route class
-                    const routeInstance = new RouteClass(db) as Route;
-                    routeInstances.push(routeInstance);
+            for (const file of files) {
+                if (path.extname(file) === '.js') {
+                    try {
+                        const RouteClass = require(path.join(routesDirectory, file)).default;
 
-                    // Register routes defined in the routeInstance
-                    for (const route of routeInstance.routes) {
-                        // e.g. app.get('/api/getAstronaut/:astronaut', handlerFunction)
-                        app[route.method as Method](route.path, route.handler);
-                    }
-                    // Register events defined in the routeInstance
-                    for (const event of routeInstance.events) {
-                        // e.g. eventMap['VITALS'] = handlerFunction
-                        eventRegistry[event.type.toUpperCase()] = event.handler;
+                        // Instantiate the route class
+                        const routeInstance = new RouteClass(db) as Route;
+                        routeInstances.push(routeInstance);
+
+                        // Register routes defined in the routeInstance
+                        for (const route of routeInstance.routes) {
+                            // e.g. app.get('/api/getAstronaut/:astronaut', handlerFunction)
+                            app[route.method as Method](route.path, route.handler);
+                        }
+                        // Register events defined in the routeInstance
+                        for (const event of routeInstance.events) {
+                            // e.g. eventMap['VITALS'] = handlerFunction
+                            eventRegistry[event.type.toUpperCase()] = event.handler;
+                        }
+                    } catch (err) {
+                        console.error(`Failed to load route ${file}: ${err.message}`);
                     }
                 } catch (err) {
                     console.error(`Failed to load route ${file}: ${err.message}`);
