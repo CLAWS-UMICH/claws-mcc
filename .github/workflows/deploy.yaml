@@ -18,29 +18,37 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install root dependencies
-      run: npm i
-
-    - name: Install client dependencies and build client
+    - name: Prepare SSH key
       run: |
-        cd client
-        npm i
-        npm run build
-        cd ..
+        echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+        chmod 400 key.pem
 
     - name: Deploy to EC2
       env:
         HOST: ${{ secrets.EC2_HOST }}
         USERNAME: ${{ secrets.EC2_USERNAME }}
-        KEY: ${{ secrets.EC2_SSH_KEY }}
       run: |
-        echo "$KEY" > key.pem
-        chmod 400 key.pem
-        scp -o StrictHostKeyChecking=no -i key.pem -r client/build/* ${USERNAME}@${HOST}:/home/ubuntu/claws-mcc/client/build
-        ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} '
-          cd /home/ubuntu/claws-mcc/client
+        # SSH into the EC2 instance and run the deployment commands
+        ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} << 'EOF'
+          # Ensure the working directory is the project directory
+          cd /home/ubuntu/claws-mcc
+          
+          # Pull the latest changes
           git pull
-          npm ci
+          
+          # Install root dependencies and build if necessary
+          npm install
+          npm run build
+          
+          # Install client dependencies, build the client
+          cd client
+          npm install
+          npm run build
+          
+          # Navigate back to the root project directory if needed
+          cd ..
+          
+          # Restart the application and web server
           pm2 restart all
           sudo systemctl restart nginx
-        '
+        EOF
