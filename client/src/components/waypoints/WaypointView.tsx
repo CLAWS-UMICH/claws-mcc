@@ -50,16 +50,16 @@ const NewView: React.FC<NewViewProps> = (props) => {
     date: "",
   });
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     setNewWaypoint((prev) => ({ ...prev, time: Date.now().toString() }));
     const new_waypoints = [...props.waypoints, new_waypoint];
     try{
-      const res = Axios.put("/api/waypoint", {
+      const res = await Axios.put("/api/waypoint", {
         data: {
           waypoints: new_waypoints
         }
       });
-      console.log(res);
+      console.log({res});
     }catch (error) {
       console.error(error);
       return;

@@ -14,6 +14,7 @@
     "image-size": "^1.1.1",
     "ioredis": "^5.3.2",
     "mongodb": "^6.3.0",
+    "morgan": "^1.10.0",
     "nodemon": "^3.1.0",
     "path": "^0.12.7",
     "react": "^18.2.0",
@@ -29,7 +30,7 @@
     "test": "jest",
     "dev": "concurrently \"tsc --watch\" \"nodemon ./dist/api/index.js\"",
     "setup": "npm install && cd client && npm install && cd ..",
-    "app": "concurrently \"npm run dev\" \"cd client && npm start\""
+    "app": "concurrently \"npm run dev\" \"cd client && npm start\" -n \"Backend,Frontend\" -c \"bgBlue.bold,bgMagenta.bold\""
   },
   "name": "web",
   "version": "1.0.0",
@@ -41,6 +42,7 @@
     "@types/express": "^4.17.20",
     "@types/jest": "^29.5.11",
     "@types/mongodb": "^4.0.7",
+    "@types/morgan": "^1.9.9",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1"
   }
