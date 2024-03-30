@@ -18,11 +18,14 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install dependencies
+    - name: Install root dependencies
+      run: npm i
+
+    - name: Install client dependencies and build client
       run: |
-        npm i
         cd client
         npm i
+        npm run build
         cd ..
 
     - name: Deploy to EC2
@@ -33,7 +36,6 @@ jobs:
       run: |
         echo "$KEY" > key.pem
         chmod 400 key.pem
-        ls
         scp -o StrictHostKeyChecking=no -i key.pem -r client/build/* ${USERNAME}@${HOST}:/var/www/claws-mcc/build
         ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} '
           cd /home/ubuntu/claws-mcc/client
