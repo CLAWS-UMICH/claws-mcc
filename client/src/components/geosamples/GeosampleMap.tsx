@@ -163,7 +163,7 @@ export const GeosampleMap: React.FC<GeosampleMapProps> = props => {
         );
     }
     return isLoaded ? (
-        <div style={{gridColumn: "1"}}>
+        <div style={{padding: "0.5rem 2rem 2.5rem 2rem"}}>
             <GoogleMap
                 mapContainerClassName={"map"}
                 center={{lat: 42.27697713747799, lng: -83.73820501490505}}

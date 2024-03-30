@@ -42,6 +42,7 @@ export default class Waypoints extends Base {
     }
 
     async sendWaypoints() {
+        console.log('receiving waypoints request')
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
         const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?

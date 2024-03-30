@@ -29,11 +29,11 @@ function App() {
   return (
     <FluentProvider theme={theme}>
         <BrowserRouter>
-            <div className='debug' style={{ display: 'flex', flexDirection: 'row' }}>
+            <div className='debug'>
                 <CameraView />
                 <div className='content-container'>
                     <NavBar />
-                    <div className='content'>
+                    <div>
                       <Routes>
                           <Route path="/" element={<EmptyComponent />} />
                           <Route path="/tasks" element={<EmptyComponent />} />

@@ -1,24 +1,27 @@
 import * as React from "react";
 
 import type { ButtonProps, FieldProps } from "@fluentui/react-components";
-import { makeStyles, useId, Field, Input, Button } from "@fluentui/react-components";
+import { makeStyles, useId, Field, Input, Button, shorthands } from "@fluentui/react-components";
 import { Search12Regular, Dismiss16Regular} from "@fluentui/react-icons"
 
 
 const useStyles = makeStyles({
   root: {
     display: "flex",
-    rowGap: "5px",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: "-10px",
+    paddingLeft: "1rem",
+    paddingRight: ".75rem",
+    paddingBottom: "11px",
   },
   input: {
+    // flexBasis: "50%"
     width: "150px",
-    marginRight: "auto"
+    // marginRight: "auto"
   },
   dismiss: {
-    marginRight: "-10px"
+    paddingRight: "0"
+    // marginRight: "-10px"
   }
 });
 
