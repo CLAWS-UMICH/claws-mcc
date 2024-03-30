@@ -1,6 +1,6 @@
 // Geosamples.tsx
 import React, { useEffect, useReducer, useState } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { ReadyState } from 'react-use-websocket';
 import {
     Button,
     Divider,
@@ -17,6 +17,7 @@ import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
 import "./Geosamples.css"
 import { GeosampleMap } from './GeosampleMap.tsx';
+import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
 // import { WaypointMap } from '../waypoints/WaypointMap.tsx';
 
 type ARLocation = {
@@ -276,7 +277,7 @@ const GeosampleManager: React.FC = () => {
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const [showSearchBar, setShowSearchBar] = useState(false);
 
-    const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
+    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
         onOpen: () => {
             sendMessage(JSON.stringify({type: 'GET_SAMPLES'}));
         }

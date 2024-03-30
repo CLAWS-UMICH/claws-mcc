@@ -1,10 +1,11 @@
 import React, {useEffect, useReducer, useState} from "react";
 import {Divider, InlineDrawer, DrawerHeader, Button, DrawerHeaderTitle} from "@fluentui/react-components";
 import {WaypointMap} from "./WaypointMap.tsx";
-import useWebSocket, {ReadyState} from 'react-use-websocket';
+import {ReadyState} from 'react-use-websocket';
 import './Waypoints.css';
 import {WaypointDrawer} from "./WaypointDrawer.tsx";
 import {WaypointView} from "./WaypointView.tsx";
+import useDynamicWebSocket from "../../hooks/useWebSocket.tsx";
 
 export enum WaypointType {
     STATION,
@@ -117,7 +118,7 @@ const initialState: ManagerState = {waypoints: []}
 export const WaypointManager: React.FC = () => {
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
-    const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
+    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
     });
     useEffect(() => {
