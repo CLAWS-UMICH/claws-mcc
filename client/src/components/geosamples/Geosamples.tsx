@@ -1,6 +1,6 @@
 // Geosamples.tsx
 import React, { useEffect, useReducer, useState } from 'react';
-import { ReadyState } from 'react-use-websocket';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 import {
     Button,
     Divider,
