@@ -37,13 +37,13 @@ jobs:
           git pull
           
           # Install root dependencies and build if necessary
-          npm install
-          npm run build
+          pnpm install
+          pnpm run build
           
           # Install client dependencies, build the client
           cd client
-          npm install
-          npm run build
+          pnpm install
+          pnpm run build
           
           # Navigate back to the root project directory if needed
           cd ..
