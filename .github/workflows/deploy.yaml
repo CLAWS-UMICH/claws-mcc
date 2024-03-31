@@ -39,9 +39,9 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pnpm install
+        pnpm install --no-frozen-lockfile
         cd client
-        pnpm install
+        pnpm install --no-frozen-lockfile
         cd ..
 
     - name: Build backend
