@@ -30,25 +30,33 @@ jobs:
       run: |
         # SSH into the EC2 instance and run the deployment commands
         ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} << 'EOF'
-          # Ensure the working directory is the project directory
           cd /home/ubuntu/claws-mcc
           
-          # Pull the latest changes
+          # remove any local changes that might interefere with git pull
+          git reset --hard
+
+          # pull the latest changes
           git pull
+
+          # check if pnpm is installed and install it if not
+            if ! command -v pnpm &> /dev/null
+            then
+                # Install pnpm
+                curl -fsSL https://get.pnpm.io/install.sh | sh -
+                source /home/ubuntu/.bashrc
+            fi
           
-          # Install root dependencies and build if necessary
+          # install root deps
           pnpm install
           pnpm run build
           
-          # Install client dependencies, build the client
+          # install client deps
           cd client
           pnpm install
           pnpm run build
-          
-          # Navigate back to the root project directory if needed
           cd ..
           
-          # Restart the application and web server
+          # restart backend and frontend
           pm2 restart all
           sudo systemctl restart nginx
         EOF
