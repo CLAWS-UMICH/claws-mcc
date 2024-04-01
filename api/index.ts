@@ -104,6 +104,10 @@ client.connect().then(() => {
             wssFrontend.on('connection', (sock, request) => {
                 console.log('Frontend WebSocket connection established');
                 sock.on("message", (message) => {
+                    if (message.toString() === 'ping') {
+                        sock.send('Pong!');
+                        return;
+                    }
                     const data = JSON.parse(message.toString());
 
                     console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
@@ -120,6 +124,11 @@ client.connect().then(() => {
             wssHoloLens.on('connection', (sock, request) => {
                 console.log('HoloLens WebSocket connection established');
                 sock.on('message', (message) => {
+                    if (message.toString() === 'ping') {
+                        sock.send('Pong');
+                        return;
+                    }
+
                     const data = JSON.parse(message.toString());
 
                     console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
