@@ -105,7 +105,8 @@ client.connect().then(() => {
                 console.log('Frontend WebSocket connection established');
                 sock.on("message", (message) => {
                     if (message.toString() === 'ping') {
-                        sock.send('Pong!');
+                        sock.send('hello frontend - lmcc');
+                        console.log('pinged frontend');
                         return;
                     }
                     const data = JSON.parse(message.toString());
@@ -125,7 +126,8 @@ client.connect().then(() => {
                 console.log('HoloLens WebSocket connection established');
                 sock.on('message', (message) => {
                     if (message.toString() === 'ping') {
-                        sock.send('Pong');
+                        sock.send('hello hololens - lmcc');
+                        console.log('pinged hololens');
                         return;
                     }
 
