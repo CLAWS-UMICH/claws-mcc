@@ -139,7 +139,7 @@ client.connect().then(() => {
 
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
-                        eventRegistry[data.type](data.data);
+                        eventRegistry[data.type.toUpperCase()](data.data);
                     }
                 })
             });
