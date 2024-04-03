@@ -111,9 +111,6 @@ client.connect().then(() => {
                         return;
                     }
                     const data = JSON.parse(message.toString());
-                    console.log({data});
-                    console.log({eventRegistry})
-
                     console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
@@ -135,6 +132,8 @@ client.connect().then(() => {
                     }
 
                     const data = JSON.parse(message.toString());
+                    console.log({data});
+                    console.log({eventRegistry})
 
                     console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
 
