@@ -106,7 +106,7 @@ export default class Astronauts extends Base {
 
     async handleVitalsMessage(data: VitalsMessage) {
         // update db if necessary (id is astronaut id, upsert means insert if not found)
-        await this.db.collection('vitals').updateOne({id: data.id}, {$set: data.data}, {upsert: true});
+        await this.db.collection('vitals').updateOne({id: data.id}, {$set: data}, {upsert: true});
 
         // .. do what else we want to do with the data
 
@@ -114,7 +114,7 @@ export default class Astronauts extends Base {
             id: data.id,
             type: 'VITALS',
             use: 'PUT',
-            data: data.data,
+            data: data,
         });
     }
 }

@@ -63,6 +63,7 @@ client.connect().then(() => {
                     }
                 }
             }
+
             console.log(eventRegistry);
 
             app.get('/api/test', (req, res) => {
@@ -110,6 +111,8 @@ client.connect().then(() => {
                         return;
                     }
                     const data = JSON.parse(message.toString());
+                    console.log({data});
+                    console.log({eventRegistry})
 
                     console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
                     // call the handler for the event type
