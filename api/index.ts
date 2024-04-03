@@ -114,7 +114,7 @@ client.connect().then(() => {
                     console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
-                        eventRegistry[data.type](data.data);
+                        eventRegistry[data.type](data);
                     }
                 });
             });
@@ -139,7 +139,7 @@ client.connect().then(() => {
 
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
-                        eventRegistry[data.type.toUpperCase()](data.data);
+                        eventRegistry[data.type.toUpperCase()](data);
                     }
                 })
             });
