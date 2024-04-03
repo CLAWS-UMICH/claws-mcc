@@ -89,15 +89,7 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
     ...shorthands.gap("10px"),
   },
-  divider: {
-    // marginTop: "15px",
-    // marginBottom: "15px"
-  },
-  dividerTop: {
-    // marginTop: "10px",
-  },
   header: {
-    // marginBottom: "-7.5px",
     paddingTop: "11px",
     paddingBottom: "11px",
   },
@@ -163,6 +155,7 @@ const GeosampleManager: React.FC = () => {
         if (lastMessage !== null) {
             setMessageHistory((prev) => prev.concat(lastMessage.data));
             dispatch({type: 'set', payload: JSON.parse(lastMessage.data).data});
+            console.log(JSON.parse(lastMessage.data).data)
         }
     }, [lastMessage, setMessageHistory]);
 
@@ -178,7 +171,7 @@ const GeosampleManager: React.FC = () => {
                     <Divider></Divider>
                     {showSearchBar && (<div style={{flexGrow: "1"}}>               
                                             <SearchBox handleDismiss={() => setShowSearchBar(!showSearchBar)}/>
-                                            <Divider className={styles.divider}></Divider>
+                                            <Divider></Divider>
                                         </div>)}
                 </div>
                 <DrawerBody>

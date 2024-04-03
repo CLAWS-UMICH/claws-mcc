@@ -220,6 +220,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
   // TODO: make this send message to hololens if clicked
   const handleFavoriting = async (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
     if (geosample) {   
+      geosample.starred = !geosample.starred
       const res = await fetch("/api/geosamples", {
         method: "PUT",
         headers: {
@@ -230,17 +231,15 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           data: geosample
         })
       });
-      if (!res.ok) {
+      if (res.status !== 200) {
         alert("Failed favoriting of sample");
         return;
       }  
 
       if (!geosample.starred) {
-        geosample.starred = true;
         dispatch({type: 'update', payload: geosample});
       }
       else {
-        geosample.starred = false;
         dispatch({type: 'update', payload: geosample});
       }
     }
@@ -259,7 +258,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           data: geosample
         })
       });
-      if (!res.ok) {
+      if (res.status !== 200) {
         alert("Failed to delete sample");
         return;
       }
@@ -281,7 +280,8 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           data: editedSample
         })
       });
-      if (!res.ok) {
+      console.log(res.status)
+      if (res.status !== 200) {
         alert("Failed to save edited sample");
         setCurrentSample(props.geosample);
         setEditedSample(props.geosample);

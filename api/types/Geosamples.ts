@@ -86,7 +86,7 @@ export interface SampleMessage extends Message {
     type: string;
     data: {
         AllGeosamples: BaseGeosample[];
-        AllGeosamplezones: BaseZone[];
+        AllGeosamplezones: BaseResponseZone[];
     };
 }
 
