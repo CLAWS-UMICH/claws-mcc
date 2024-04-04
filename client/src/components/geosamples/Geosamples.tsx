@@ -15,7 +15,11 @@ import { Search20Regular } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
 import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
+<<<<<<< HEAD
 import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
+=======
+import { sample } from 'lodash';
+>>>>>>> 70166fbf82c91e136145294769729aa3c5e31dc1
 
 type ARLocation = {
     latitude: number;
@@ -39,7 +43,7 @@ export type EvaData = {
 };
 
 export type BaseGeosample = {
-    _id?: number;
+    _id: number;
     geosample_id: number;
     zone_id: string;
     starred: boolean;
@@ -56,6 +60,7 @@ export type BaseGeosample = {
 };
 
 export type BaseZone = {
+    _id: number;
     zone_id: string;
     geosample_ids: BaseGeosample[];
     location: ARLocation;
@@ -90,15 +95,7 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
     ...shorthands.gap("10px"),
   },
-  divider: {
-    // marginTop: "15px",
-    // marginBottom: "15px"
-  },
-  dividerTop: {
-    // marginTop: "10px",
-  },
   header: {
-    // marginBottom: "-7.5px",
     paddingTop: "11px",
     paddingBottom: "11px",
   },
@@ -115,15 +112,18 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
         case 'delete':
             return {
                 ...state,
+                geosamples: state.geosamples.filter(
+                    geosample => geosample.geosample_id !== action.payload.geosample_id
+                ),
                 sample_zones: state.sample_zones.map(zone => ({
                     ...zone,
-                    geosample_ids: zone.geosample_ids.filter(id => id.geosample_id !== action.payload.geosample_id)
+                    geosample_ids: zone.geosample_ids.filter(sample => sample.geosample_id !== action.payload.geosample_id)
                 })),
             };
         case 'update':
             if (action.payload === undefined) {
                 return state;
-            }
+            };
 
             return {
                 ...state,
@@ -132,7 +132,16 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
                         return action.payload;
                     }
                     return sample;
-                })
+                }),
+                sample_zones: state.sample_zones.map(zone => ({
+                    ...zone,
+                    geosample_ids: zone.geosample_ids.map(sample => {
+                        if (sample.geosample_id === action.payload.geosample_id) {
+                            return action.payload;
+                        }
+                        return sample;
+                    })
+                })),
             };
         case 'select':
             return {
@@ -160,12 +169,15 @@ const GeosampleManager: React.FC = () => {
     const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'}))
     });
+
     useEffect(() => {
         if (lastMessage !== null) {
             setMessageHistory((prev) => prev.concat(lastMessage.data));
             dispatch({type: 'set', payload: JSON.parse(lastMessage.data).data});
         }
     }, [lastMessage, setMessageHistory]);
+
+    // TODO: search feature
 
     return (
         <div className={styles.root}>
@@ -179,7 +191,7 @@ const GeosampleManager: React.FC = () => {
                     <Divider></Divider>
                     {showSearchBar && (<div style={{flexGrow: "1"}}>               
                                             <SearchBox handleDismiss={() => setShowSearchBar(!showSearchBar)}/>
-                                            <Divider className={styles.divider}></Divider>
+                                            <Divider></Divider>
                                         </div>)}
                 </div>
                 <DrawerBody>
