@@ -1,6 +1,6 @@
-import {Request, Response} from "express";
-import Base, {RouteEvent} from "../Base";
-import {Collection, Db,  WithId} from "mongodb";
+import { Request, Response } from "express";
+import Base, { RouteEvent } from "../Base";
+import { Collection, Db, WithId } from "mongodb";
 import { BaseGeosample, BaseZone, SampleMessage, isBaseGeosample, isBaseZone } from "../types/Geosamples";
 
 export interface ResponseBody {
@@ -11,7 +11,7 @@ export interface ResponseBody {
 
 export default class Geosamples extends Base {
     public routes = [
-        {   
+        {
             path: '/api/geosamples', // to handle incoming messages from hololens
             method: 'post',
             handler: this.addGeosamples.bind(this),
@@ -48,7 +48,6 @@ export default class Geosamples extends Base {
     };
 
     async sendSamples() {
-        console.log("why not received?")
         const allSamples = this.samplesCollection.find();
         const allZones = this.zonesCollection.find();
         const sampleData = await allSamples.toArray();
@@ -57,16 +56,16 @@ export default class Geosamples extends Base {
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'SEND_SAMPLES',
-            use: 'POST', // TODO: what to put here
+            use: 'POST',
             data: {
                 samples: sampleData,
                 zones: zoneData
             },
         });
-        this.updateARSamples(messageId, {samples: sampleData, zones: zoneData});
+        this.updateARSamples(messageId, { samples: sampleData, zones: zoneData });
     }
 
-    async addGeosamples(req: Request, res: Response) : Promise<{}> {
+    async addGeosamples(req: Request, res: Response): Promise<{}> {
         const data = req.body.data;
         try {
             var operations = data['samples'].map((sample: BaseGeosample) => ({
@@ -80,7 +79,7 @@ export default class Geosamples extends Base {
             const samplesCursor = this.samplesCollection.find();
             const samplesArray = await samplesCursor.toArray();
             const sampleMap = new Map(samplesArray.map(sample => [sample.geosample_id, sample]));
-            const modZones = data['zones'].map((zone : any) => ({
+            const modZones = data['zones'].map((zone: any) => ({
                 ...zone,
                 geosample_ids: zone.geosample_ids.map((id: number) => sampleMap.get(id) || null)  // Replace id with sample object
             }));
@@ -96,28 +95,28 @@ export default class Geosamples extends Base {
                 id: -1,
                 type: 'SEND_SAMPLES',
                 use: 'PUT',
-                data: {samples: samplesArray, zones: modZones}
+                data: { samples: samplesArray, zones: modZones }
             });
-            res.status(200).send({samples: samplesArray, zones: modZones});
-            this.updateARSamples(0, {samples: samplesArray, zones: modZones});
-            return {samples: samplesArray, zones: modZones};
+            res.status(200).send({ samples: samplesArray, zones: modZones });
+            this.updateARSamples(0, { samples: samplesArray, zones: modZones });
+            return { samples: samplesArray, zones: modZones };
         } catch (e) {
             res.status(404).send(e.message);
             return e.message;
         }
     }
 
-    async deleteGeosample(req: Request, res: Response) : Promise<{}> {
+    async deleteGeosample(req: Request, res: Response): Promise<{}> {
         const sample = req.body.data;
         if (!isBaseGeosample(sample)) {
             res.status(404).send("Invalid request");
         }
 
         try {
-            await this.samplesCollection.deleteOne({geosample_id: sample.geosample_id});
+            await this.samplesCollection.deleteOne({ geosample_id: sample.geosample_id });
             const updateResult = await this.zonesCollection.updateOne(
-                {zone_id: sample.zone_id},
-                {$pull: {geosample_ids: sample}}
+                { zone_id: sample.zone_id },
+                { $pull: { geosample_ids: sample } }
             );
 
             if (updateResult.modifiedCount !== 1) {
@@ -128,7 +127,7 @@ export default class Geosamples extends Base {
             const allZones = this.zonesCollection.find();
             const sampleData = await allSamples.toArray();
             const zoneData = await allZones.toArray();
-            this.updateARSamples(0, {samples: sampleData, zones: zoneData});
+            this.updateARSamples(0, { samples: sampleData, zones: zoneData });
             return "Deleted sample";
         } catch (e) {
             res.status(404).send(e.message);
@@ -136,13 +135,14 @@ export default class Geosamples extends Base {
         }
     }
 
-    async editGeosample(req: Request, res: Response) : Promise<string> {
+    async editGeosample(req: Request, res: Response): Promise<string> {
+        const data = req.body.data;
         const sample = req.body.data;
         try {
-            const allSamples = this.samplesCollection.replaceOne({geosample_id: sample.geosample_id}, sample, {upsert: true});
+            const allSamples = this.samplesCollection.replaceOne({ geosample_id: sample.geosample_id }, sample, { upsert: true });
             const sampleData = await this.samplesCollection.find().toArray();
             const zoneData = await this.zonesCollection.find().toArray();
-            this.updateARSamples(0, {samples: sampleData, zones: zoneData});
+            this.updateARSamples(0, { samples: sampleData, zones: zoneData });
             res.status(200).send("Edited sample");
             return "Edited sample";
         } catch (e) {
@@ -151,7 +151,7 @@ export default class Geosamples extends Base {
         }
     }
 
-    private updateARSamples(messageId: number, data: {samples: BaseGeosample[], zones: BaseZone[]}) : void {
+    private updateARSamples(messageId: number, data: { samples: BaseGeosample[], zones: BaseZone[] }): void {
         const newGeosampleMessage: SampleMessage = {
             id: messageId,
             type: 'Geosamples',

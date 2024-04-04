@@ -63,6 +63,7 @@ client.connect().then(() => {
                     }
                 }
             }
+
             console.log(eventRegistry);
 
             app.get('/api/test', (req, res) => {
@@ -104,8 +105,12 @@ client.connect().then(() => {
             wssFrontend.on('connection', (sock, request) => {
                 console.log('Frontend WebSocket connection established');
                 sock.on("message", (message) => {
+                    if (message.toString() === 'ping') {
+                        sock.send('hello frontend - lmcc');
+                        console.log('pinged frontend');
+                        return;
+                    }
                     const data = JSON.parse(message.toString());
-
                     console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
@@ -120,13 +125,21 @@ client.connect().then(() => {
             wssHoloLens.on('connection', (sock, request) => {
                 console.log('HoloLens WebSocket connection established');
                 sock.on('message', (message) => {
+                    if (message.toString() === 'ping') {
+                        sock.send('hello hololens - lmcc');
+                        console.log('pinged hololens');
+                        return;
+                    }
+
                     const data = JSON.parse(message.toString());
+                    console.log({data});
+                    console.log({eventRegistry})
 
                     console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
 
                     // call the handler for the event type
                     if (eventRegistry[data.type.toUpperCase()]) {
-                        eventRegistry[data.type](data.data);
+                        eventRegistry[data.type.toUpperCase()](data.data);
                     }
                 })
             });

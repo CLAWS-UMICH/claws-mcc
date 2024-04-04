@@ -58,8 +58,7 @@ const useStyles = makeStyles({
     alignContent: "center",
   },
   dropdown: { 
-    minWidth: '160px', 
-    ...shorthands.padding('0', tokens.spacingHorizontalM),
+    minWidth: '11.375rem', 
   },
   line: {
     display: "flex",
@@ -207,7 +206,6 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
   useEffect(() => {
     setCurrentSample(props.geosample);
     setEditedSample(props.geosample);
-    console.log("props changed");
   }, [props.geosample]);
 
   if (!props.geosample) {
@@ -240,12 +238,10 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
       if (!geosample.starred) {
         geosample.starred = true;
         dispatch({type: 'update', payload: geosample});
-        // TODO: send message to hololens 
       }
       else {
         geosample.starred = false;
         dispatch({type: 'update', payload: geosample});
-        // TODO: send message to hololens
       }
     }
   }
@@ -253,7 +249,6 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
 
   const handleDelete = async (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
     if (geosample) {
-      console.log(geosample)
       const res = await fetch("/api/geosamples", {
         method: "DELETE",
         headers: {
@@ -429,7 +424,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                   <Option text="Unknown">
                       <Question16Regular/> Unknown
                   </Option>
-              </Dropdown> ) : <Input style={{}} appearance="outline" id="shape_dropdown" readOnly={true} value={currentSample ? currentSample?.shape.charAt(0).toUpperCase() + currentSample?.shape.slice(1) : ""} />}
+              </Dropdown> ) : <Input appearance="outline" id="shape_dropdown" readOnly={true} value={currentSample ? currentSample?.shape.charAt(0).toUpperCase() + currentSample?.shape.slice(1) : ""} />}
           </div>
           <div className={styles.root}>
               <Label htmlFor="color_dropdown">Color</Label>
@@ -446,7 +441,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                         {option}
                     </Option>
                   ))}
-                </Dropdown>) : <Input style={{}} appearance="outline" id="color_dropdown" readOnly={true} value={currentSample ? currentSample?.color.charAt(0).toUpperCase() + currentSample?.color.slice(1) : ""} /> }
+                </Dropdown>) : <Input appearance="outline" id="color_dropdown" readOnly={true} value={currentSample ? currentSample?.color.charAt(0).toUpperCase() + currentSample?.color.slice(1) : ""} /> }
           </div>
           <div className={styles.field}>
             <Label htmlFor="rock_type">Rock Type<sub></sub></Label>

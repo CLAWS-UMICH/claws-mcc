@@ -1,6 +1,6 @@
 // Geosamples.tsx
 import React, { useEffect, useReducer, useState } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { ReadyState } from 'react-use-websocket';
 import {
     Button,
     Divider,
@@ -15,7 +15,11 @@ import { Search20Regular } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
 import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
+<<<<<<< HEAD
+import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
+=======
 import { sample } from 'lodash';
+>>>>>>> 70166fbf82c91e136145294769729aa3c5e31dc1
 
 type ARLocation = {
     latitude: number;
@@ -162,9 +166,7 @@ const GeosampleManager: React.FC = () => {
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const [showSearchBar, setShowSearchBar] = useState(false);
 
-    // Connect to frontend websocket
-    const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
-        // Retrieve samples from database on page load
+    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'}))
     });
 

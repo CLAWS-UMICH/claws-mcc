@@ -18,6 +18,41 @@ jobs:
       with:
         node-version: '20'
 
+    - name: Set up pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 7.x.x
+        run_install: false
+
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      run: |
+        echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+    - name: Cache pnpm dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-
+
+    - name: Install dependencies
+      run: |
+        pnpm install --no-frozen-lockfile
+        cd client
+        pnpm install --no-frozen-lockfile
+        cd ..
+
+    - name: Build backend
+      run: pnpm run build
+
+    - name: Build frontend
+      run: |
+        cd client
+        pnpm run build
+        cd ..
+
     - name: Prepare SSH key
       run: |
         echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
@@ -28,27 +63,13 @@ jobs:
         HOST: ${{ secrets.EC2_HOST }}
         USERNAME: ${{ secrets.EC2_USERNAME }}
       run: |
+        # Copy built files to the EC2 instance
+        scp -o StrictHostKeyChecking=no -i key.pem -r dist/* ${USERNAME}@${HOST}:/home/ubuntu/claws-mcc/dist
+        scp -o StrictHostKeyChecking=no -i key.pem -r client/build/* ${USERNAME}@${HOST}:/home/ubuntu/claws-mcc/client/build
+
         # SSH into the EC2 instance and run the deployment commands
         ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} << 'EOF'
-          # Ensure the working directory is the project directory
-          cd /home/ubuntu/claws-mcc
-          
-          # Pull the latest changes
-          git pull
-          
-          # Install root dependencies and build if necessary
-          npm install
-          npm run build
-          
-          # Install client dependencies, build the client
-          cd client
-          npm install
-          npm run build
-          
-          # Navigate back to the root project directory if needed
-          cd ..
-          
-          # Restart the application and web server
+          # Restart backend and frontend
           pm2 restart all
           sudo systemctl restart nginx
         EOF

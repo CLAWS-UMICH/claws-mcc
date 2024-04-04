@@ -43,6 +43,13 @@ export type BaseGeosample = {
     image: string;
 }
 
+export type BaseResponseZone = {
+    zone_id: string;
+    geosample_ids: number[];
+    location: Location;
+    radius: number;
+}
+
 export const isBaseGeosample = (geosample: any) : geosample is BaseGeosample => {
     if (typeof geosample !== 'object') return false;
     if (!geosample.hasOwnProperty('geosample_id')) return false;
