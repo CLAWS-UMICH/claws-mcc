@@ -1,7 +1,7 @@
 import redis from "./core/redis";
-import {Db} from "mongodb";
-import {Redis} from "ioredis";
-import {WebSocket, WebSocketServer} from "ws";
+import { Db } from "mongodb";
+import { Redis } from "ioredis";
+import { WebSocket, WebSocketServer } from "ws";
 import Message from "./types/message";
 
 export interface RouteEvent {
@@ -19,10 +19,8 @@ export interface Route {
 export default class Base {
     public readonly routes: Route[];
     public readonly events: RouteEvent[];
-
     public db: Db;
     public redis: Redis;
-
     private wsFrontend: WebSocketServer;
     private wsHoloLens: WebSocketServer;
 

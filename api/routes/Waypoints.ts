@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Base, { RouteEvent } from "../Base";
 import { BaseWaypoint, isBaseWaypoint, WaypointsMessage } from "../types/Waypoints";
 import { Collection, Db, Document, InsertManyResult, WithId } from "mongodb";
+import Logger from "../core/logger";
 
 export interface ResponseBody {
     error: boolean,
@@ -34,6 +35,7 @@ export default class Waypoints extends Base {
         }
     ]
     private collection: Collection<BaseWaypoint>
+    private logger = new Logger('Waypoints');
 
     constructor(db: Db, collection?: Collection<BaseWaypoint>) {
         super(db);
@@ -42,7 +44,7 @@ export default class Waypoints extends Base {
     }
 
     async sendWaypoints() {
-        console.log('receiving waypoints request')
+        this.logger.info('receiving waypoints request')
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
         const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
@@ -133,7 +135,7 @@ export default class Waypoints extends Base {
             message = "Could not add waypoints";
             error = true;
             const response: ResponseBody = { error, message, data: [] };
-            console.error(waypoints)
+            this.logger.error(waypoints)
             res.send(response);
             return response;
         }
@@ -186,7 +188,7 @@ export default class Waypoints extends Base {
             }
                 , '').slice(0, -2) + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
 
         // delete the remaining waypoints from the database
@@ -197,7 +199,7 @@ export default class Waypoints extends Base {
                     return acc + waypoint.waypoint_id.toString(10) + ', ';
                 }, '') + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
@@ -272,7 +274,7 @@ export default class Waypoints extends Base {
                     return acc + waypointId.toString(10) + ', ';
                 }, '').slice(0, -2) + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
         if (notFound.length) {
             message += ". Could not find waypoints with ids: [" +
@@ -280,7 +282,7 @@ export default class Waypoints extends Base {
                     return acc + waypointId.toString(10) + ', ';
                 }, '').slice(0, -2) + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
         const response: ResponseBody = { error, message, data };
         this.updateARWaypoints(messageId, data);
