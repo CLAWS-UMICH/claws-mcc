@@ -24,7 +24,6 @@ export default class Base {
     public redis: Redis;
     private wsFrontend: WebSocketServer;
     private wsHoloLens: WebSocketServer;
-    private logger = new Logger('Base');
 
     constructor(db: Db) {
         this.routes = [];
@@ -39,7 +38,8 @@ export default class Base {
 
     public dispatch(target: 'AR' | 'FRONTEND', data: Message) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
-        this.logger.info(`Dispatching message to ${target}`, data);
+        const dispatchLogger = new Logger('DISPATCH');
+        dispatchLogger.info(`Dispatching message to ${target}`, data);
 
         const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;
 
