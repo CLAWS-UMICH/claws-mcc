@@ -27,8 +27,10 @@ const MONGO_URI = process.env.MONGO_URI;
 
 async function connectToMongoDB() {
     try {
+        const mongoLogger = new Logger('Mongo');
+        mongoLogger.info('Connecting to MongoDB');
         const client = await MongoClient.connect(MONGO_URI);
-        logger.info('Connected to MongoDB');
+        mongoLogger.info('Connected to MongoDB');
         return client.db();
     } catch (err) {
         logger.error(`Failed to connect to MongoDB: ${err.message}`);
