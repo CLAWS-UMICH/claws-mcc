@@ -4,6 +4,7 @@ import axios from 'axios';
 import { FluentProvider, webDarkTheme, webLightTheme } from "@fluentui/react-components";
 import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
+import Messages from "./components/messages/Messages.tsx";
 import GeosampleManager from './components/geosamples/Geosamples.tsx';
 import NavBar from './components/layout/NavBar/NavBar.tsx';
 import Communication from './components/communications/Communication.tsx';
@@ -42,7 +43,7 @@ function App() {
                           <Route path="/navigation" element={<WaypointManager />} />
                           <Route path="/rover" element={<EmptyComponent />} />
                           <Route path="/suits" element={<EmptyComponent />} />
-                          <Route path="/messages" element={<EmptyComponent />} />
+                          <Route path="/messages" element={<Messages />} />
                           <Route path="/connect" element={<Communication />} />
                       </Routes>
                     </div>
