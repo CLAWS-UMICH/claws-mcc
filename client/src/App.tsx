@@ -9,6 +9,7 @@ import NavBar from './components/layout/NavBar/NavBar.tsx';
 import Communication from './components/communications/Communication.tsx';
 import CameraView from './components/camera_view/CameraView.tsx';
 import EmptyComponent from './components/common/EmptyComponent.tsx';
+import VitalManager from './components/vitals/Vitals.tsx';
 
 interface AstronautData {
   heartrate: number;
@@ -37,7 +38,7 @@ function App() {
                       <Routes>
                           <Route path="/" element={<EmptyComponent />} />
                           <Route path="/tasks" element={<EmptyComponent />} />
-                          <Route path="/vitals" element={<EmptyComponent />} />
+                          <Route path="/vitals" element={<VitalManager />} />
                           <Route path="/samples" element={<GeosampleManager />} />
                           <Route path="/navigation" element={<WaypointManager />} />
                           <Route path="/rover" element={<EmptyComponent />} />
