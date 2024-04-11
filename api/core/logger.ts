@@ -9,7 +9,7 @@ constructor(loggerName: string) {
         format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.printf(({ timestamp, level, message, ...meta }) => {
-                let metaStr = JSON.stringify(meta, null, 2);
+                let metaStr = JSON.stringify(meta);
                 if (metaStr === '{}') {
                     metaStr = '';
                 } else {
