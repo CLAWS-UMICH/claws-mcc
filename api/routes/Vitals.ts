@@ -42,7 +42,7 @@ export default class Vitals extends Base {
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'VITALS',
-            use: 'POST',
+            use: 'PUT',
             data: vitalsData,
         });
     }

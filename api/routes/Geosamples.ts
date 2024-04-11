@@ -59,7 +59,7 @@ export default class Geosamples extends Base {
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'SEND_SAMPLES',
-            use: 'POST',
+            use: 'PUT',
             data: {
                 samples: sampleData,
                 zones: zoneData

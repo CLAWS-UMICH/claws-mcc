@@ -3,18 +3,24 @@ import winston from "winston";
 export default class Logger {
 	private logger: winston.Logger;
 
-	constructor(loggerName: string) {
-		this.logger = winston.createLogger({
-			level: "info",
-			format: winston.format.combine(
-				winston.format.timestamp(),
-				winston.format.printf(({ timestamp, level, message }) => {
-					return `${timestamp} [${loggerName}]: ${message}`;
-				})
-			),
-			transports: [new winston.transports.Console()],
-		});
-	}
+constructor(loggerName: string) {
+    this.logger = winston.createLogger({
+        level: "info",
+        format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.printf(({ timestamp, level, message, ...meta }) => {
+                let metaStr = JSON.stringify(meta);
+                if (metaStr === '{}') {
+                    metaStr = '';
+                } else {
+                    metaStr = ' ' + metaStr;
+                }
+                return `${timestamp} [${loggerName}] ${level}: ${message}${metaStr}`;
+            })
+        ),
+        transports: [new winston.transports.Console()],
+    });
+}
 
 	get info() {
 		return this.logger.info.bind(this.logger);
