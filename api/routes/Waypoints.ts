@@ -44,6 +44,12 @@ export default class Waypoints extends Base {
     }
 
     async sendWaypoints() {
+        const index_collection = this.db.collection('waypoint_current_index');
+        var current_index = await index_collection.findOne()
+            .then((doc) => {
+                if (doc) return doc.index;
+                else return 0;
+            });
         this.logger.info('receiving waypoints request')
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
@@ -54,7 +60,7 @@ export default class Waypoints extends Base {
             use: 'GET',
             data: data,
         })
-        this.updateARWaypoints(messageId, data);
+        this.updateARWaypoints(messageId, data, current_index);
     }
 
     async addWaypoint(req: Request, res: Response<ResponseBody>): Promise<ResponseBody> {
