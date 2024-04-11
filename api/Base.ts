@@ -39,7 +39,7 @@ export default class Base {
     public dispatch(target: 'AR' | 'FRONTEND', data: Message) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
         const dispatchLogger = new Logger('DISPATCH');
-        dispatchLogger.info(`Dispatching message ${data.type} to ${target}`, data);
+        dispatchLogger.info(`Dispatching message ${data.type} to ${target}`);
 
         const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;
 
