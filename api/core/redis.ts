@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import Logger from './logger';
 
 const redis = new Redis({
     username: process.env.REDIS_USERNAME,
@@ -7,12 +8,14 @@ const redis = new Redis({
     port: 19005
 });
 
+const logger = new Logger('Redis');
+
 redis.on("connect", function() {
-    console.log('Connected to Redis');
+    logger.info('Connected to Redis');
 });
 
 redis.on("error", function(error) {
-    console.error(`Redis error: ${error}`);
+    logger.error(`Redis error: ${error}`);
 });
 
 export default redis;

@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import Base from "../Base";
 import {VitalsMessage} from "../types/Astronaut";
 import {Collection, Db, Document, InsertManyResult, WithId, FindCursor} from "mongodb";
+import Logger from "../core/logger";
 
 interface Astronaut {
     id: number,
@@ -33,6 +34,7 @@ export default class Astronauts extends Base {
         }
     ]
 
+    private logger = new Logger('Astronauts');
     private collection: Collection<Astronaut>
 
     constructor(db: Db) {

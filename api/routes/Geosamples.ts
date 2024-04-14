@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Base, { RouteEvent } from "../Base";
 import { Collection, Db, WithId } from "mongodb";
 import { BaseGeosample, BaseZone, SampleMessage, isBaseGeosample, isBaseZone } from "../types/Geosamples";
+import Logger from "../core/logger";
 
 export interface ResponseBody {
     error: boolean,
@@ -40,6 +41,7 @@ export default class Geosamples extends Base {
 
     private samplesCollection: Collection<BaseGeosample>;
     private zonesCollection: Collection<BaseZone>;
+    private logger = new Logger('Geosampling');
 
     constructor(db: Db, sampleCollection?: Collection<BaseGeosample>, zoneCollection?: Collection<BaseZone>) {
         super(db);
@@ -48,6 +50,7 @@ export default class Geosamples extends Base {
     };
 
     async sendSamples() {
+        this.logger.info("Sending samples");
         const allSamples = this.samplesCollection.find();
         const allZones = this.zonesCollection.find();
         const sampleData = await allSamples.toArray();
@@ -56,7 +59,7 @@ export default class Geosamples extends Base {
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'SEND_SAMPLES',
-            use: 'POST',
+            use: 'PUT',
             data: {
                 samples: sampleData,
                 zones: zoneData

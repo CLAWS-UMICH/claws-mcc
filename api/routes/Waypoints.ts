@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Base, { RouteEvent } from "../Base";
 import { BaseWaypoint, isBaseWaypoint, WaypointsMessage } from "../types/Waypoints";
 import { Collection, Db, Document, InsertManyResult, WithId } from "mongodb";
+import Logger from "../core/logger";
 
 export interface ResponseBody {
     error: boolean,
@@ -34,6 +35,7 @@ export default class Waypoints extends Base {
         }
     ]
     private collection: Collection<BaseWaypoint>
+    private logger = new Logger('Waypoints');
 
     constructor(db: Db, collection?: Collection<BaseWaypoint>) {
         super(db);
@@ -42,7 +44,13 @@ export default class Waypoints extends Base {
     }
 
     async sendWaypoints() {
-        console.log('receiving waypoints request')
+        const index_collection = this.db.collection('waypoint_current_index');
+        var current_index = await index_collection.findOne()
+            .then((doc) => {
+                if (doc) return doc.index;
+                else return 0;
+            });
+        this.logger.info('receiving waypoints request')
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
         const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
@@ -52,7 +60,7 @@ export default class Waypoints extends Base {
             use: 'GET',
             data: data,
         })
-        this.updateARWaypoints(messageId, data);
+        this.updateARWaypoints(messageId, data, current_index);
     }
 
     async addWaypoint(req: Request, res: Response<ResponseBody>): Promise<ResponseBody> {
@@ -133,7 +141,7 @@ export default class Waypoints extends Base {
             message = "Could not add waypoints";
             error = true;
             const response: ResponseBody = { error, message, data: [] };
-            console.error(waypoints)
+            this.logger.error(waypoints)
             res.send(response);
             return response;
         }
@@ -147,13 +155,19 @@ export default class Waypoints extends Base {
             use: 'GET',
             data: data,
         })
-        this.updateARWaypoints(messageId, data);
+        this.updateARWaypoints(messageId, data, current_index);
         const response: ResponseBody = { error: false, message, data };
         res.send(response);
         return response;
     }
 
     async deleteWaypoint(req: Request, res: Response<ResponseBody>) {
+        const index_collection = this.db.collection('waypoint_current_index');
+        var current_index = await index_collection.findOne()
+            .then((doc) => {
+                if (doc) return doc.index;
+                else return 0;
+            });
         // Waypoint ids to delete
         let toDelete: number[];
         // the request is the array of all the waypoints
@@ -186,7 +200,7 @@ export default class Waypoints extends Base {
             }
                 , '').slice(0, -2) + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
 
         // delete the remaining waypoints from the database
@@ -197,7 +211,7 @@ export default class Waypoints extends Base {
                     return acc + waypoint.waypoint_id.toString(10) + ', ';
                 }, '') + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
@@ -208,13 +222,19 @@ export default class Waypoints extends Base {
             use: 'GET',
             data: data,
         });
-        this.updateARWaypoints(messageId, data);
+        this.updateARWaypoints(messageId, data, current_index);
         const response: ResponseBody = { error, message, data };
         res.send(response);
         return response;
     }
 
     async editWaypoint(req: Request, res: Response<ResponseBody>) {
+        const index_collection = this.db.collection('waypoint_current_index');
+        var current_index = await index_collection.findOne()
+            .then((doc) => {
+                if (doc) return doc.index;
+                else return 0;
+            });
         let message = "";
         let error = false;
         const errors: number[] = [];
@@ -272,7 +292,7 @@ export default class Waypoints extends Base {
                     return acc + waypointId.toString(10) + ', ';
                 }, '').slice(0, -2) + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
         if (notFound.length) {
             message += ". Could not find waypoints with ids: [" +
@@ -280,10 +300,10 @@ export default class Waypoints extends Base {
                     return acc + waypointId.toString(10) + ', ';
                 }, '').slice(0, -2) + "]";
             error = true;
-            console.error(message);
+            this.logger.error(message);
         }
         const response: ResponseBody = { error, message, data };
-        this.updateARWaypoints(messageId, data);
+        this.updateARWaypoints(messageId, data, current_index);
         res.send(response);
         return response;
     }
@@ -296,21 +316,23 @@ export default class Waypoints extends Base {
 
     // Requests waypoints from AR
     // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
-    private updateARWaypoints(messageId: number, data: WithId<Document>[]): void {
+    private updateARWaypoints(messageId: number, data: WithId<Document>[], current_index: number): void {
         const waypoints = data.map(waypoint => ({
             waypoint_id: waypoint.waypoint_id,
             location: waypoint.location,
             type: waypoint.type,
             description: waypoint.description,
             details: waypoint.details,
-            author: waypoint.author
+            author: waypoint.author,
+            waypoint_letter: waypoint.waypointLetter
         }));
         const newWaypointsMessage: WaypointsMessage = {
-            id: messageId,
-            type: 'Messaging',
+            id: -1, // all astronauts
+            type: 'Waypoints',
             use: 'PUT',
             data: {
-                AllMessages: waypoints
+                AllWaypoints: waypoints,
+                currentIndex: current_index
             }
         }
         this.dispatch("AR", newWaypointsMessage)
