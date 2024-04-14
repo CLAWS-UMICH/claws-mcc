@@ -15,11 +15,7 @@ import { Search20Regular } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
 import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
-<<<<<<< HEAD
 import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
-=======
-import { sample } from 'lodash';
->>>>>>> 70166fbf82c91e136145294769729aa3c5e31dc1
 
 type ARLocation = {
     latitude: number;
