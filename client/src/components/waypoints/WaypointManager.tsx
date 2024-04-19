@@ -6,6 +6,8 @@ import './Waypoints.css';
 import {WaypointDrawer} from "./WaypointDrawer.tsx";
 import {WaypointView} from "./WaypointView.tsx";
 import useDynamicWebSocket from "../../hooks/useWebSocket.tsx";
+import { AddCircle24Filled } from "@fluentui/react-icons";
+
 
 export enum WaypointType {
     STATION,
@@ -128,10 +130,12 @@ export const WaypointManager: React.FC = () => {
         }
     }, [lastMessage, setMessageHistory]);
     return (
-        <div style={{display: "flex", height:"100vh", backgroundColor: "#000000"}}>
-            <InlineDrawer style={{backgroundColor: "#0F0F0F"}} className={'drawer'} separator open>
-                <DrawerHeader style={{backgroundColor: "#141414"}}>
-                    <DrawerHeaderTitle action={
+        <div style={{display: "flex", height:"100vh", backgroundColor: "#000000", width: "100%"}}>
+            <InlineDrawer style={{backgroundColor: "#0F0F0F", width: "250px"}} className={'drawer'} separator open>
+                <DrawerHeader style={{backgroundColor: "#141414", borderBottom: "1px solid #333333"}}>
+                    <DrawerHeaderTitle 
+                    action=
+                    {
                         <Button size={"medium"} icon={
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                  viewBox="0 0 20 20" fill="none">
@@ -155,7 +159,8 @@ export const WaypointManager: React.FC = () => {
                                     }
                                 });
                                 
-                                }}>New Waypoint</Button>}>
+                                }}>New</Button>
+                        }>
                         Navigation
                     </DrawerHeaderTitle>
                 </DrawerHeader>

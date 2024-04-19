@@ -77,8 +77,8 @@ export const Messages: React.FC = () => {
 
     return (
         <div style={{display: "flex", height:"100vh", backgroundColor: "#000000"}}>
-            <InlineDrawer style={{backgroundColor: "#0F0F0F", width: "20%"}} className={'drawer'} separator open>
-                <DrawerHeader style={{backgroundColor: "#141414"}}>
+            <InlineDrawer style={{backgroundColor: "#0F0F0F", width: "250px"}} className={'drawer'} separator open>
+                <DrawerHeader style={{backgroundColor: "#141414", borderBottom: "1px solid #333333"}}>
                     <DrawerHeaderTitle>
                         Messages
                     </DrawerHeaderTitle>

@@ -40,7 +40,7 @@ function MessageDrawer({ messages, conversations, setActiveConversation, activeC
         setHoveredButton(null);
     };
     return (
-        <div style={{display: 'flex', flexDirection: 'column'}}>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: "center", paddingTop: "15px"}}>
             {Array.from(conversations.keys()).map((key, index) => {
                     const astro = key as number;
                     return (   
@@ -48,7 +48,7 @@ function MessageDrawer({ messages, conversations, setActiveConversation, activeC
                                 style={{fontSize: "13px", width: "210px", height: "45px", border: "0px",
                                 backgroundColor: hoveredButton === index ? "#2b2b2b" : "#0F0F0F",
                                 transition: "background-color 0.2s ease",
-                                width: "100%",
+                                width: "92%",
                                 }}
                                 shape='circular'
                                 secondaryContent="Recent Message"

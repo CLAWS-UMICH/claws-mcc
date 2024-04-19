@@ -16,7 +16,8 @@ import {
     Label,
     makeStyles,
     Option,
-    shorthands, Tooltip
+    shorthands, Tooltip,
+    CompoundButton
 } from "@fluentui/react-components"
 import {
     BuildingFilled,
@@ -129,6 +130,27 @@ const WaypointListItem: React.FC<WaypointListItemProps> = props => {
                         onClick={handleDelete}>Delete</Button>
             </div>
         </Card>
+    //     <CompoundButton
+    //         style={{fontSize: "13px", width: "210px", height: "45px", border: "0px",
+    //         backgroundColor: hoveredButton === index ? "#2b2b2b" : "#0F0F0F",
+    //         transition: "background-color 0.2s ease",
+    //         width: "100%",
+    //         }}
+    //         shape='circular'
+    //         secondaryContent="Recent Message"
+    //         // icon={<SampleImage astro={astro}/> }
+    //         // onClick={()=>{
+    //         //     setActiveConversation(astro);
+    //         // }}
+    //         // onMouseEnter={()=>{
+    //         //     handleMouseEnter(index);
+    //         // }}
+    //         // onMouseLeave={()=>{
+    //         //     handleMouseLeave();
+    //         // }}
+    //     >
+    //     Astronaut 1
+    // </CompoundButton>
     );
 }
 

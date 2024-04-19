@@ -1,6 +1,6 @@
 import React, {useCallback} from 'react';
 import {BaseWaypoint, ManagerAction, useAstronaut} from "./WaypointManager.tsx";
-import {Body1, Body1Stronger, Skeleton} from "@fluentui/react-components";
+import {Body1, Body1Stronger, Skeleton, CompoundButton} from "@fluentui/react-components";
 import {isEqual} from "lodash";
 // @ts-ignore
 import waypointImage from '../../assets/waypoint.png';
@@ -19,13 +19,25 @@ enum GroupKey {
 
 type DrawerSubItemProps = { waypoint: BaseWaypoint, selected: boolean, dispatch: React.Dispatch<ManagerAction> }
 
-const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispatch}) => {
-    const [hovering, setHovering] = React.useState(false);
+function SampleImage({astro}: { astro: number }) {
     const intToChar = (i: number): string => {
         // If i > 26, add another letter.
-        if (i > 26) return String.fromCharCode(i / 26 + 65) + String.fromCharCode(i % 26 + 65);
-        return String.fromCharCode(i + 65);
+        if (i > 26) return String.fromCharCode((i - 1) / 26 + 65) + String.fromCharCode(i % 26 + 65);
+        return String.fromCharCode(i - 1 + 65);
     };
+    return (
+        <div className={"waypoint-image"}>
+        <img style={{alignSelf: "center", padding: "0 15px 0 0"}} width={27} height={31} src={waypointImage}
+             alt={"Waypoint Icon"}/>
+        <div className={'waypoint-image-text'}>
+            {intToChar(astro)}
+        </div>
+    </div>
+    );
+}
+
+const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispatch}) => {
+    const [hovering, setHovering] = React.useState(false);
     return <div key={waypoint._id}
                 onClick={() => {
                     // If already selected, deselect.
@@ -40,24 +52,19 @@ const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispat
                 onMouseEnter={() => setHovering(true)}
                 onMouseLeave={() => setHovering(false)}
                 className={"drawer-sub-item"}
-                style={{display: "flex", backgroundColor: selected || hovering ? "grey" : undefined}}>
-
-        <div className={"waypoint-image"}>
-            <img style={{alignSelf: "center", padding: "0 15px 0 0"}} width={27} height={31} src={waypointImage}
-                 alt={"Waypoint Icon"}/>
-            <div className={'waypoint-image-text'}>
-                {intToChar(waypoint.waypoint_id)}
-            </div>
-        </div>
-        <div key={waypoint._id} style={{
-            opacity: 0.95,
-            flexDirection: "column",
-            display: "flex",
-            alignItems: "start"
-        }}>
-            <Body1Stronger>Waypoint {waypoint.waypoint_id}</Body1Stronger>
-            <Body1>{waypoint.description}</Body1>
-        </div>
+                style={{display: "flex"}}>
+        <CompoundButton
+            style={{fontSize: "13px", width: "210px", height: "45px", border: "0px",
+            backgroundColor: hovering ? "#2b2b2b" : "#0F0F0F",
+            transition: "background-color 0.2s ease",
+            width: "100%",
+            }}
+            shape='circular'
+            secondaryContent={waypoint.details}
+            icon={<SampleImage astro={waypoint.waypoint_id}/> }
+        >
+            Waypoint {waypoint.waypoint_id}
+        </CompoundButton>
     </div>
 }
 
