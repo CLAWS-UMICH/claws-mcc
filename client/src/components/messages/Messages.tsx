@@ -8,6 +8,7 @@ import axios from "axios";
 import {useAstronaut} from "../waypoints/WaypointManager.tsx";
 import MessageDrawer from "./MessageDrawer.tsx";
 import MessageDisplay from "./MessageDisplay.tsx";
+import { Backpack12Filled } from "@fluentui/react-icons";
 
 
 export type MessageAction =
@@ -76,18 +77,20 @@ export const Messages: React.FC = () => {
 
     return (
         <div style={{display: "flex", height:"100vh", backgroundColor: "#000000"}}>
-            <InlineDrawer style={{backgroundColor: "#0F0F0F"}} className={'drawer'} separator open>
+            <InlineDrawer style={{backgroundColor: "#0F0F0F", width: "20%"}} className={'drawer'} separator open>
                 <DrawerHeader style={{backgroundColor: "#141414"}}>
                     <DrawerHeaderTitle>
                         Messages
                     </DrawerHeaderTitle>
                 </DrawerHeader>
-                <MessageDrawer 
-                    messages={allMessages} 
-                    conversations={conversations} 
-                    setActiveConversation={setActiveConversation} 
-                    activeConversation={activeConversation}
-                />
+                <div style={{width: "100%"}}>
+                    <MessageDrawer 
+                        messages={allMessages} 
+                        conversations={conversations} 
+                        setActiveConversation={setActiveConversation} 
+                        activeConversation={activeConversation}
+                    />
+                </div>
             </InlineDrawer>
             <MessageDisplay 
                 setAllMessages={setAllMessages} 
