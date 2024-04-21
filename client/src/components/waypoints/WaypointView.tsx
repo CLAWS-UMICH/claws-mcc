@@ -36,6 +36,14 @@ const NewView: React.FC<NewViewProps> = (props) => {
     isNaN(Number(key))
   );
 
+  useEffect(() => {
+    setNewWaypoint((prev) => ({ ...prev, 
+      details: "",
+      type: 1,
+      description: "",
+      location: {latitude: props.temp.location.latitude || 0, longitude: props.temp.location.longitude || 0}}));
+  } , [props.temp.location]);
+
   const [new_waypoint, setNewWaypoint] = useState<BaseWaypoint>({
     waypoint_id: -1,
     author: -1,
@@ -194,6 +202,7 @@ type NewViewProps = {
   waypoints:BaseWaypoint[]
   selected?: BaseWaypoint;
   dispatch: React.Dispatch<ManagerAction>;
+  temp: BaseWaypoint;
 };
 
 
@@ -502,6 +511,6 @@ export const WaypointView: React.FC<WaypointViewProps> = (props) => {
     if (isUndefined(props.selected)) return <EmptyView />;
     return <SelectedView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected} />;
   }
-  return <NewView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected}/>;
+  return <NewView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected} temp={props.temp}/>;
 };
 
