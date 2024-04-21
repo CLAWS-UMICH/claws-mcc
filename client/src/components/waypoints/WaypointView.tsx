@@ -107,7 +107,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
         </div>
         <br />
         <div className={styles.container2}>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"}}>
             <Label htmlFor={"waypoint-type"}>Type</Label>
             <Dropdown 
               placeholder={"Select Waypoint Type"}
@@ -137,7 +137,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
                 ))}
               </Dropdown>
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{  margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1" }}>
             <Label htmlFor={"waypoint-location"}>Latitude</Label>
               <Input
               type="text"
@@ -148,7 +148,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
                 }}
             />
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1" }}>
             <Label htmlFor={"waypoint-location"}>Longitude</Label>
               <Input
               type="text"
@@ -159,7 +159,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
                 }}
               />
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1" }}>
             <Label htmlFor={"waypoint-time"}>Time</Label>
             <Input disabled
               type="text"
@@ -167,7 +167,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
               value={Date.now().toString()}
             />
           </div>
-          <div className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"}}>
             <Label htmlFor={"waypoint-date"}>Date</Label>
             <Input disabled
               type="text"
@@ -206,8 +206,11 @@ const listStyles = makeStyles({
   },
   container2: {
     display: "flex",
-    justifyContent: "space-between",
+    flexDirection: "row",
     width: "100%",
+    height: "100%",
+    flexWrap: "wrap",
+    alignItems: "center",
   },
   edit: {
     display: "flex",
@@ -362,7 +365,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
         </div>
         <br />
         <div className={styles.container2}>
-          <div style={{ margin: "0% 1% 0% 0%" }}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column" }}>
             <Label htmlFor={"waypoint-type"}>Type</Label>
             {
               isEditing ?
@@ -402,7 +405,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
               </Dropdown>
             }
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"  }}>
             <Label htmlFor={"waypoint-location"}>Latitude</Label>
             {
               isEditing ?
@@ -424,7 +427,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
             />
             }
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"   }}>
             <Label htmlFor={"waypoint-location"}>Longitude</Label>
             {
               isEditing ?
@@ -446,7 +449,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
             />
             }
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"   }}>
             <Label htmlFor={"waypoint-time"}>Time</Label>
             <Input 
               {...(isEditing ? {disabled: true} : {})}
@@ -456,7 +459,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
               value={props.selected?.time}
             />
           </div>
-          <div className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"  }}>
             <Label htmlFor={"waypoint-date"}>Date</Label>
             <Input disabled
               type="text"
