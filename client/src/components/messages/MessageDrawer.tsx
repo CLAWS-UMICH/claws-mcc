@@ -43,15 +43,21 @@ function MessageDrawer({ messages, conversations, setActiveConversation, activeC
         <div style={{display: 'flex', flexDirection: 'column', alignItems: "center", paddingTop: "15px"}}>
             {Array.from(conversations.keys()).map((key, index) => {
                     const astro = key as number;
+                    
+                    let recent_message = conversations.get(astro)[conversations.get(astro).length - 1].data.message;
+                    let preview_length = 20;
+                    if(recent_message.length > preview_length) {
+                        recent_message = recent_message.substring(0, (preview_length - 3)) + "...";
+                    } 
                     return (   
                             <CompoundButton
-                                style={{fontSize: "13px", width: "210px", height: "45px", border: "0px",
+                                style={{fontSize: "13px", width: "92%", height: "45px", border: "0px",
                                 backgroundColor: hoveredButton === index ? "#2b2b2b" : "#0F0F0F",
-                                transition: "background-color 0.2s ease",
-                                width: "92%",
+                                transition: "background-color 0.2s ease"
                                 }}
                                 shape='circular'
-                                secondaryContent="Recent Message"
+                                secondaryContent={ <span style={{ display: "inline-block", width: "150px" /* Adjust width as needed */ }}>{recent_message}</span>
+                            }
                                 icon={<SampleImage astro={astro}/> }
                                 onClick={()=>{
                                     setActiveConversation(astro);
