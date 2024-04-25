@@ -38,6 +38,11 @@ function SampleImage({astro}: { astro: number }) {
 
 const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispatch}) => {
     const [hovering, setHovering] = React.useState(false);
+    let preview_length = 25;
+    let details = waypoint.details;
+    if(details.length > preview_length) {
+        details = details.substring(0, (preview_length - 3)) + "...";
+    } 
     return <div key={waypoint._id}
                 onClick={() => {
                     // If already selected, deselect.
@@ -54,13 +59,13 @@ const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispat
                 className={"drawer-sub-item"}
                 style={{display: "flex"}}>
         <CompoundButton
-            style={{fontSize: "13px", width: "210px", height: "45px", border: "0px",
+            style={{fontSize: "13px", width: "100%", height: "45px", border: "0px",
             backgroundColor: hovering ? "#2b2b2b" : "#0F0F0F",
             transition: "background-color 0.2s ease",
-            width: "100%",
+            
             }}
             shape='circular'
-            secondaryContent={waypoint.details}
+            secondaryContent={<span style={{ display: "inline-block", width: "150px"}}>{details}</span>}
             icon={<SampleImage astro={waypoint.waypoint_id}/> }
         >
             Waypoint {waypoint.waypoint_id}
@@ -76,7 +81,7 @@ const DrawerItem: React.FC<{
 }> = props => {
     const name = useAstronaut(props.astronaut)?.name ?? `Astronaut ${props.astronaut}`;
     return <div key={props.astronaut}>
-        <h3>{name}</h3>
+        <h3 style={{paddingLeft: "10px"}}>{name}</h3>
         <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
             {props.waypoints.map((waypoint) => <DrawerSubItem dispatch={props.dispatch} waypoint={waypoint}
                                                               selected={isEqual(props.selected, waypoint)}/>)}

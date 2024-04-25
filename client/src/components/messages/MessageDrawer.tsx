@@ -45,19 +45,19 @@ function MessageDrawer({ messages, conversations, setActiveConversation, activeC
                     const astro = key as number;
                     
                     let recent_message = conversations.get(astro)[conversations.get(astro).length - 1].data.message;
-                    let preview_length = 20;
+                    let preview_length = 25;
                     if(recent_message.length > preview_length) {
                         recent_message = recent_message.substring(0, (preview_length - 3)) + "...";
                     } 
                     return (   
+                        <div style={{paddingBottom: "10px"}}>
                             <CompoundButton
-                                style={{fontSize: "13px", width: "92%", height: "45px", border: "0px",
+                                style={{fontSize: "13px", width: "100%", height: "45px", border: "0px",
                                 backgroundColor: hoveredButton === index ? "#2b2b2b" : "#0F0F0F",
                                 transition: "background-color 0.2s ease"
                                 }}
                                 shape='circular'
-                                secondaryContent={ <span style={{ display: "inline-block", width: "150px" /* Adjust width as needed */ }}>{recent_message}</span>
-                            }
+                                secondaryContent={<span style={{ display: "inline-block", width: "150px"}}>{recent_message}</span>}
                                 icon={<SampleImage astro={astro}/> }
                                 onClick={()=>{
                                     setActiveConversation(astro);
@@ -71,6 +71,7 @@ function MessageDrawer({ messages, conversations, setActiveConversation, activeC
                             >
                                 Astronaut {astro}
                             </CompoundButton>
+                        </div>
                     );
                 })}
         </div>
