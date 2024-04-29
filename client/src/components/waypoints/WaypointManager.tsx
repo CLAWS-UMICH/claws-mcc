@@ -34,9 +34,9 @@ export type ManagerAction =
 export type BaseWaypoint = {
     _id?: number; // server generated
     waypoint_id: number; //sequential
-    details: string // not in mongo
-    date: string// not in mongo
-    time: string// not in mongo
+    details?: string // not in mongo
+    date?: string// not in mongo
+    time?: string// not in mongo
     location: { latitude: number, longitude: number };
     type: WaypointType;
     description: string;
