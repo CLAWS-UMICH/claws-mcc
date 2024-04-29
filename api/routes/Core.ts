@@ -76,12 +76,23 @@ export default class Core extends Base {
     }
 
     async dispatchWaypoints() {
-        const waypoints = (await this.db.collection('waypoints').find().toArray()) || [];
+        const [waypoints, currentIndex] = await Promise.all([
+            this.db.collection('waypoints').find().toArray(),
+            this.db.collection('waypoint_current_index').findOne()
+            .then((doc) => {
+                if (doc) return doc.index;
+                else return 0;
+            })
+        ]);
+
         await this.dispatch('AR', {
             id: -1,
             type: 'WAYPOINTS',
             use: 'PUT',
-            data: waypoints,
+            data: {
+                currentIndex,
+                AllWaypoints: waypoints
+            },
         });
 
         return waypoints.length;
