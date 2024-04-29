@@ -36,19 +36,24 @@ export default class Base {
         this.wsHoloLens = wsHoloLens;
     }
 
-    public dispatch(target: 'AR' | 'FRONTEND', data: Message) {
+    public async dispatch(target: 'AR' | 'FRONTEND', data: Message): Promise<void> {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
         const dispatchLogger = new Logger('DISPATCH');
         dispatchLogger.info(`Dispatching message ${data.type} to ${target}`);
 
         const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;
 
-        clients.forEach(client => {
+        await Promise.all([...clients].map(async (client) => {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(data));
+                await new Promise((resolve, reject) => {
+                    client.send(JSON.stringify(data), (error) => {
+                        if (error) reject(error);
+                        else resolve(true);
+                    });
+                });
             } else {
                 console.error(`WebSocket connection for client is not open`);
             }
-        });
+        }));
     }
 }
