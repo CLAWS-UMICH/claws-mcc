@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import {BaseWaypoint, ManagerAction, useAstronaut} from "./WaypointManager.tsx";
+import {Astronaut, BaseWaypoint, ManagerAction, useAstronaut} from "./WaypointManager.tsx";
 import {Body1, Body1Stronger, Skeleton} from "@fluentui/react-components";
 import {isEqual} from "lodash";
 // @ts-ignore
@@ -10,6 +10,7 @@ interface WaypointsDrawerProps {
     selected?: BaseWaypoint;
     dispatch: React.Dispatch<ManagerAction>;
     ready: boolean;
+    astronauts: Astronaut[];
 }
 
 enum GroupKey {
@@ -62,12 +63,12 @@ const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispat
 }
 
 const DrawerItem: React.FC<{
-    astronaut: number,
+    astronaut: string,
     waypoints: BaseWaypoint[],
     selected?: BaseWaypoint,
     dispatch: React.Dispatch<ManagerAction>
 }> = props => {
-    const name = useAstronaut(props.astronaut)?.name ?? `Astronaut ${props.astronaut}`;
+    const name = props.astronaut;
     return <div key={props.astronaut}>
         <h3>{name}</h3>
         <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
@@ -82,12 +83,24 @@ export const WaypointDrawer: React.FC<WaypointsDrawerProps> = props => {
     // Key by which to group waypoints.
     const [key, setKey] = React.useState<GroupKey>(GroupKey.Astronaut);
     const grouper = useCallback((waypoints: BaseWaypoint[]) => {
-        const astronauts: Map<number, BaseWaypoint[]> = new Map();
+        const astronauts: Map<string, BaseWaypoint[]> = new Map();
         waypoints.forEach((waypoint) => {
-            if (!astronauts.has(waypoint.author)) {
-                astronauts.set(waypoint.author, []);
+            // Assuming props.astronauts is an array of astronaut objects with properties `id` and `name`
+            const astronaut = props.astronauts.find(a => a.id === waypoint.author);
+
+            let astronautDisplayName: string;
+            if (waypoint.author == -1) {
+                astronautDisplayName = "Mission Control Center";
+            } else if (astronaut) {
+                astronautDisplayName = `Astronaut #${astronaut.id} (${astronaut.name})`;
+            } else {
+                astronautDisplayName = `Astronaut #${waypoint.author}`;
             }
-            astronauts.get(waypoint.author)?.push(waypoint);
+
+            if (!astronauts.has(astronautDisplayName)) {
+                astronauts.set(astronautDisplayName, []);
+            }
+            astronauts.get(astronautDisplayName)?.push(waypoint);
         });
         const astronautList: React.ReactNode[] = [];
         astronauts.forEach((waypoints, astronaut) =>

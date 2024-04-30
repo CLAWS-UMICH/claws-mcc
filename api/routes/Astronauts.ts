@@ -33,6 +33,10 @@ export default class Astronauts extends Base {
             handler: this.handleVitalsMessage.bind(this),
         },
         {
+            type: 'ASTRONAUTS',
+            handler: this.fetchAstronauts.bind(this),
+        },
+        {
             type: 'GET_ASTRONAUT',
             handler: this.fetchAstronaut.bind(this),
         }
@@ -59,6 +63,15 @@ export default class Astronauts extends Base {
         const result: WithId<Astronaut> | null = await this.collection.findOne({id: id});
         if (!result) throw new Error('Astronaut not found');
         return result;
+    }
+
+    async fetchAstronauts() {
+        const result = await this.collection.find().toArray();
+        this.dispatch('FRONTEND', {
+            type: 'ASTRONAUTS',
+            use: 'PUT',
+            data: result,
+        });
     }
 
     async getAstronaut(req: Request, res: Response) {
