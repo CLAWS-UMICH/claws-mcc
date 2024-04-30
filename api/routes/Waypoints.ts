@@ -340,8 +340,8 @@ export default class Waypoints extends Base {
 
     private generateWaypointLetter(index: number): string {
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const quotient = Math.floor((index - 1) / 26);
-        const remainder = (index - 1) % 26;
+        const quotient = Math.floor(index / 26);
+        const remainder = index % 26;
         return alphabet[quotient - 1] ? alphabet[quotient - 1] + alphabet[remainder] : alphabet[remainder];
     }
 }
