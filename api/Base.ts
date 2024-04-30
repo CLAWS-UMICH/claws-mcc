@@ -43,6 +43,10 @@ export default class Base {
 
         const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;
 
+        if (target == 'AR') {
+            data.type = data.type.toUpperCase();
+        }
+
         await Promise.all([...clients].map(async (client) => {
             if (client.readyState === WebSocket.OPEN) {
                 await new Promise((resolve, reject) => {

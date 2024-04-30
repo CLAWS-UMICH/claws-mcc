@@ -353,7 +353,7 @@ export default class Waypoints extends Base {
         }));
         const newWaypointsMessage: WaypointsMessage = {
             id: -1, // all astronauts
-            type: 'Waypoints',
+            type: 'WAYPOINTS',
             use: 'PUT',
             data: {
                 AllWaypoints: waypoints,
