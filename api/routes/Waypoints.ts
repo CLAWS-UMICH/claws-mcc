@@ -48,10 +48,10 @@ export default class Waypoints extends Base {
     }
 
     async sendWaypoints() {
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         this.logger.info('receiving waypoints request')
@@ -78,6 +78,11 @@ export default class Waypoints extends Base {
         await this.collection.deleteMany({});
         await this.collection.insertMany(newWaypoints);
         this.logger.info('Received new waypoints');
+
+        // update current_index in the config collection
+        const config_collection = this.db.collection('waypoint_config');
+        await config_collection.updateOne({}, { $set: { current_index: data.data.currentIndex } });
+        this.logger.info('Updated current_index in config collection');    
 
         const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
         this.dispatch('FRONTEND', {
