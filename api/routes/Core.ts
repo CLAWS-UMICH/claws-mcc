@@ -87,7 +87,7 @@ export default class Core extends Base {
 
         await this.dispatch('AR', {
             id: -1,
-            type: 'WAYPOINTS',
+            type: 'Waypoints',
             use: 'PUT',
             data: {
                 currentIndex,
@@ -102,7 +102,7 @@ export default class Core extends Base {
         const tasks = (await this.db.collection('tasks').find().toArray()) || [];
         await this.dispatch('AR', {
             id: -1,
-            type: 'TASKS',
+            type: 'Tasks',
             use: 'PUT',
             data: tasks,
         });
