@@ -32,6 +32,10 @@ export default class Waypoints extends Base {
         {
             type: 'GET_WAYPOINTS',
             handler: this.sendWaypoints.bind(this),
+        },
+        {
+            type: 'WAYPOINTS',
+            handler: this.handleReceiveWaypoints.bind(this),
         }
     ]
     private collection: Collection<BaseWaypoint>
@@ -61,6 +65,27 @@ export default class Waypoints extends Base {
             data: data,
         })
         this.updateARWaypoints(messageId, data, current_index);
+    }
+
+    async handleReceiveWaypoints(data: WaypointsMessage) {
+        const newWaypoints = data.data?.AllWaypoints;
+        if (!newWaypoints.length) {
+            this.logger.error('No waypoints received');
+            return;
+        }
+
+        // just delete all the waypoints and insert the new ones
+        await this.collection.deleteMany({});
+        await this.collection.insertMany(newWaypoints);
+        this.logger.info('Received new waypoints');
+
+        const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
+        this.dispatch('FRONTEND', {
+            id: messageId,
+            type: 'WAYPOINTS',
+            use: 'GET',
+            data: newWaypoints,
+        });
     }
 
     async addWaypoint(req: Request, res: Response<ResponseBody>): Promise<ResponseBody> {
