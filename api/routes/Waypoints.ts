@@ -81,11 +81,11 @@ export default class Waypoints extends Base {
             return response;
         }
         const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
-        // get current_index from DB
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        // get current_index from config collection
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         // Get all existing waypoints
@@ -105,13 +105,14 @@ export default class Waypoints extends Base {
                 res.send(response);
                 return response;
             }
-            // change the waypoint_id of the new waypoints
+            // change the waypoint_id and assign waypoint_letter for the new waypoints
             diff.forEach(waypoint => {
                 current_index++;
                 waypoint.waypoint_id = current_index;
+                waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
             });
-            // update the current_index in the collection
-            index_collection.updateOne({}, { $set: { index: current_index } });
+            // update the current_index in the config collection
+            config_collection.updateOne({}, { $set: { current_index: current_index } });
             insertResult = await this.collection.insertMany(diff);
             message = "Waypoints with ids: " +
                 // @ts-ignore
@@ -122,13 +123,14 @@ export default class Waypoints extends Base {
         }
         // All waypoints sent in request are new
         else {
-            // change the waypoint_id of the new waypoints
+            // change the waypoint_id and assign waypoint_letter for the new waypoints
             waypoints.forEach(waypoint => {
                 current_index++;
                 waypoint.waypoint_id = current_index;
+                waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
             });
-            // update the current_index in the collection
-            index_collection.updateOne({}, { $set: { index: current_index } });
+            // update the current_index in the config collection
+            config_collection.updateOne({}, { $set: { current_index: current_index } }, { upsert: true });
 
             insertResult = await this.collection.insertMany(waypoints);
             message = "Added waypoints with ids: [" +
@@ -260,7 +262,6 @@ export default class Waypoints extends Base {
                     },
                     type: editedWaypoint.type,
                     description: editedWaypoint.description,
-                    details: editedWaypoint.details,
                     author: editedWaypoint.author
                 }
             }
@@ -322,7 +323,6 @@ export default class Waypoints extends Base {
             location: waypoint.location,
             type: waypoint.type,
             description: waypoint.description,
-            details: waypoint.details,
             author: waypoint.author,
             waypoint_letter: waypoint.waypointLetter
         }));
@@ -338,4 +338,10 @@ export default class Waypoints extends Base {
         this.dispatch("AR", newWaypointsMessage)
     }
 
+    private generateWaypointLetter(index: number): string {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const quotient = Math.floor((index - 1) / 26);
+        const remainder = (index - 1) % 26;
+        return alphabet[quotient - 1] ? alphabet[quotient - 1] + alphabet[remainder] : alphabet[remainder];
+    }
 }

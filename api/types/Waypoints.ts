@@ -17,27 +17,15 @@ export class BaseWaypoint {
     location: ARLocation;
     type: WaypointType;
     description: string;
-    details: string;
     author: number; //-1 if mission control created
+    waypoint_letter: string;
 
-    constructor(waypoint_id: number, location: ARLocation, type: WaypointType, description: string, details: string, author: number) {
+    constructor(waypoint_id: number, location: ARLocation, type: WaypointType, description: string, author: number) {
         this.waypoint_id = waypoint_id;
         this.location = location;
         this.type = type;
         this.description = description;
-        this.details = details;
         this.author = author;
-    }
-
-    get waypoint_letter(): string {
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let id = this.waypoint_id;
-        let letter = '';
-        do {
-            letter = letters[id % 26] + letter;
-            id = Math.floor(id / 26);
-        } while (id-- > 0);
-        return letter;
     }
 }
 
