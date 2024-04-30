@@ -198,13 +198,13 @@ export function TaskList() {
             <li key={task.id}>
                 {/* <CheckBox onChange={(e) => handleTaskFinished(e, task)}/> */}
                 <p>{task.title}</p>
-                <p>{task.description}</p>
+                {/* <p>{task.description}</p>
                 {task.subtasks.map(subtask => (
                     // <subtask info>
                     // <CheckBox/>
                     subtask // do something to nicely display subtask
                 )
-                )}
+                )} */}
             </li>
             ))}
             </p>
