@@ -107,9 +107,9 @@ export default class Waypoints extends Base {
             }
             // change the waypoint_id and assign waypoint_letter for the new waypoints
             diff.forEach(waypoint => {
-                current_index++;
                 waypoint.waypoint_id = current_index;
                 waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
+                current_index++;
             });
             // update the current_index in the config collection
             config_collection.updateOne({}, { $set: { current_index: current_index } });
@@ -125,9 +125,9 @@ export default class Waypoints extends Base {
         else {
             // change the waypoint_id and assign waypoint_letter for the new waypoints
             waypoints.forEach(waypoint => {
-                current_index++;
                 waypoint.waypoint_id = current_index;
                 waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
+                current_index++;
             });
             // update the current_index in the config collection
             config_collection.updateOne({}, { $set: { current_index: current_index } }, { upsert: true });
@@ -164,10 +164,10 @@ export default class Waypoints extends Base {
     }
 
     async deleteWaypoint(req: Request, res: Response<ResponseBody>) {
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         // Waypoint ids to delete
@@ -194,7 +194,7 @@ export default class Waypoints extends Base {
             return acc + waypointId.toString(10) + ', ';
         }, '').slice(0, -2) + "]";
 
-        //if any waypoint_ids in reqeusted_waypoints are not in current_waypoints, return error
+        //if any waypoint_ids in requested_waypoints are not in current_waypoints, return error
         let result = requested_waypoint_ids.filter(x => !current_waypoint_ids.includes(x));
         if (result.length > 0) {
             message = "Could not find waypoints with ids: [" + result.reduce((acc, waypointId) => {
@@ -231,10 +231,10 @@ export default class Waypoints extends Base {
     }
 
     async editWaypoint(req: Request, res: Response<ResponseBody>) {
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         let message = "";

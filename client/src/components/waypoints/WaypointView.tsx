@@ -45,12 +45,10 @@ const NewView: React.FC<NewViewProps> = (props) => {
       latitude: 0,
       longitude: 0,
     },
-    time: "",
-    date: "",
   });
 
   const handleAdd = async () => {
-    setNewWaypoint((prev) => ({ ...prev, time: Date.now().toString() }));
+    setNewWaypoint((prev) => ({ ...prev }));
     const new_waypoints = [...props.waypoints, new_waypoint];
     try{
       const res = await Axios.put("/api/waypoint", {
@@ -158,21 +156,6 @@ const NewView: React.FC<NewViewProps> = (props) => {
                 }}
               />
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
-            <Label htmlFor={"waypoint-time"}>Time</Label>
-            <Input disabled
-              type="text"
-              id={"waypoint-time"}
-              value={Date.now().toString()}
-            />
-          </div>
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-date"}>Date</Label>
-            <Input disabled
-              type="text"
-              id={"waypoint-date"}              
-            />
-          </div>
         </div>
       </form>
       <div id={"edit"} className={styles.edit} style={{gap: "10px"}}>
@@ -239,8 +222,6 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
       latitude: 0,
       longitude: 0,
     },
-    time: "",
-    date: "",
   });
 
   useEffect(() => {
@@ -442,24 +423,6 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
               style={{pointerEvents: "none"}}
             />
             }
-          </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
-            <Label htmlFor={"waypoint-time"}>Time</Label>
-            <Input 
-              {...(isEditing ? {disabled: true} : {})}
-              style={{pointerEvents: "none"}}
-              type="text"
-              id={"waypoint-time"}
-              value={props.selected?.time}
-            />
-          </div>
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-date"}>Date</Label>
-            <Input disabled
-              type="text"
-              id={"waypoint-date"}
-              value={props.selected?.date}
-            />
           </div>
         </div>
         {isEditing ? (
