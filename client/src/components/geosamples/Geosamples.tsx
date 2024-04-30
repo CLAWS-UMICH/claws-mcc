@@ -1,6 +1,6 @@
 // Geosamples.tsx
 import React, { useEffect, useReducer, useState } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { ReadyState } from 'react-use-websocket';
 import {
     Button,
     Divider,
@@ -15,6 +15,7 @@ import { Search20Regular } from "@fluentui/react-icons";
 import SearchBox from '../common/SearchBox/SearchBox.tsx'
 import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
+import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
 
 type ARLocation = {
     latitude: number;
@@ -38,7 +39,7 @@ export type EvaData = {
 };
 
 export type BaseGeosample = {
-    _id?: number;
+    _id: number;
     geosample_id: number;
     zone_id: string;
     starred: boolean;
@@ -55,6 +56,7 @@ export type BaseGeosample = {
 };
 
 export type BaseZone = {
+    _id: number;
     zone_id: string;
     geosample_ids: BaseGeosample[];
     location: ARLocation;
@@ -106,15 +108,18 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
         case 'delete':
             return {
                 ...state,
+                geosamples: state.geosamples.filter(
+                    geosample => geosample.geosample_id !== action.payload.geosample_id
+                ),
                 sample_zones: state.sample_zones.map(zone => ({
                     ...zone,
-                    geosample_ids: zone.geosample_ids.filter(id => id.geosample_id !== action.payload.geosample_id)
+                    geosample_ids: zone.geosample_ids.filter(sample => sample.geosample_id !== action.payload.geosample_id)
                 })),
             };
         case 'update':
             if (action.payload === undefined) {
                 return state;
-            }
+            };
 
             return {
                 ...state,
@@ -123,7 +128,16 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
                         return action.payload;
                     }
                     return sample;
-                })
+                }),
+                sample_zones: state.sample_zones.map(zone => ({
+                    ...zone,
+                    geosample_ids: zone.geosample_ids.map(sample => {
+                        if (sample.geosample_id === action.payload.geosample_id) {
+                            return action.payload;
+                        }
+                        return sample;
+                    })
+                })),
             };
         case 'select':
             return {
@@ -148,9 +162,10 @@ const GeosampleManager: React.FC = () => {
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const [showSearchBar, setShowSearchBar] = useState(false);
 
-    const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
+    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'}))
     });
+
     useEffect(() => {
         if (lastMessage !== null) {
             setMessageHistory((prev) => prev.concat(lastMessage.data));
@@ -158,6 +173,8 @@ const GeosampleManager: React.FC = () => {
             console.log(JSON.parse(lastMessage.data).data)
         }
     }, [lastMessage, setMessageHistory]);
+
+    // TODO: search feature
 
     return (
         <div className={styles.root}>

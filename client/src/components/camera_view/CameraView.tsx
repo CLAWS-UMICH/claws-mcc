@@ -9,7 +9,7 @@ const CameraView: React.FC = props => {
         <div className='camera-view-container'>
             <div className='top-bar'>
                 <div className='blue-dot'></div>
-                01:05:18
+                01:05:21
             </div>
             <div className="content camera-content">
                 <div className='top-image camera'>

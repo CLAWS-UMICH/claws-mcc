@@ -12,13 +12,21 @@ enum WaypointType {
     'DANGER'
 }
 
-export type BaseWaypoint = {
+export class BaseWaypoint {
     waypoint_id: number; //sequential
     location: ARLocation;
     type: WaypointType;
     description: string;
-    details: string;
     author: number; //-1 if mission control created
+    waypoint_letter: string;
+
+    constructor(waypoint_id: number, location: ARLocation, type: WaypointType, description: string, author: number) {
+        this.waypoint_id = waypoint_id;
+        this.location = location;
+        this.type = type;
+        this.description = description;
+        this.author = author;
+    }
 }
 
 export const isBaseWaypoint = (waypoint: any): waypoint is BaseWaypoint => {
@@ -48,7 +56,8 @@ export interface WaypointsMessage extends Message {
     id: number;
     type: string;
     data: {
-        AllMessages: BaseWaypoint[];
+        AllWaypoints: BaseWaypoint[];
+        currentIndex: number;
     };
 }
 

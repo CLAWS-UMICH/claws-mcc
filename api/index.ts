@@ -2,153 +2,175 @@ import express from "express";
 import * as path from "path";
 import * as fs from "fs";
 import Route from "./Base";
-import {Server as WebSocketServer} from "ws";
-
-import {URL} from 'url';
+import { Server as WebSocketServer } from "ws";
+import { URL } from 'url';
 import dotenv from "dotenv";
-import {MongoClient} from "mongodb";
+import { MongoClient } from "mongodb";
+import Logger from "./core/logger";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT || 8000;
 
-// serve the files for our built React app
-app.use(express.static(path.resolve(__dirname, '../../client/build')));
+const logger = new Logger('Server');
 
-const routesDirectory = path.join(__dirname, 'routes');
+if (!process.env.MONGO_URI) {
+    logger.error(`No MONGO_URI environment variable found. 
+        Please make sure you have a .env file in the root directory of the project with a MONGO_URI variable set to your MongoDB connection string. Exiting..`);
+    process.exit(1);
+}
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/yourdbname';
+const MONGO_URI = process.env.MONGO_URI;
 
-const client = new MongoClient(MONGO_URI);
-client.connect().then(() => {
-        const db = client.db();
-        fs.readdir(routesDirectory, (err, files) => {
-            if (err) {
-                console.error(`Error reading routes directory: ${err.message}`);
+async function connectToMongoDB() {
+    try {
+        const mongoLogger = new Logger('Mongo');
+        mongoLogger.info('Connecting to MongoDB');
+        const client = await MongoClient.connect(MONGO_URI);
+        mongoLogger.info('Connected to MongoDB');
+        return client.db();
+    } catch (err) {
+        logger.error(`Failed to connect to MongoDB: ${err.message}`);
+        process.exit(1);
+    }
+}
+
+// Load routes from the routes directory
+async function loadRoutes(db: any) {
+    const routesDirectory = path.join(__dirname, 'routes');
+    const files = await fs.promises.readdir(routesDirectory);
+
+    const routeInstances: Route[] = [];
+    const eventRegistry: any = {};
+
+    for (const file of files) {
+        if (path.extname(file) === '.js') {
+            try {
+                const RouteClass = require(path.join(routesDirectory, file)).default;
+
+                // Instantiate the route class
+                const routeInstance = new RouteClass(db) as Route;
+                routeInstances.push(routeInstance);
+
+                // Register routes defined in the routeInstance
+                for (const route of routeInstance.routes) {
+                    app[route.method as Method](route.path, route.handler);
+                    logger.info(`Registered route ${route.method.toUpperCase()} ${route.path}`);
+                }
+
+                // Register events defined in the routeInstance
+                for (const event of routeInstance.events) {
+                    eventRegistry[event.type.toUpperCase()] = event.handler;
+                    logger.info(`Registered event ${event.type}`);
+                }
+            } catch (err) {
+                logger.error(`Failed to load route ${file}: ${err.message}`);
+            }
+        }
+    }
+
+    logger.info(`Initialized ${routeInstances.length} routes and ${Object.keys(eventRegistry).length} events`);
+    return { routeInstances, eventRegistry };
+}
+
+// Set up WebSocket servers
+function setupWebSocketServers(server: any, routeInstances: Route[], eventRegistry: any) {
+    const wssFrontend = new WebSocketServer({ noServer: true });
+    const wssHoloLens = new WebSocketServer({ noServer: true });
+
+    server.on('upgrade', (request: any, socket: any, head: any) => {
+        const pathname = new URL(request.url as string, `http://${request.headers.host}`).pathname;
+
+        if (pathname === '/frontend') {
+            wssFrontend.handleUpgrade(request, socket, head, (ws) => {
+                wssFrontend.emit('connection', ws, request);
+            });
+        } else if (pathname === '/hololens') {
+            wssHoloLens.handleUpgrade(request, socket, head, (ws) => {
+                wssHoloLens.emit('connection', ws, request);
+            });
+        } else {
+            socket.destroy();
+        }
+    });
+
+    wssFrontend.on('connection', (sock, request) => {
+        logger.info('Frontend WebSocket connection established');
+        sock.on("message", (message) => {
+            if (message.toString() === 'ping') {
+                sock.send('hello frontend - lmcc');
+                logger.info('pinged frontend');
+                return;
+            }
+            const data = JSON.parse(message.toString());
+            logger.info(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
+
+            if (eventRegistry[data.type.toUpperCase()]) {
+                eventRegistry[data.type.toUpperCase()](data);
+            }
+        });
+    });
+
+    wssHoloLens.on('connection', (sock, request) => {
+        logger.info('HoloLens WebSocket connection established');
+        sock.on('message', (message) => {
+            if (message.toString() === 'ping') {
+                sock.send('hello hololens - lmcc');
+                logger.info('pinged hololens');
                 return;
             }
 
-            app.get('*', (req, res, next) => {
-                console.log(`Request received: ${req.method} ${req.path}`);
-                next();
-            });
+            const data = JSON.parse(message.toString());
+            logger.info(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
 
-            const routeInstances: Route[] = [];
-            const eventRegistry: any = {};
-
-            for (const file of files) {
-                if (path.extname(file) === '.js') {
-                    try {
-                        const RouteClass = require(path.join(routesDirectory, file)).default;
-
-                        // Instantiate the route class
-                        const routeInstance = new RouteClass(db) as Route;
-                        routeInstances.push(routeInstance);
-
-                        // Register routes defined in the routeInstance
-                        for (const route of routeInstance.routes) {
-                            // e.g. app.get('/api/getAstronaut/:astronaut', handlerFunction)
-                            app[route.method as Method](route.path, route.handler);
-                        }
-                        // Register events defined in the routeInstance
-                        for (const event of routeInstance.events) {
-                            // e.g. eventMap['VITALS'] = handlerFunction
-                            eventRegistry[event.type.toUpperCase()] = event.handler;
-                        }
-                    } catch (err) {
-                        console.error(`Failed to load route ${file}: ${err.message}`);
-                    }
-                }
-            }
-            console.log(eventRegistry);
-
-            app.get('/api/test', (req, res) => {
-                res.send('Hello from the server!');
-            })
-
-            // All other GET requests not handled before will return our React app
-            app.get('*', (req, res) => {
-                res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
-            });
-
-            // start the web server
-            const server = app.listen(port, () => {
-                console.log(`Server listening on port ${port}`);
-            });
-
-            // start the websocket server
-            const wssFrontend = new WebSocketServer({noServer: true});
-            const wssHoloLens = new WebSocketServer({noServer: true});
-
-            // so anything can now connect to us via ws://localhost:8000/frontend or ws://localhost:8000/hololens
-            server.on('upgrade', (request, socket, head) => {
-                const pathname = new URL(request.url as string, `http://${request.headers.host}`).pathname;
-
-                if (pathname === '/frontend') {
-                    wssFrontend.handleUpgrade(request, socket, head, (ws) => {
-                        wssFrontend.emit('connection', ws, request);
-                    });
-                } else if (pathname === '/hololens') {
-                    wssHoloLens.handleUpgrade(request, socket, head, (ws) => {
-                        wssHoloLens.emit('connection', ws, request);
-                    });
-                } else {
-                    socket.destroy();
-                }
-            });
-
-            // Initialize frontend WS server
-            wssFrontend.on('connection', (sock, request) => {
-                console.log('Frontend WebSocket connection established');
-                sock.on("message", (message) => {
-                    const data = JSON.parse(message.toString());
-
-                    console.log(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
-                    // call the handler for the event type
-                    if (eventRegistry[data.type.toUpperCase()]) {
-                        eventRegistry[data.type](data.data);
-                    }
-                });
-            });
-
-            // Frontend doesn't dispatch events to the backend, so we don't need to register any event handlers
-
-            // Initialize HoloLens WS server
-            wssHoloLens.on('connection', (sock, request) => {
-                console.log('HoloLens WebSocket connection established');
-                sock.on('message', (message) => {
-                    const data = JSON.parse(message.toString());
-
-                    console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
-
-                    // call the handler for the event type
-                    if (eventRegistry[data.type.toUpperCase()]) {
-                        eventRegistry[data.type](data.data);
-                    }
-                })
-            });
-            // wssHoloLens.on('message', (message) => {
-            //     const data = JSON.parse(message.toString());
-
-            //     console.log(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
-
-            //     // call the handler for the event type
-            //     if (eventRegistry[data.type.toUpperCase()]) {
-            //         eventRegistry[data.type](data.data);
-            //     }
-            // });
-
-            // Set the WebSocket instances on each route instance
-            for (const routeInstance of routeInstances) {
-                routeInstance.setWebSocketInstances(wssFrontend, wssHoloLens);
+            // Call the handler for the event type
+            if (eventRegistry[data.type.toUpperCase()]) {
+                eventRegistry[data.type.toUpperCase()](data);
             }
         });
-        console.log('Connected to MongoDB');
-    }
-)
+    });
 
+    // Set the WebSocket instances on each route instance
+    for (const routeInstance of routeInstances) {
+        routeInstance.setWebSocketInstances(wssFrontend, wssHoloLens);
+    }
+}
+
+async function startServer() {
+    // Connect to mongo first
+    const db = await connectToMongoDB();
+    const { routeInstances, eventRegistry } = await loadRoutes(db);
+
+    // Serve the files for our built React app
+    app.use(express.static(path.resolve(__dirname, '../../client/build')));
+
+    app.get('*', (req, res, next) => {
+        logger.info(`Request received: ${req.method} ${req.path}`);
+        next();
+    });
+
+    app.get('/api/test', (req, res) => {
+        res.send('Hello from the server!');
+    });
+
+    // All other GET requests not handled before will return our React app
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
+    });
+
+    const server = app.listen(port, () => {
+        logger.info(`Server listening on port ${port}`);
+    });
+
+    setupWebSocketServers(server, routeInstances, eventRegistry);
+}
+
+startServer().catch((err) => {
+    logger.error(`Failed to start server: ${err.message}`);
+    process.exit(1);
+});
 
 type Method = 'get' | 'post' | 'put';

@@ -3,6 +3,7 @@ import Base, {RouteEvent} from "../Base";
 import { Db } from 'mongodb';
 import { readdirSync, readFileSync } from 'fs';
 import express, { Request, Response } from 'express';
+import Logger from "../core/logger";
 
 /*
  TODO:
@@ -127,6 +128,9 @@ export default class ARWebConnection extends Base {
             handler: this.sendAllScreensToFrontend.bind(this)
         }
     ]
+
+    private logger = new Logger('AR-Web-Connectino');
+
     constructor(db: Db) {
         super(db); // Calls superclass constructor (in this case Base! Wooo!!)
     }
@@ -136,12 +140,12 @@ export default class ARWebConnection extends Base {
         try {
             if (presetScreens.length > 0) {
                 await this.db.collection('screens').insertMany(presetScreens); // Wait until you insert all these screens to DB (need bc async function #lit)
-                console.log('Images added to screens collection successfully #slay');
+                this.logger.info('Images added to screens collection successfully #slay');
             } else {
-                console.log('No images to insert :( ');
+                this.logger.info('No images to insert :( ');
             }
         } catch (error) {
-            console.error('Error adding images to collection :( b/c:', error);
+            this.logger.error('Error adding images to collection :( b/c:', error);
         }
     }
 
@@ -157,9 +161,9 @@ export default class ARWebConnection extends Base {
                 data: allScreens,
             });
 
-            console.log('All screens sent to API successfully! Slay!');
+            this.logger.info('All screens sent to API successfully! Slay!');
         } catch (error) {
-            console.error('Error sending screens to API:', error);
+            this.logger.error('Error sending screens to API:', error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
@@ -182,12 +186,12 @@ export default class ARWebConnection extends Base {
                         img_binary: screen.img_binary                    },
                 });
 
-                console.log('Screen sent to AR successfully! Slay!');
+                this.logger.info('Screen sent to AR successfully! Slay!');
             } else {
-                console.error('Screen not found with ID:', imageID);
+                this.logger.error('Screen not found with ID:', imageID);
             }
         } catch (error) {
-            console.error('Error sending screen to AR:', error);
+            this.logger.error('Error sending screen to AR:', error);
             throw error; // Propagate the error if necessary
         }
     }
@@ -195,19 +199,19 @@ export default class ARWebConnection extends Base {
     // FUNC: Tell AR to highlight a specific button for a specific astronaut in AR over our WebSocket
     public async highlightButton(buttonID: number, astronautID: number): Promise<void> {
         if (buttonID === null) {
-            console.error('Invalid button ID. Cannot highlight a null button.');
+            this.logger.error('Invalid button ID. Cannot highlight a null button.');
             return;
         }
 
         try {
             // Additional checks to validate buttonID and astronautID
             if (buttonID < 0 || buttonID > 5) {
-                console.error('Invalid button ID. Button ID must be between 0 and 5.');
+                this.logger.error('Invalid button ID. Button ID must be between 0 and 5.');
                 return;
             }
 
             if (astronautID !== 1 && astronautID !== 2) {
-                console.error('Invalid astronaut ID. Astronaut ID must be either 1 or 2.');
+                this.logger.error('Invalid astronaut ID. Astronaut ID must be either 1 or 2.');
                 return;
             }
 
@@ -221,9 +225,9 @@ export default class ARWebConnection extends Base {
                 },
             });
 
-            console.log('Button highlighted in AR successfully!');
+            this.logger.info('Button highlighted in AR successfully!');
         } catch (error) {
-            console.error('Error highlighting button in AR:', error);
+            this.logger.error('Error highlighting button in AR:', error);
             throw error; // Propagate the error if necessary
         }
     }
@@ -234,9 +238,9 @@ export default class ARWebConnection extends Base {
         try {
             const screensCollection = this.db.collection('screens');
             await screensCollection.deleteOne({ id: id }); // Peace out image
-            console.log(`Screen with ID ${id} deleted successfully!`); // Bye screen
+            this.logger.info(`Screen with ID ${id} deleted successfully!`); // Bye screen
         } catch (error) {
-            console.error(`Error deleting image with ID ${id}:`, error);
+            this.logger.error(`Error deleting image with ID ${id}:`, error);
         }
     }
 

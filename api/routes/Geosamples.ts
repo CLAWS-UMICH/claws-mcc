@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
 import {Collection, Db,  WithId} from "mongodb";
 import { BaseGeosample, BaseResponseZone, BaseZone, SampleMessage, isBaseGeosample, isBaseZone } from "../types/Geosamples";
+import Logger from "../core/logger";
 
 export interface ResponseBody {
     error: boolean,
@@ -11,7 +12,7 @@ export interface ResponseBody {
 
 export default class Geosamples extends Base {
     public routes = [
-        {   
+        {
             path: '/api/geosamples', // to handle incoming messages from hololens
             method: 'post',
             handler: this.addGeosamples.bind(this),
@@ -40,6 +41,7 @@ export default class Geosamples extends Base {
 
     private samplesCollection: Collection<BaseGeosample>;
     private zonesCollection: Collection<BaseZone>;
+    private logger = new Logger('Geosampling');
 
     constructor(db: Db, sampleCollection?: Collection<BaseGeosample>, zoneCollection?: Collection<BaseZone>) {
         super(db);
@@ -48,6 +50,7 @@ export default class Geosamples extends Base {
     };
 
     async sendSamples() {
+        this.logger.info("Sending samples");
         const allSamples = this.samplesCollection.find();
         const allZones = this.zonesCollection.find();
         const sampleData = await allSamples.toArray();
@@ -56,13 +59,13 @@ export default class Geosamples extends Base {
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'SEND_SAMPLES',
-            use: 'POST',
+            use: 'PUT',
             data: {
                 samples: sampleData,
                 zones: zoneData
             },
         });
-        this.updateARSamples(messageId, {samples: sampleData, zones: zoneData});
+        this.updateARSamples(messageId, { samples: sampleData, zones: zoneData });
     }
 
     async addGeosamples(req: Request, res: Response) : Promise<{}> {
@@ -79,7 +82,7 @@ export default class Geosamples extends Base {
             const samplesCursor = this.samplesCollection.find();
             const samplesArray = await samplesCursor.toArray();
             const sampleMap = new Map(samplesArray.map(sample => [sample.geosample_id, sample]));
-            const modZones = data['zones'].map((zone : any) => ({
+            const modZones = data['zones'].map((zone: any) => ({
                 ...zone,
                 geosample_ids: zone.geosample_ids.map((id: number) => sampleMap.get(id) || null)  // Replace id with sample object
             }));
@@ -95,18 +98,18 @@ export default class Geosamples extends Base {
                 id: -1,
                 type: 'SEND_SAMPLES',
                 use: 'PUT',
-                data: {samples: samplesArray, zones: modZones}
+                data: { samples: samplesArray, zones: modZones }
             });
-            res.status(200).send({samples: samplesArray, zones: modZones});
-            this.updateARSamples(0, {samples: samplesArray, zones: modZones});
-            return {samples: samplesArray, zones: modZones};
+            res.status(200).send({ samples: samplesArray, zones: modZones });
+            this.updateARSamples(0, { samples: samplesArray, zones: modZones });
+            return { samples: samplesArray, zones: modZones };
         } catch (e) {
             res.status(404).send(e.message);
             return e.message;
         }
     }
 
-    async deleteGeosample(req: Request, res: Response) : Promise<{}> {
+    async deleteGeosample(req: Request, res: Response): Promise<{}> {
         const sample = req.body.data;
         if (!isBaseGeosample(sample)) {
             res.status(404).send("Invalid request");
@@ -115,8 +118,8 @@ export default class Geosamples extends Base {
         try {
             await this.samplesCollection.deleteOne({geosample_id: sample.geosample_id, zone_id: sample.zone_id});
             const updateResult = await this.zonesCollection.updateOne(
-                {zone_id: sample.zone_id},
-                {$pull: {geosample_ids: sample}}
+                { zone_id: sample.zone_id },
+                { $pull: { geosample_ids: sample } }
             );
 
             if (updateResult.modifiedCount !== 1) {

@@ -16,17 +16,17 @@ import type {
 import { Send24Regular } from "@fluentui/react-icons";
 
 
-export const DropDown = () => {
+export const DropDown = ({ open: isOpen, onOpenChange }) => {
   const [open, setOpen] = React.useState(false);
   const [key, setKey] = React.useState(0); // Add a key state to force re-render
 
-  const onOpenChange: MenuProps["onOpenChange"] = (e, data) => {
-    setOpen(data.open);
-    if (!data.open) {
+  React.useEffect(() => {
+    setOpen(isOpen);
+    if (!isOpen) {
       // Reset key to force re-render of MenuItemCheckbox components when menu is closed
       setKey((prevKey) => prevKey + 1);
     }
-  };
+  }, [isOpen]);
 
   return (
     <Menu open={open} onOpenChange={onOpenChange} key={key}>

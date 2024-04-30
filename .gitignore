@@ -3,3 +3,5 @@ dist
 .env
 .history
 .DS_STORE
+*.pem
+/client/build

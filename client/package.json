@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@fluentui/react-components": "^9.39.0",
+    "@fluentui/react-icons": "^2.0.233",
     "@react-google-maps/api": "^2.19.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -24,7 +25,7 @@
   },
   "scripts": {
     "start": "set PORT=8080 && react-scripts start",
-    "build": "react-scripts build",
+    "build": "CI=true react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -47,6 +48,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.24.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-typescript": "^7.23.3",
     "@types/google.maps": "^3.54.10",
     "@types/lodash": "^4.14.202"

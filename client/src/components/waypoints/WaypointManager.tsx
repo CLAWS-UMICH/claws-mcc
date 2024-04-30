@@ -1,10 +1,11 @@
 import React, {useEffect, useReducer, useState} from "react";
 import {Divider, InlineDrawer, DrawerHeader, Button, DrawerHeaderTitle} from "@fluentui/react-components";
 import {WaypointMap} from "./WaypointMap.tsx";
-import useWebSocket, {ReadyState} from 'react-use-websocket';
+import {ReadyState} from 'react-use-websocket';
 import './Waypoints.css';
 import {WaypointDrawer} from "./WaypointDrawer.tsx";
 import {WaypointView} from "./WaypointView.tsx";
+import useDynamicWebSocket from "../../hooks/useWebSocket.tsx";
 
 export enum WaypointType {
     STATION,
@@ -33,9 +34,8 @@ export type ManagerAction =
 export type BaseWaypoint = {
     _id?: number; // server generated
     waypoint_id: number; //sequential
-    details: string // not in mongo
-    date: string// not in mongo
-    time: string// not in mongo
+    date?: string// not in mongo
+    time?: string// not in mongo
     location: { latitude: number, longitude: number };
     type: WaypointType;
     description: string;
@@ -117,7 +117,7 @@ const initialState: ManagerState = {waypoints: []}
 export const WaypointManager: React.FC = () => {
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
-    const {sendMessage, lastMessage, readyState} = useWebSocket("ws://localhost:8000/frontend", {
+    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
         onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
     });
     useEffect(() => {
@@ -146,7 +146,6 @@ export const WaypointManager: React.FC = () => {
                                         waypoint_id: -1,
                                         author: -1,
                                         type: WaypointType.NAV,
-                                        details:"",
                                         date:"",
                                         time:"",
                                         description: "",
