@@ -24,7 +24,6 @@ export default class Base {
     public redis: Redis;
     private wsFrontend: WebSocketServer;
     private wsHoloLens: WebSocketServer;
-    private wsVega: WebSocketServer;
 
     constructor(db: Db) {
         this.routes = [];
@@ -32,37 +31,33 @@ export default class Base {
         this.redis = redis;
     }
 
-    public setWebSocketInstances(wsFrontend: WebSocketServer, wsHoloLens: WebSocketServer, wsVega: WebSocketServer) {
+    public setWebSocketInstances(wsFrontend: WebSocketServer, wsHoloLens: WebSocketServer) {
         this.wsFrontend = wsFrontend;
         this.wsHoloLens = wsHoloLens;
-        this.wsVega = wsVega;
     }
 
-    public dispatch(target: 'AR' | 'FRONTEND' | 'VEGA', data: Message) {
+    public async dispatch(target: 'AR' | 'FRONTEND', data: Message): Promise<void> {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
         const dispatchLogger = new Logger('DISPATCH');
         dispatchLogger.info(`Dispatching message ${data.type} to ${target}`);
 
-        const clients = this.getTargetClients(target);
-        clients.forEach(client => {
+        const clients = (target === 'AR') ? this.wsHoloLens.clients : this.wsFrontend.clients;
+
+        if (target == 'AR') {
+            data.type = data.type.toUpperCase();
+        }
+
+        await Promise.all([...clients].map(async (client) => {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(data));
+                await new Promise((resolve, reject) => {
+                    client.send(JSON.stringify(data), (error) => {
+                        if (error) reject(error);
+                        else resolve(true);
+                    });
+                });
             } else {
                 console.error(`WebSocket connection for client is not open`);
             }
-        });
-    }
-
-    private getTargetClients(target: 'AR' | 'FRONTEND' | 'VEGA'): Set<WebSocket> {
-        switch (target) {
-            case 'AR':
-                return this.wsHoloLens.clients;
-            case 'FRONTEND':
-                return this.wsFrontend.clients;
-            case 'VEGA':
-                return this.wsVega.clients;
-            default:
-                throw new Error(`Invalid target ${target}`);
-        }
+        }));
     }
 }
