@@ -30,7 +30,7 @@
     "start": "node ./dist/api/index.js",
     "test": "jest",
     "dev": "concurrently \"tsc --watch\" \"nodemon ./dist/api/index.js\"",
-    "setup": "npm install && npm run build && cd client && npm install && npm run build && cd ..",
+    "setup": "rm -rf node_modules && npm install && npm run build && cd client && rm -rf node_modules && npm install && npm run build && cd ..",
     "app": "test -f .env && concurrently \"npm run dev\" \"cd client && npm start\" -n \"Backend,Frontend\" -c \"bgBlue.bold,bgMagenta.bold\" || echo \".env file not found. Please request one from another team member.\""
   },
   "name": "web",
