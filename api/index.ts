@@ -80,6 +80,7 @@ async function loadRoutes(db: any) {
 function setupWebSocketServers(server: any, routeInstances: Route[], eventRegistry: any) {
     const wssFrontend = new WebSocketServer({ noServer: true });
     const wssHoloLens = new WebSocketServer({ noServer: true });
+    const wssVega = new WebSocketServer({ noServer: true });
 
     server.on('upgrade', (request: any, socket: any, head: any) => {
         const pathname = new URL(request.url as string, `http://${request.headers.host}`).pathname;
@@ -91,6 +92,10 @@ function setupWebSocketServers(server: any, routeInstances: Route[], eventRegist
         } else if (pathname === '/hololens') {
             wssHoloLens.handleUpgrade(request, socket, head, (ws) => {
                 wssHoloLens.emit('connection', ws, request);
+            });
+        } else if (pathname === '/vega') {
+            wssVega.handleUpgrade(request, socket, head, (ws) => {
+                wssVega.emit('connection', ws, request);
             });
         } else {
             socket.destroy();
@@ -133,9 +138,28 @@ function setupWebSocketServers(server: any, routeInstances: Route[], eventRegist
         });
     });
 
+    wssVega.on('connection', (sock, request) => {
+        logger.info('VEGA WebSocket connection established');
+        sock.on('message', (message) => {
+            if (message.toString() === 'ping') {
+                sock.send('hello vega - lmcc');
+                logger.info('pinged vega');
+                return;
+            }
+
+            const data = JSON.parse(message.toString());
+            logger.info(`Received message from VEGA: ${data.type || JSON.stringify(data)}`);
+
+            // Call the handler for the event type
+            if (eventRegistry[data.type.toUpperCase()]) {
+                eventRegistry[data.type.toUpperCase()](data);
+            }
+        });
+    });
+
     // Set the WebSocket instances on each route instance
     for (const routeInstance of routeInstances) {
-        routeInstance.setWebSocketInstances(wssFrontend, wssHoloLens);
+        routeInstance.setWebSocketInstances(wssFrontend, wssHoloLens, wssVega);
     }
 }
 
