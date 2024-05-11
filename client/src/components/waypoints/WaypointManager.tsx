@@ -42,8 +42,7 @@ export type BaseWaypoint = {
 
 export interface Astronaut {
     id: number,
-    name: string,
-    color?: string
+    name: string
 }
 
 export const useAstronaut = (idOrName: string | number) => {
@@ -114,45 +113,17 @@ export const waypointsReducer = (state: ManagerState, action: ManagerAction): Ma
 const initialState: ManagerState = {waypoints: []}
 
 export const WaypointManager: React.FC = () => {
-    const [state, dispatch] = useReducer(waypointsReducer, initialState);
+    const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
-    const [astronauts, setAstronauts] = useState<Astronaut[]>([]);
-  
-    const handleMessage = (event: MessageEvent) => {
-      const message = JSON.parse(event.data);
-      setMessageHistory((prev) => prev.concat(event.data));
-
-      switch (message.type) {
-        case 'WAYPOINTS':
-          dispatch({ type: 'set', payload: message.data });
-          break;
-        case 'ASTRONAUTS':
-          setAstronauts(message.data);
-          break;
-        default:
-          break;
-      }
-    };
-  
-    const { sendMessage, lastMessage, readyState } = useDynamicWebSocket({
-      onOpen: () => {
-        sendMessage(JSON.stringify({ type: 'GET_WAYPOINTS' }));
-        sendMessage(JSON.stringify({ type: 'ASTRONAUTS' }));
-      },
-      onMessage: handleMessage,
+    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
+        onOpen: () => sendMessage(JSON.stringify({type: 'GET_WAYPOINTS'}))
     });
-  
     useEffect(() => {
-      if (lastMessage !== null) {
-        const message = JSON.parse(lastMessage.data);
-        if (message.type === 'GET_WAYPOINTS') {
-          dispatch({ type: 'set', payload: message.data });
+        if (lastMessage !== null) {
+            setMessageHistory((prev) => prev.concat(lastMessage.data));
+            dispatch({type: 'set', payload: JSON.parse(lastMessage.data).data});
         }
-      }
-    }, [lastMessage]);
-
-    console.log(state.waypoints)
-
+    }, [lastMessage, setMessageHistory]);
     return (
         <div style={{display: "flex", height:"100vh", backgroundColor: "#000000"}}>
             <InlineDrawer style={{backgroundColor: "#0F0F0F"}} className={'drawer'} separator open>
@@ -182,7 +153,7 @@ export const WaypointManager: React.FC = () => {
                         Navigation
                     </DrawerHeaderTitle>
                 </DrawerHeader>
-                <WaypointDrawer selected={state.selected} astronauts={astronauts} waypoints={state.waypoints} dispatch={dispatch}
+                <WaypointDrawer selected={state.selected} waypoints={state.waypoints} dispatch={dispatch}
                                 ready={readyState === ReadyState.OPEN}/>
             </InlineDrawer>
             <div className={"waypoints-container"}>
