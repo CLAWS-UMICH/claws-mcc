@@ -140,6 +140,13 @@ export default class Waypoints extends Base {
                 waypoint.waypoint_id = current_index;
                 waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
                 current_index++;
+                if (current_index === 17 || current_index === 23 || current_index === 24) {
+                    if (current_index === 23) {
+                        current_index = 25;
+                    } else {
+                        current_index++;
+                    }
+                }
             });
             // update the current_index in the config collection
             config_collection.updateOne({}, { $set: { current_index: current_index } });
@@ -158,6 +165,13 @@ export default class Waypoints extends Base {
                 waypoint.waypoint_id = current_index;
                 waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
                 current_index++;
+                if (current_index === 17 || current_index === 23 || current_index === 24) {
+                    if (current_index === 23) {
+                        current_index = 25;
+                    } else {
+                        current_index++;
+                    }
+                }
             });
             // update the current_index in the config collection
             config_collection.updateOne({}, { $set: { current_index: current_index } }, { upsert: true });
