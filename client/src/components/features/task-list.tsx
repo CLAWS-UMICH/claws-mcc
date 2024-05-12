@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import CheckBox from '../common/CheckBox/CheckBox';
+import './task-list.css';
+// import TwoColumnLayout from './column-layout.tsx';
 
 export type Astronaut = {
 	astronaut_id: number;
@@ -22,6 +24,54 @@ export type Task = {
 	astronauts: Astronaut[];
 	subtasks?: Task[];
 }
+export const dummyTasks: Task[] = [
+	{
+	  id: 1,
+	  subtask: false,
+	  title: "Prepare for Spacewalk",
+	  description: "Gather necessary tools and equipment for the upcoming spacewalk mission. Ensure proper suit functionality and oxygen levels.",
+	  status: TaskStatus.INPROGRESS,
+	  astronauts: [{ astronaut_id: 0, ready: true }], // Update astronauts here
+	  subtasks: [
+		{
+		  id: 11,
+		  subtask: true,
+		  title: "Check suit integrity",
+		  description: "Run diagnostic tests on the spacesuit to ensure no leaks or malfunctions.",
+		  status: TaskStatus.COMPLETED,
+		  astronauts: [],
+		},
+		{
+		  id: 12,
+		  subtask: true,
+		  title: "Assemble tools",
+		  description: "Gather and prepare all necessary tools needed for the planned spacewalk activities.",
+		  status: TaskStatus.TODO,
+		  astronauts: [],
+		},
+	  ],
+	},
+	// ... other dummy tasks (update astronauts property similarly)
+  ];
+
+    // const tasksInProgress = [ 
+    //     {id: 0, title: 'Task 0 Title', description: "Task 0 description",
+    //     status: 0, astronauts: ["Alice", "Bob"], subtasks: []},
+
+    //     {id: 1, title: 'Task 1 Title', description: "Task 1 description",
+    //     status: 0, astronauts: ["Alice"], subtasks: []}
+    // ]
+    
+
+    // export type Task = {
+    //     id: number; //eventually replace with ObjectId
+    //     title: string;
+    //     description: string;
+    //     status: number;
+    //     astronauts: [];
+    //     subtasks: [];
+    // }
+
 
 export function TaskList() {
     // FIXME! might not actually need separate variables for these but need to decide how to 
@@ -36,26 +86,28 @@ export function TaskList() {
     // ------------------------------------------------------------------------
     useEffect(() => {
         // Declare a boolean flag that we can use to cancel the API request.
-        let ignoreStaleRequest = false;
+        console.log("initializing tasks");
+        setTasksInProgress(dummyTasks);
+        // let ignoreStaleRequest = false;
     
-        // Call api to get initial list of all tasks
-        fetch('/api/getTasks/', { credentials: "same-origin" })  // FIXME: url for getting tasks?
-          .then((response) => {
-            if (!response.ok) throw Error(response.statusText);
-            return response.json();
-          })
-          .then((tasks) => {
-            if (!ignoreStaleRequest) {
-              // FIXME: how to determine which tasks are initially in progress or emergency?
-              setTasksToDo(tasks.filter((t) => t.status === 0))
-              setTasksCompleted(tasks.filter((t) => t.status === 1))
-            }
-          })
-          .catch((error) => console.log(error));
+        // // Call api to get initial list of all tasks
+        // fetch('/api/getTasks/', { credentials: "same-origin" })  // FIXME: url for getting tasks?
+        //   .then((response) => {
+        //     if (!response.ok) throw Error(response.statusText);
+        //     return response.json();
+        //   })
+        //   .then((tasks) => {
+        //     if (!ignoreStaleRequest) {
+        //       // FIXME: how to determine which tasks are initially in progress or emergency?
+        //       setTasksToDo(tasks.filter((t) => t.status === 0))
+        //       setTasksCompleted(tasks.filter((t) => t.status === 1))
+        //     }
+        //   })
+        //   .catch((error) => console.log(error));
     
-        return () => {
-          ignoreStaleRequest = true;
-        };
+        // return () => {
+        //   ignoreStaleRequest = true;
+        // };
       }, []);
 
     // ------------------------------------------------------------------------
@@ -215,6 +267,7 @@ export function TaskList() {
             <p>To-do</p>
 
             <p>Completed</p>
+
 
 
         </div>
