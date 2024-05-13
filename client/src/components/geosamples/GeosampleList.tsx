@@ -57,7 +57,7 @@ interface SampleListProps {
 
 const GeosampleList: React.FC<SampleListProps> = ({sample_zones, dispatch, ready, selected}) => {
     const styles = useStyles();
-    const [openItems, setOpenItems] = React.useState<string[]>(sample_zones.map(zone => zone.zone_id));
+    const [openItems, setOpenItems] = React.useState<string[]>(sample_zones?.map(zone => zone.zone_id));
 
     // Maintain state of accordion panels
     const handleToggle: AccordionToggleEventHandler<string> = (event, data) => {
@@ -96,7 +96,7 @@ const GeosampleList: React.FC<SampleListProps> = ({sample_zones, dispatch, ready
                                 secondaryContent={sample.rock_type}
                                 icon={!sample.starred ? <SampleImage sample={sample} index={index}/> : <StarredSample sample={sample} index={index}/>}
                             >
-                                {sample.eva_data.name}
+                                {sample.eva_data?.name}
                             </CompoundButton>
                         </AccordionPanel>
                     ))}
