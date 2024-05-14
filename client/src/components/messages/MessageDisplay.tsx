@@ -45,8 +45,12 @@ function MessageDisplay({ setAllMessages, allMessages, conversations, activeConv
 
     if (activeConversation === -1) {
         return (
-            <div style={{ width: "100%" }}>
-                <Body1>Select an astronaut to view messages</Body1>
+            <div style={{ width: "100%", height: "100%", backgroundColor: "#0A0A0A", display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", alignItems: "center", paddingLeft: "10px", width: "100%", height: "70px", backgroundColor: "#141414", borderColor: "#444444", borderStyle: "solid", borderWidth: "0px 0px 1px 0px" }}>
+                    <DrawerHeaderTitle>
+                        Select An Astronaut
+                    </DrawerHeaderTitle>
+                </div>
             </div>
         );
     }

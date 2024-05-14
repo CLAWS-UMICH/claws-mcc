@@ -85,7 +85,7 @@ const DrawerItem: React.FC<{
     return <div key={props.astronaut}>
         <h3 style={{ paddingLeft: "10px" }}>{name}</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {props.waypoints.map((waypoint) => <DrawerSubItem dispatch={props.dispatch} waypoint={waypoint}
+            {props.waypoints.map((waypoint) => <DrawerSubItem key={waypoint._id} dispatch={props.dispatch} waypoint={waypoint}
                 selected={isEqual(props.selected, waypoint)} />)}
         </div>
     </div>
@@ -95,7 +95,9 @@ const DrawerItem: React.FC<{
 export const WaypointDrawer: React.FC<WaypointsDrawerProps> = props => {
     // Key by which to group waypoints.
     const [key, setKey] = React.useState<GroupKey>(GroupKey.Astronaut);
+
     const grouper = useCallback((waypoints: BaseWaypoint[]) => {
+        if (waypoints.length === 0) return <Body1>No waypoints found</Body1>;
         const astronauts: Map<number, BaseWaypoint[]> = new Map();
         waypoints.forEach((waypoint) => {
             if (!astronauts.has(waypoint.author)) {
@@ -105,7 +107,7 @@ export const WaypointDrawer: React.FC<WaypointsDrawerProps> = props => {
         });
         const astronautList: React.ReactNode[] = [];
         astronauts.forEach((waypoints, astronaut) =>
-            astronautList.push(<DrawerItem dispatch={props.dispatch} astronaut={astronaut} waypoints={waypoints}
+            astronautList.push(<DrawerItem key={astronaut} dispatch={props.dispatch} astronaut={astronaut} waypoints={waypoints}
                 selected={props.selected} />));
         return astronautList;
     }, [key, props.selected, props.waypoints])
