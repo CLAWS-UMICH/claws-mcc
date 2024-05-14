@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Base, { RouteEvent } from "../Base";
-import { BaseWaypoint, isBaseWaypoint, WaypointsMessage } from "../types/Waypoints";
+import {BaseMessage, MessagingMessage} from "../types/Messages";
 import Message from "../types/message";
 import { Collection, Db, Document, InsertManyResult, WithId } from "mongodb";
 import Logger from "../core/logger";
@@ -8,18 +8,7 @@ import Logger from "../core/logger";
 export interface ResponseBody {
     error: boolean,
     message: string,
-    data: WithId<Message>[]
-}
-
-export type BaseMessage = {
-    message_id: number;
-    type: 'MESSAGING'
-    use: 'PUT' | 'GET'; // these are the only two methods AR expects
-    data?: {
-        from: number
-        sent_to: number
-        message: string
-    };
+    data: BaseMessage[]
 }
 
 export default class Messages extends Base {
@@ -70,11 +59,11 @@ export default class Messages extends Base {
         });
         // insert the diff into the collection
         const result = await this.collection.insertMany(diff);
-        // if(result.acknowledged === false) {
-        //     const response: ResponseBody = { error: true, message: 'error adding message', data: [] }
-        //     res.send(response);
-        //     return response;
-        // }
+        if(result.acknowledged === false) {
+            const response: ResponseBody = { error: true, message: 'error adding message', data: new_messages }
+            res.send(response);
+            return response;
+        }
 
         const message_id = -1;
         this.dispatch('FRONTEND', {
@@ -83,35 +72,29 @@ export default class Messages extends Base {
             use: 'GET',
             data: new_messages,
         })
-        // this.updateARMessages(message_id, data);
-        // const response: ResponseBody = { error: false, "message!",  
-        // const response: ResponseBody = { error: false, message: 'message added', data: new_messages }
-        // console.log()
-        // res.send(response);
-        // return response;
+        this.updateARMessages(message_id, new_messages);
+        const response: ResponseBody = {
+            error: false,
+            message: 'message added',
+            data: new_messages
+        }
+        console.log()
+        res.send(response);
+        return response;
     }
 
     // Requests waypoints from AR
     // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
-    private updateARMessages(messageId: number, data: WithId<Document>[]): void {
-        const messages = data.map(message => ({
-            message_id: message.message_id,
-            use: 'PUT',
-            data: {
-                sent_to: message.sent_to,
-                message: message.message,
-                from: message.from
-            }
-        }));
-        const newMessage =  {
+    private updateARMessages(messageId: number, data: BaseMessage[]): void {
+        const newMessage: MessagingMessage =  {
             id: messageId,
             type: 'MESSAGING',
             use: 'PUT',
             data: {
-                AllMessages: messages
+                AllMessages: data
             }
         }
-        // this.dispatch("AR", newMessage)
+        this.dispatch("AR", newMessage)
     }
 
 }

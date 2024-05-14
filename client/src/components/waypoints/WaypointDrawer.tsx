@@ -1,7 +1,7 @@
-import React, {useCallback} from 'react';
-import {BaseWaypoint, ManagerAction, useAstronaut} from "./WaypointManager.tsx";
-import {Body1, Body1Stronger, Skeleton, CompoundButton} from "@fluentui/react-components";
-import {isEqual} from "lodash";
+import React, { useCallback } from 'react';
+import { BaseWaypoint, ManagerAction, useAstronaut } from "./WaypointManager.tsx";
+import { DrawerBody, Body1, Body1Stronger, Skeleton, CompoundButton } from "@fluentui/react-components";
+import { isEqual } from "lodash";
 // @ts-ignore
 import waypointImage from '../../assets/waypoint.png';
 
@@ -19,7 +19,7 @@ enum GroupKey {
 
 type DrawerSubItemProps = { waypoint: BaseWaypoint, selected: boolean, dispatch: React.Dispatch<ManagerAction> }
 
-function SampleImage({astro}: { astro: number }) {
+function SampleImage({ astro }: { astro: number }) {
     const intToChar = (i: number): string => {
         // If i > 26, add another letter.
         if (i > 26) return String.fromCharCode((i - 1) / 26 + 65) + String.fromCharCode(i % 26 + 65);
@@ -27,46 +27,48 @@ function SampleImage({astro}: { astro: number }) {
     };
     return (
         <div className={"waypoint-image"}>
-        <img style={{alignSelf: "center", padding: "0 15px 0 0"}} width={27} height={31} src={waypointImage}
-             alt={"Waypoint Icon"}/>
-        <div className={'waypoint-image-text'}>
-            {intToChar(astro)}
+            <img style={{ alignSelf: "center", padding: "0 15px 0 0" }} width={27} height={31} src={waypointImage}
+                alt={"Waypoint Icon"} />
+            <div className={'waypoint-image-text'}>
+                {intToChar(astro)}
+            </div>
         </div>
-    </div>
     );
 }
 
-const DrawerSubItem: React.FC<DrawerSubItemProps> = ({waypoint, selected, dispatch}) => {
+const DrawerSubItem: React.FC<DrawerSubItemProps> = ({ waypoint, selected, dispatch }) => {
     const [hovering, setHovering] = React.useState(false);
     let preview_length = 25;
     let details = waypoint.details;
-    if(details.length > preview_length) {
+    if (!details) details = "";
+    if (details.length > preview_length) {
         details = details.substring(0, (preview_length - 3)) + "...";
-    } 
+    }
     return <div key={waypoint._id}
-                onClick={() => {
-                    // If already selected, deselect.
-                    if (selected)
-                        dispatch({type: 'deselect'});
-                    // Otherwise, select.
-                    else {
-                        dispatch({type: 'clearTemp'});
-                        dispatch({type: 'select', payload: waypoint});
-                    }
-                }}
-                onMouseEnter={() => setHovering(true)}
-                onMouseLeave={() => setHovering(false)}
-                className={"drawer-sub-item"}
-                style={{display: "flex"}}>
+        onClick={() => {
+            // If already selected, deselect.
+            if (selected)
+                dispatch({ type: 'deselect' });
+            // Otherwise, select.
+            else {
+                dispatch({ type: 'clearTemp' });
+                dispatch({ type: 'select', payload: waypoint });
+            }
+        }}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+        className={"drawer-sub-item"}
+        style={{ display: "flex" }}>
         <CompoundButton
-            style={{fontSize: "13px", width: "100%", height: "45px", border: "0px",
-            backgroundColor: hovering ? "#2b2b2b" : "#0F0F0F",
-            transition: "background-color 0.2s ease",
-            
+            style={{
+                fontSize: "13px", width: "100%", height: "45px", border: "0px",
+                backgroundColor: hovering ? "#2b2b2b" : "#0F0F0F",
+                transition: "background-color 0.2s ease",
+
             }}
             shape='circular'
-            secondaryContent={<span style={{ display: "inline-block", width: "150px"}}>{details}</span>}
-            icon={<SampleImage astro={waypoint.waypoint_id}/> }
+            secondaryContent={<span style={{ display: "inline-block", width: "150px" }}>{details}</span>}
+            icon={<SampleImage astro={waypoint.waypoint_id} />}
         >
             Waypoint {waypoint.waypoint_id}
         </CompoundButton>
@@ -81,10 +83,10 @@ const DrawerItem: React.FC<{
 }> = props => {
     const name = useAstronaut(props.astronaut)?.name ?? `Astronaut ${props.astronaut}`;
     return <div key={props.astronaut}>
-        <h3 style={{paddingLeft: "10px"}}>{name}</h3>
-        <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
+        <h3 style={{ paddingLeft: "10px" }}>{name}</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {props.waypoints.map((waypoint) => <DrawerSubItem dispatch={props.dispatch} waypoint={waypoint}
-                                                              selected={isEqual(props.selected, waypoint)}/>)}
+                selected={isEqual(props.selected, waypoint)} />)}
         </div>
     </div>
 }
@@ -104,15 +106,17 @@ export const WaypointDrawer: React.FC<WaypointsDrawerProps> = props => {
         const astronautList: React.ReactNode[] = [];
         astronauts.forEach((waypoints, astronaut) =>
             astronautList.push(<DrawerItem dispatch={props.dispatch} astronaut={astronaut} waypoints={waypoints}
-                                           selected={props.selected}/>));
+                selected={props.selected} />));
         return astronautList;
     }, [key, props.selected, props.waypoints])
     if (!props.ready) {
-        return <Skeleton/>
+        return <Skeleton />
     }
     return (
-        <div className={'drawer-content'}>
-            {grouper(props.waypoints)}
-        </div>
+        <DrawerBody style={{ backgroundColor: "#0F0F0F" }}>
+            <div className={'drawer-content'}>
+                {grouper(props.waypoints)}
+            </div>
+        </DrawerBody>
     );
 }

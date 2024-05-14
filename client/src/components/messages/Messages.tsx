@@ -1,11 +1,11 @@
-import React, {useEffect, useReducer, useState} from "react";
-import {Divider, InlineDrawer, DrawerHeader, Button, DrawerHeaderTitle, Input} from "@fluentui/react-components";
+import React, { useEffect, useReducer, useState } from "react";
+import { Divider, InlineDrawer, DrawerHeader, Button, DrawerHeaderTitle, Input } from "@fluentui/react-components";
 import useDynamicWebSocket from "../../hooks/useWebSocket.tsx";
-import {ReadyState} from 'react-use-websocket';
+import { ReadyState } from 'react-use-websocket';
 // import Message from "../../../../api/types/message.ts";
 import { add, set } from "lodash";
 import axios from "axios";
-import {useAstronaut} from "../waypoints/WaypointManager.tsx";
+import { useAstronaut } from "../waypoints/WaypointManager.tsx";
 import MessageDrawer from "./MessageDrawer.tsx";
 import MessageDisplay from "./MessageDisplay.tsx";
 import { Backpack12Filled } from "@fluentui/react-icons";
@@ -29,17 +29,17 @@ export type BaseMessage = {
 function createConversations(setConversations, messages: BaseMessage[]) {
     // Map from astronaut ID to messages
     const conversations = new Map();
-    for(const message of messages) {
+    for (const message of messages) {
         const from = message.data?.from;
         const sent_to = message.data?.sent_to;
 
         // Only include messages including LMCC (-1)
-        if(from !== -1 && sent_to !== -1) {
+        if (from !== -1 && sent_to !== -1) {
             continue;
         }
 
         const astro = from === -1 ? sent_to : from;
-        if(!conversations.has(astro)) {
+        if (!conversations.has(astro)) {
             conversations.set(astro, []);
         }
         conversations.get(astro).push(message);
@@ -59,8 +59,8 @@ function createConversations(setConversations, messages: BaseMessage[]) {
 export const Messages: React.FC = () => {
     const [allMessages, setAllMessages] = useState<BaseMessage[]>([]);
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
-    const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
-        onOpen: () => sendMessage(JSON.stringify({type: 'GET_MESSAGES'}))
+    const { sendMessage, lastMessage, readyState } = useDynamicWebSocket({
+        onOpen: () => sendMessage(JSON.stringify({ type: 'GET_MESSAGES' }))
     });
 
     const [conversations, setConversations] = useState<Map<number, BaseMessage[]>>(new Map());
@@ -74,30 +74,32 @@ export const Messages: React.FC = () => {
             createConversations(setConversations, messages);
         }
     }, [lastMessage, setMessageHistory]);
-
     return (
-        <div style={{display: "flex", height:"100vh", backgroundColor: "#000000"}}>
-            <InlineDrawer style={{backgroundColor: "#0F0F0F", width: "250px"}} className={'drawer'} separator open>
-                <DrawerHeader style={{backgroundColor: "#141414", borderBottom: "1px solid #333333"}}>
+        <div style={{ display: "flex", height: "100vh", width: "100%", backgroundColor: "#000000", border: "1px solid #444444", overflowX: "hidden" }}>
+            <InlineDrawer style={{ backgroundColor: "#0F0F0F", width: "250px" }} separator open>
+                <DrawerHeader style={{ height: "70px", backgroundColor: "#141414", borderColor: "#444444", borderStyle: "solid", borderWidth: "0px 1px 1px 0px" }}>
                     <DrawerHeaderTitle>
                         Messages
                     </DrawerHeaderTitle>
                 </DrawerHeader>
-                <div style={{width: "100%"}}>
-                    <MessageDrawer 
-                        messages={allMessages} 
-                        conversations={conversations} 
-                        setActiveConversation={setActiveConversation} 
+                <h2 style={{ width: "100%" }}>
+                    <MessageDrawer
+                        messages={allMessages}
+                        conversations={conversations}
+                        setActiveConversation={setActiveConversation}
                         activeConversation={activeConversation}
                     />
-                </div>
+                </h2>
             </InlineDrawer>
-            <MessageDisplay 
-                setAllMessages={setAllMessages} 
-                allMessages={allMessages} 
-                conversations={conversations} 
-                activeConversation={activeConversation}
-            />
+
+            <div style={{ flexGrow: "1" }}>
+                <MessageDisplay
+                    setAllMessages={setAllMessages}
+                    allMessages={allMessages}
+                    conversations={conversations}
+                    activeConversation={activeConversation}
+                />
+            </div>
         </div>
     );
 }
