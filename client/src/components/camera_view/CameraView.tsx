@@ -53,7 +53,9 @@ const CameraView: React.FC = () => {
                 try {
                     const response = await fetch(`https://${ip}:8080/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=true&loopback=true&RenderFromCamera=true`, { method: 'HEAD' });
                     if (!response.ok) {
-                        setVideoError(true);
+                        setTimeout(() => {
+                            setVideoError(true);
+                        }, 5000);
                         return;
                     }
                 } catch (error) {
