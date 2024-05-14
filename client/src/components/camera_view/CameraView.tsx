@@ -51,7 +51,7 @@ const CameraView: React.FC = () => {
 
             for (const ip of ipAddresses) {
                 try {
-                    const response = await fetch(`http://${ip}:8080/video`, { method: 'HEAD' });
+                    const response = await fetch(`https://${ip}:8080/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=true&loopback=true&RenderFromCamera=true`, { method: 'HEAD' });
                     if (!response.ok) {
                         setVideoError(true);
                         return;
@@ -94,7 +94,7 @@ const CameraView: React.FC = () => {
                 ) : (
                     ipAddresses.map((ip, index) => (
                         <div key={index} className='camera'>
-                            <video src={`http://${ip}:8080/video`} controls className='video' />
+                            <video src={`https://${ip}:8080/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=true&loopback=true&RenderFromCamera=true`} controls className='video' />
                         </div>
                     ))
                 )}
