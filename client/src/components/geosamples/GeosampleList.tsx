@@ -11,10 +11,11 @@ import {
     makeStyles
 } from '@fluentui/react-components';
 import { ChevronUp16Regular, ChevronDown16Regular } from '@fluentui/react-icons';
-import { BaseGeosample, BaseZone, ManagerAction } from './Geosamples.tsx';
+import { BaseGeosample, BaseZone, ManagerAction } from './GeosampleTypes.tsx';
 import './Geosamples.css'
 import StarredSample from './StarredImage.tsx';
 import SampleImage from './SampleImage.tsx';
+import { stringify } from 'querystring';
 
 const useStyles = makeStyles({
     container: {
@@ -49,15 +50,22 @@ const useStyles = makeStyles({
 });
 
 interface SampleListProps {
+    geosamples: BaseGeosample[];
     sample_zones: BaseZone[];
     dispatch: React.Dispatch<ManagerAction>;
     ready: boolean;
     selected?: BaseGeosample;
 };
 
-const GeosampleList: React.FC<SampleListProps> = ({sample_zones, dispatch, ready, selected}) => {
+const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dispatch, ready, selected}) => {
     const styles = useStyles();
     const [openItems, setOpenItems] = React.useState<string[]>(sample_zones?.map(zone => zone.zone_id));
+
+    const geosampleMap = React.useMemo(() => {
+        const map = new Map();
+        geosamples.forEach(sample => map.set(sample.geosample_id, sample));
+        return map;
+    }, [geosamples]);
 
     // Maintain state of accordion panels
     const handleToggle: AccordionToggleEventHandler<string> = (event, data) => {
@@ -78,29 +86,30 @@ const GeosampleList: React.FC<SampleListProps> = ({sample_zones, dispatch, ready
     if (!ready || !sample_zones || sample_zones.length === 0) {
         return <Skeleton />
     };
- 
+
     return (
         <Accordion className={styles.container} onToggle={handleToggle} openItems={openItems} multiple collapsible>
             {sample_zones.map((zone) =>             
-                <AccordionItem key={zone.zone_id} value={zone.zone_id}>
-                    {zone.geosample_ids.length > 0 &&
-                        <AccordionHeader key={zone.zone_id} className={styles.header} size="large" expandIcon={openItems.includes(zone.zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
-                            <b style={{fontSize:"15px"}}>Zone {zone.zone_id}</b>
-                        </AccordionHeader>}
-                    {zone.geosample_ids && zone.geosample_ids.map((sample, index) => (
-                        <AccordionPanel style={{marginLeft: "-15px", marginRight: "-12px", marginBottom: "1px"}} className={styles.sampleContainer} key={index}>
-                            <CompoundButton
-                                style={{fontSize: "13px", width: "210px", height: "45px", border: "0px"}}
-                                onClick={() => handleSelect(dispatch, sample)}
-                                shape='circular'
-                                secondaryContent={sample.rock_type}
-                                icon={!sample.starred ? <SampleImage sample={sample} index={index}/> : <StarredSample sample={sample} index={index}/>}
-                            >
-                                {sample.eva_data?.name}
-                            </CompoundButton>
+                zone.geosample_ids.length > 0 && (<AccordionItem key={zone.zone_id} value={zone.zone_id}>
+                    <AccordionHeader key={zone.zone_id} className={styles.header} size="large" expandIcon={openItems.includes(zone.zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
+                        <b style={{fontSize:"15px"}}>Zone {zone.zone_id}</b>
+                    </AccordionHeader>
+                    {zone.geosample_ids.map((id, index) => (
+                        <AccordionPanel style={{marginLeft: "-15px", marginRight: "-12px", marginBottom: "1px"}} className={styles.sampleContainer} key={id}>
+                            {geosampleMap.has(Number(id)) && (
+                                <CompoundButton
+                                    style={{fontSize: "13px", width: "210px", height: "45px", border: "0px"}}
+                                    onClick={() => handleSelect(dispatch, geosampleMap.get(Number(id)))}
+                                    shape='circular'
+                                    secondaryContent={geosampleMap.get(Number(id)).rock_type}
+                                    icon={!geosampleMap.get(Number(id)).starred ? <SampleImage sample={geosampleMap.get(Number(id))} index={index}/> : <StarredSample sample={geosampleMap.get(Number(id))} index={index}/>}
+                                >
+                                    {geosampleMap.get(Number(id)).eva_data.name}
+                                </CompoundButton>
+                            )}
                         </AccordionPanel>
                     ))}
-                </AccordionItem>
+                </AccordionItem>)
             )}
         </Accordion>
     );

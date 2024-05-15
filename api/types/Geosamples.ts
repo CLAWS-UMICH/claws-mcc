@@ -21,14 +21,8 @@ type EvaData = {
     }
 }
 
-export type BaseZone = {
-    zone_id: string;
-    geosample_ids: [BaseGeosample];
-    location: Location;
-    radius: number;
-}
-
 export type BaseGeosample = {
+    _id?: number;
     geosample_id: number;
     zone_id: string;
     starred: boolean;
@@ -40,17 +34,17 @@ export type BaseGeosample = {
     location: ARLocation;
     author: number;
     description: string;
-    image: string;
+    photo_jpg: string;
 }
 
-export type BaseResponseZone = {
+export type BaseZone = {
     zone_id: string;
     geosample_ids: number[];
     location: Location;
     radius: number;
 }
 
-export const isBaseGeosample = (geosample: any) : geosample is BaseGeosample => {
+export const isGeosample = (geosample: any) : geosample is BaseGeosample => {
     if (typeof geosample !== 'object') return false;
     if (!geosample.hasOwnProperty('geosample_id')) return false;
     if (!geosample.hasOwnProperty('zone_id')) return false;
@@ -63,13 +57,13 @@ export const isBaseGeosample = (geosample: any) : geosample is BaseGeosample => 
     if (!geosample.hasOwnProperty('location')) return false;
     if (!geosample.hasOwnProperty('author')) return false;
     if (!geosample.hasOwnProperty('description')) return false;
-    return geosample.hasOwnProperty('image');
+    return geosample.hasOwnProperty('photo_jpg');
 }
 
-export const isBaseZone = (zone: any) : zone is BaseZone => {
+export const isZone = (zone: any) : zone is BaseZone => {
     if (typeof zone !== 'object') return false;
     if (!zone.hasOwnProperty('zone_id')) return false;
-    if (!zone.hasOwnProperty('geosample_ids')) return false;
+    if (!zone.hasOwnProperty('ZoneGeosamplesIds')) return false;
     if (!zone.hasOwnProperty('location')) return false;
     return zone.hasOwnProperty('radius');
 }
@@ -86,7 +80,7 @@ export interface SampleMessage extends Message {
     type: string;
     data: {
         AllGeosamples: BaseGeosample[];
-        AllGeosamplezones: BaseZone[];
+        AllZones: BaseZone[];
     };
 }
 
