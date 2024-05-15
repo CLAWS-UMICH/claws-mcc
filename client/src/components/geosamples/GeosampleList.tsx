@@ -59,7 +59,7 @@ interface SampleListProps {
 
 const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dispatch, ready, selected}) => {
     const styles = useStyles();
-    const [openItems, setOpenItems] = React.useState<string[]>(sample_zones.map(zone => zone.zone_id));
+    const [openItems, setOpenItems] = React.useState<string[]>(sample_zones?.map(zone => zone.zone_id));
 
     const geosampleMap = React.useMemo(() => {
         const map = new Map();

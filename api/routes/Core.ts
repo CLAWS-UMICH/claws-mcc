@@ -22,6 +22,10 @@ export default class Core extends Base {
         {
             type: 'KILL',
             handler: this.killAstronaut.bind(this),
+        },
+        {
+            type: 'UPTIME',
+            handler: this.dispatchUptime.bind(this),
         }
     ]
 
@@ -75,6 +79,18 @@ export default class Core extends Base {
         // What else do we need to do when an astronaut disconnects? Alert maybe?
     }
 
+    async dispatchUptime() {
+        const uptime = Math.floor(process.uptime());
+        await this.dispatch('FRONTEND', {
+            id: -1,
+            type: 'UPTIME',
+            use: 'PUT',
+            data: uptime,
+        });
+
+        return uptime;
+    }
+
     async dispatchWaypoints() {
         const [waypoints, currentIndex] = await Promise.all([
             this.db.collection('waypoints').find().toArray(),
@@ -87,7 +103,7 @@ export default class Core extends Base {
 
         await this.dispatch('AR', {
             id: -1,
-            type: 'WAYPOINTS',
+            type: 'Waypoints',
             use: 'PUT',
             data: {
                 currentIndex,
@@ -102,7 +118,7 @@ export default class Core extends Base {
         const tasks = (await this.db.collection('tasks').find().toArray()) || [];
         await this.dispatch('AR', {
             id: -1,
-            type: 'TASKS',
+            type: 'Tasks',
             use: 'PUT',
             data: tasks,
         });
