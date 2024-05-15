@@ -12,7 +12,6 @@
     "noImplicitAny": false,
     "strictNullChecks": true,
     "allowImportingTsExtensions": true,
-    "noEmit": true,
     // Ensure this is set to "react"
     "jsx": "react"
   },
