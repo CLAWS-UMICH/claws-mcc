@@ -12,70 +12,12 @@ import {
     shorthands,
 } from "@fluentui/react-components";
 import { Search20Regular } from "@fluentui/react-icons";
-import SearchBox from '../common/SearchBox/SearchBox.tsx'
+import SearchComponent from '../common/SearchBox/SearchBox.tsx'
 import DetailScreen from './DetailScreen.tsx';
 import GeosampleList from './GeosampleList.tsx';
+import GeosampleMap from './GeosampleMap.tsx';
 import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
-
-type ARLocation = {
-    latitude: number;
-    longitude: number;
-};
-
-export type EvaData = {
-    name: string;
-    id: number;
-    data: {
-        SiO2: number;
-        TiO2: number;
-        Al2O3: number;
-        FeO: number;
-        MnO: number;
-        MgO: number;
-        CaO: number;
-        K2O: number;
-        P2O3: number;
-    }
-};
-
-export type BaseGeosample = {
-    _id: number;
-    geosample_id: number;
-    zone_id: string;
-    starred: boolean;
-    eva_data: EvaData;
-    time: string; 
-    date: string;
-    color: string;
-    shape: string;
-    rock_type: string; 
-    location: ARLocation;
-    author: number;
-    description: string;
-    image: string;
-};
-
-export type BaseZone = {
-    _id: number;
-    zone_id: string;
-    geosample_ids: BaseGeosample[];
-    location: ARLocation;
-    radius: number;
-};
-
-export type ManagerState = {
-    sample_zones: BaseZone[];
-    geosamples: BaseGeosample[];
-    selected?: BaseGeosample;
-};
-
-export type ManagerAction =
-    { type: 'set', payload: {zones: BaseZone[], samples: BaseGeosample[]} } | // Should only be used by ServerListener
-    { type: 'delete', payload: BaseGeosample } |
-    { type: 'update', payload: BaseGeosample } |
-    { type: 'select', payload: BaseGeosample } |
-    { type: 'deselect' };
-
+import { ManagerAction, ManagerState } from './GeosampleTypes.tsx';
 
 const useStyles = makeStyles({
   root: {
@@ -113,7 +55,7 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
                 ),
                 sample_zones: state.sample_zones.map(zone => ({
                     ...zone,
-                    geosample_ids: zone.geosample_ids.filter(sample => sample.geosample_id !== action.payload.geosample_id)
+                    geosample_ids: zone.geosample_ids.filter(id => id !== action.payload.geosample_id)
                 })),
             };
         case 'update':
@@ -131,11 +73,11 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
                 }),
                 sample_zones: state.sample_zones.map(zone => ({
                     ...zone,
-                    geosample_ids: zone.geosample_ids.map(sample => {
-                        if (sample.geosample_id === action.payload.geosample_id) {
-                            return action.payload;
+                    geosample_ids: zone.geosample_ids.map(id => {
+                        if (id === action.payload.geosample_id) {
+                            return action.payload.geosample_id;
                         }
-                        return sample;
+                        return id;
                     })
                 })),
             };
@@ -156,6 +98,7 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
 
 const initialState: ManagerState = {geosamples: [], sample_zones: [], selected: undefined};
 
+// TODO :( -> get astronaut location to add icon to geosample list & map
 const GeosampleManager: React.FC = () => { 
     const styles = useStyles();   
     const [state, dispatch] = useReducer(geosampleReducer, initialState);
@@ -170,11 +113,17 @@ const GeosampleManager: React.FC = () => {
         if (lastMessage !== null) {
             setMessageHistory((prev) => prev.concat(lastMessage.data));
             dispatch({type: 'set', payload: JSON.parse(lastMessage.data).data});
-            console.log(JSON.parse(lastMessage.data).data)
+            // console.log(JSON.parse(lastMessage.data).data)
         }
     }, [lastMessage, setMessageHistory]);
 
-    // TODO: search feature
+    // TODO: implement search feature
+    const handleSearch = () => {
+        // state.sample_zones = state.sample_zones.map(zone => ({
+        //     ...zone,
+        //     geosample_ids: zone.geosample_ids.filter(id => id !== action.payload.geosample_id)
+        // }))
+    }
 
     return (
         <div className={styles.root}>
@@ -187,16 +136,17 @@ const GeosampleManager: React.FC = () => {
                 <div className={styles.dividerContainer}>
                     <Divider></Divider>
                     {showSearchBar && (<div style={{flexGrow: "1"}}>               
-                                            <SearchBox handleDismiss={() => setShowSearchBar(!showSearchBar)}/>
+                                            <SearchComponent handleDismiss={() => setShowSearchBar(!showSearchBar)} handleSearch={handleSearch}/>
                                             <Divider></Divider>
                                         </div>)}
                 </div>
                 <DrawerBody>
-                    <GeosampleList sample_zones={state.sample_zones} selected={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
+                    <GeosampleList geosamples={state.geosamples} sample_zones={state.sample_zones} selected={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
                 </DrawerBody>
             </InlineDrawer>
             <DrawerBody style={{paddingLeft: '0px', paddingRight: '0px'}}>
-                <DetailScreen geosample={state.selected} dispatch={dispatch}/>
+                <DetailScreen geosample={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
+                {state.selected && <GeosampleMap geosamples={state.geosamples} zones={state.sample_zones} dispatch={dispatch} ready={readyState === ReadyState.OPEN} selected={state.selected}/>}
             </DrawerBody>
         </div>
     );

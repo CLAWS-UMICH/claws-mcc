@@ -6,14 +6,14 @@ import {
   makeStyles,
   Option,
   shorthands,
-  tokens,
   Button,
   Divider,
   Popover,
   PopoverTrigger,
   PopoverSurface,
   PopoverProps,
-  Skeleton
+  Skeleton,
+  Textarea
 } from "@fluentui/react-components";
 import { 
   Edit16Regular, 
@@ -34,8 +34,8 @@ import {
   Tag16Regular
 } from "@fluentui/react-icons";
 import './Geosamples.css';
-import { BaseGeosample, EvaData, ManagerAction } from "./Geosamples";
-import { GeosampleMap } from "./GeosampleMap.tsx"
+import { BaseGeosample, EvaData, ManagerAction } from "./GeosampleTypes.tsx";
+import GeosampleMap from "./GeosampleMap.tsx"
 
 const useStyles = makeStyles({
   root: {
@@ -136,6 +136,7 @@ interface CompositionVisualizationProps {
 }
 
 const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sample }) => {
+    let comp_colors = ['#BB6BD9', '#FFFFFF', '#EB5757', '#6FCF97', '#2D9CDB', '#219653', '#9B51E0', '#F2C94C', '#6FCF97'];
     var total = 0;
     let other = 100 - (sample.data.SiO2 + sample.data.Al2O3 + sample.data.CaO + sample.data.FeO + sample.data.K2O + sample.data.MgO + sample.data.MnO + sample.data.P2O3 + sample.data.TiO2);
     const compositions = {
@@ -150,19 +151,17 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sam
       "P2O3": sample.data.P2O3, 
     }
 
-    if (other > 0) {
-      compositions["Other"] = other
+    if (other > 1) {
+      compositions["Other"] = other;
+      comp_colors.push('#F2994A');
     }
 
-
     for (var comp in compositions) {
-      var value = compositions[comp]
+      var value = compositions[comp];
       if (!isNaN(value)) {
           total += value;
       }
     }
-
-    const comp_colors = ['#BB6BD9', '#FFFFFF', '#EB5757', '#6FCF97', '#2D9CDB', '#219653', '#9B51E0', '#F2C94C', '#6FCF97', '#F2994A'];
     const components = Object.entries(compositions).map(([_, value], index) => {
         const wdth = Math.floor(calculate(value, 0, total, 0, 100));
         const classes: string[] = [];
@@ -193,35 +192,39 @@ const CompositionVisualization: React.FC<CompositionVisualizationProps> = ({ sam
 
 interface DetailScreenProps {
   dispatch: React.Dispatch<ManagerAction>;
+  ready: boolean;
   geosample?: BaseGeosample;
 }
 
-const DetailScreen : React.FC<DetailScreenProps> = props => {
+const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}) => {
   const styles = useStyles();
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState(false);
-  const [editedSample, setEditedSample] = useState<BaseGeosample | undefined>(props.geosample);
-  const [currentSample, setCurrentSample] = useState<BaseGeosample | undefined>(props.geosample);
+  const [editedSample, setEditedSample] = useState<BaseGeosample | undefined>(geosample);
+  const [currentSample, setCurrentSample] = useState<BaseGeosample | undefined>(geosample);
 
   useEffect(() => {
-    setCurrentSample(props.geosample);
-    setEditedSample(props.geosample);
-  }, [props.geosample]);
+    setCurrentSample(geosample);
+    setEditedSample(geosample);
+  }, [geosample]);
 
-  if (!props.geosample) {
+  if (!ready || !geosample) {
     return (
         <Skeleton/>
     )
   }
+  // console.log(geosample.date)
 
+  // console.log(geosample);
   const color_options = [ "Brown", "Copper Red", "Black", "Multi-color" ];
-  const location_string = props.geosample.location.latitude + "˚ " + props.geosample.location.longitude + "˚";
+  const location_string = geosample.location.latitude + "˚ " + geosample.location.longitude + "˚";
 
   // TODO: make this send message to hololens if clicked
   const handleFavoriting = async (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
+    console.log(editedSample);
     if (geosample) {   
       geosample.starred = !geosample.starred
-      const res = await fetch("/api/geosamples", {
+      const res = await fetch("/api/geosamples/editGeosample", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -248,7 +251,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
 
   const handleDelete = async (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
     if (geosample) {
-      const res = await fetch("/api/geosamples", {
+      const res = await fetch("/api/geosamples/deleteGeosample", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -268,9 +271,8 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
     }
   }
 
-  const handleSave = async (dispatch: React.Dispatch<ManagerAction>, edited_sample?: BaseGeosample) => {
-    if (edited_sample) {
-      const res = await fetch("/api/geosamples", {
+  const handleSave = async (dispatch: React.Dispatch<ManagerAction>, edited_sample?: BaseGeosample) => {    if (edited_sample) {
+      const res = await fetch("/api/geosamples/editGeosample", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -280,11 +282,11 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           data: editedSample
         })
       });
-      console.log(res.status)
+      // console.log(res.status)
       if (res.status !== 200) {
         alert("Failed to save edited sample");
-        setCurrentSample(props.geosample);
-        setEditedSample(props.geosample);
+        setCurrentSample(geosample);
+        setEditedSample(geosample);
         setEdit(false);
         return;
       }
@@ -295,8 +297,8 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
   }
 
   const handleCancel = () => {
-    setCurrentSample(props.geosample);
-    setEditedSample(props.geosample);
+    setCurrentSample(geosample);
+    setEditedSample(geosample);
     setEdit(false);
   }
     
@@ -352,6 +354,14 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
     }
   };
 
+  const splitTimeString: (input: string) => [string, string] = (input) => {
+      const match = input.match(/(.*? .*?) (.*)/);
+      if (match) {
+          return [match[1], match[2]]; // match[1] is the part before the second space
+      }
+      return [input, " "]; // In case the regex does not find two parts
+  };
+
   return (
     <div>
         <div>
@@ -361,10 +371,10 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                        appearance="outline" 
                        id="geosample_name" 
                        readOnly={!edit} 
-                       defaultValue={props.geosample.eva_data.name}
+                       defaultValue={geosample.eva_data.name}
                        value={edit ? editedSample?.eva_data.name : currentSample?.eva_data.name || ''} 
                        onChange={(e) => handleChange('eva_data', e.target.value)} />
-                <Button icon={props.geosample.starred ? <Star16Filled style={{color:"#EAA300", flexGrow: "1"}}/> : <Star16Regular />} onClick={() => handleFavoriting(props.dispatch, props.geosample)}></Button>
+                <Button icon={geosample.starred ? <Star16Filled style={{color:"#EAA300", flexGrow: "1"}}/> : <Star16Regular />} onClick={() => handleFavoriting(dispatch, geosample)}></Button>
               </div>
               <div style={{display:'flex', gap:'10px'}}>
                   <Button icon={<Map16Regular/>}>View on map</Button>
@@ -377,7 +387,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                   <PopoverSurface aria-labelledby="delete_screen">
                     <div style={{display: "flex", marginTop: "-10px"}}>
                       <h3 style={{width: "175px"}} id="delete_text">
-                        Delete {props.geosample.eva_data.name}?
+                        Delete {geosample.eva_data.name}?
                       </h3>
                         <Button style={{marginTop: "-12.5px", marginRight: "-10px"}} 
                                 icon={<Dismiss16Regular/>} 
@@ -389,7 +399,7 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
                               size="small" 
                               iconPosition="before" 
                               icon={<Delete16Regular/>} 
-                              onClick={() => handleDelete(props.dispatch, props.geosample)}>Delete</Button>
+                              onClick={() => handleDelete(dispatch, geosample)}>Delete</Button>
                       <Button size="small" onClick={() => setOpen(!open)}>Cancel</Button>
                     </div>
                   </PopoverSurface>
@@ -445,48 +455,47 @@ const DetailScreen : React.FC<DetailScreenProps> = props => {
           </div>
           <div className={styles.field}>
             <Label htmlFor="rock_type">Rock Type<sub></sub></Label>
-            <Input appearance="outline" id="rock_type" readOnly={true} value={props.geosample.rock_type} />
+            <Input appearance="outline" id="rock_type" readOnly={true} value={geosample.rock_type} />
           </div>
           <div className={styles.field}>
             <Label htmlFor="sample_id">ID<sub></sub></Label>
-            <Input appearance="outline" id="sample_id" readOnly={true} value={props.geosample.eva_data.id.toString()} />
+            <Input appearance="outline" id="sample_id" readOnly={true} value={geosample.eva_data.id.toString()} />
           </div>
         </div>
         <div className={styles.line}>
           <div style={{display: "flex", flexDirection: "column", flexGrow: "1"}}>
             <Label htmlFor="description">Description<sub></sub></Label>
-            <Input style={{height: "120px"}} appearance="outline" id="description" readOnly={!edit} defaultValue={props.geosample.description} value={edit ? editedSample?.description : currentSample?.description || ''}  onChange={(e) => handleChange('description', e.target.value)} />
+            <Textarea style={{height: "120px"}} appearance="outline" id="description" readOnly={!edit} defaultValue={geosample.description} value={edit ? editedSample?.description : currentSample?.description || ''}  onChange={(e) => handleChange('description', e.target.value)} />
           </div>
-          <img src={props.geosample.image} height={143.8} width={230}/>
+          <img src={`data:image/jpeg;base64,${geosample.photo_jpg}`} height={143.8} width={230}/>
         </div>
         <div className={styles.line}>
-          <CompositionVisualization sample={props.geosample.eva_data}/>
+          <CompositionVisualization sample={geosample.eva_data}/>
             <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "30%" }}>              
               <Label htmlFor="location">Location<sub></sub></Label>
               <Input contentBefore={<Location16Regular/>} appearance="outline" id="location" readOnly={true} value={location_string} />
             </div>
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
               <Label htmlFor="time">Time<sub></sub></Label>
-              <Input contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={props.geosample.time} />
+              <Input contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={splitTimeString(geosample.time)[0]} />
             </div>
         </div>
         <div className={styles.line}>
-          <CompositionValues sample={props.geosample.eva_data} />
+          <CompositionValues sample={geosample.eva_data} />
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "30%" }}>
               <Label htmlFor="date">Date<sub></sub></Label>
-              <Input contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={props.geosample.date} />
+              <Input contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={splitTimeString(geosample.time)[1]} />
             </div>
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
               <Label htmlFor="zone">Zone<sub></sub></Label>
-              <Input contentBefore={<Tag16Regular/>} appearance="outline" id="zone" readOnly={true} value={props.geosample.zone_id} />
+              <Input contentBefore={<Tag16Regular/>} appearance="outline" id="zone" readOnly={true} value={geosample.zone_id} />
             </div>
         </div>
         { edit && <div style={{paddingRight: "1rem", display: "flex", float: "right", gap: "15px", marginBottom: "1rem"}}>
-                    <Button style={{background: "#009B00"}} iconPosition="before" icon={<Save16Regular/>} onClick={() => handleSave(props.dispatch, editedSample)}>Save</Button>
+                    <Button style={{background: "#009B00"}} iconPosition="before" icon={<Save16Regular/>} onClick={() => handleSave(dispatch, editedSample)}>Save</Button>
                     <Button onClick={() => handleCancel()}>Cancel</Button>
                  </div>
         }
-        <GeosampleMap geosamples={[props.geosample]} dispatch={props.dispatch}/>
     </div>
   );
 };

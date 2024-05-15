@@ -1,10 +1,12 @@
 {
   "dependencies": {
-    "@fluentui/react-components": "^9.39.0",
+    "@fluentui/react": "^8.118.2",
+    "@fluentui/react-components": "^9.49.2",
     "@types/ioredis": "^5.0.0",
     "@types/node": "^20.8.7",
     "@types/redis": "^4.0.11",
     "@types/ws": "^8.5.10",
+    "@vis.gl/react-google-maps": "^1.0.0",
     "chart.js": "^4.4.1",
     "concurrently": "^8.2.2",
     "connect-redis": "^7.1.0",
