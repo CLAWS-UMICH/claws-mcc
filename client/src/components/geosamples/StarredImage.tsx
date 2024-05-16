@@ -1,5 +1,5 @@
 import React from "react";
-import { BaseGeosample } from "./Geosamples";
+import { BaseGeosample } from "./GeosampleTypes.tsx";
 import { makeStyles } from "@fluentui/react-components";
 
 const useStyles = makeStyles({

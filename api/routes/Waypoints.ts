@@ -32,6 +32,10 @@ export default class Waypoints extends Base {
         {
             type: 'GET_WAYPOINTS',
             handler: this.sendWaypoints.bind(this),
+        },
+        {
+            type: 'WAYPOINTS',
+            handler: this.handleReceiveWaypoints.bind(this),
         }
     ]
     private collection: Collection<BaseWaypoint>
@@ -44,10 +48,10 @@ export default class Waypoints extends Base {
     }
 
     async sendWaypoints() {
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         this.logger.info('receiving waypoints request')
@@ -61,6 +65,32 @@ export default class Waypoints extends Base {
             data: data,
         })
         this.updateARWaypoints(messageId, data, current_index);
+    }
+
+    async handleReceiveWaypoints(data: WaypointsMessage) {
+        const newWaypoints = data.data?.AllWaypoints;
+        if (!newWaypoints.length) {
+            this.logger.error('No waypoints received');
+            return;
+        }
+
+        // just delete all the waypoints and insert the new ones
+        await this.collection.deleteMany({});
+        await this.collection.insertMany(newWaypoints);
+        this.logger.info('Received new waypoints');
+
+        // update current_index in the config collection
+        const config_collection = this.db.collection('waypoint_config');
+        await config_collection.updateOne({}, { $set: { current_index: data.data.currentIndex } });
+        this.logger.info('Updated current_index in config collection');    
+
+        const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
+        this.dispatch('FRONTEND', {
+            id: messageId,
+            type: 'WAYPOINTS',
+            use: 'GET',
+            data: newWaypoints,
+        });
     }
 
     async addWaypoint(req: Request, res: Response<ResponseBody>): Promise<ResponseBody> {
@@ -81,11 +111,11 @@ export default class Waypoints extends Base {
             return response;
         }
         const waypointsId = waypoints.map(waypoint => waypoint.waypoint_id);
-        // get current_index from DB
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        // get current_index from config collection
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         // Get all existing waypoints
@@ -105,13 +135,21 @@ export default class Waypoints extends Base {
                 res.send(response);
                 return response;
             }
-            // change the waypoint_id of the new waypoints
+            // change the waypoint_id and assign waypoint_letter for the new waypoints
             diff.forEach(waypoint => {
-                current_index++;
                 waypoint.waypoint_id = current_index;
+                waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
+                current_index++;
+                if (current_index === 17 || current_index === 23 || current_index === 24) {
+                    if (current_index === 23) {
+                        current_index = 25;
+                    } else {
+                        current_index++;
+                    }
+                }
             });
-            // update the current_index in the collection
-            index_collection.updateOne({}, { $set: { index: current_index } });
+            // update the current_index in the config collection
+            config_collection.updateOne({}, { $set: { current_index: current_index } });
             insertResult = await this.collection.insertMany(diff);
             message = "Waypoints with ids: " +
                 // @ts-ignore
@@ -122,13 +160,21 @@ export default class Waypoints extends Base {
         }
         // All waypoints sent in request are new
         else {
-            // change the waypoint_id of the new waypoints
+            // change the waypoint_id and assign waypoint_letter for the new waypoints
             waypoints.forEach(waypoint => {
-                current_index++;
                 waypoint.waypoint_id = current_index;
+                waypoint.waypoint_letter = this.generateWaypointLetter(current_index);
+                current_index++;
+                if (current_index === 17 || current_index === 23 || current_index === 24) {
+                    if (current_index === 23) {
+                        current_index = 25;
+                    } else {
+                        current_index++;
+                    }
+                }
             });
-            // update the current_index in the collection
-            index_collection.updateOne({}, { $set: { index: current_index } });
+            // update the current_index in the config collection
+            config_collection.updateOne({}, { $set: { current_index: current_index } }, { upsert: true });
 
             insertResult = await this.collection.insertMany(waypoints);
             message = "Added waypoints with ids: [" +
@@ -162,10 +208,10 @@ export default class Waypoints extends Base {
     }
 
     async deleteWaypoint(req: Request, res: Response<ResponseBody>) {
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         // Waypoint ids to delete
@@ -192,7 +238,7 @@ export default class Waypoints extends Base {
             return acc + waypointId.toString(10) + ', ';
         }, '').slice(0, -2) + "]";
 
-        //if any waypoint_ids in reqeusted_waypoints are not in current_waypoints, return error
+        //if any waypoint_ids in requested_waypoints are not in current_waypoints, return error
         let result = requested_waypoint_ids.filter(x => !current_waypoint_ids.includes(x));
         if (result.length > 0) {
             message = "Could not find waypoints with ids: [" + result.reduce((acc, waypointId) => {
@@ -229,10 +275,10 @@ export default class Waypoints extends Base {
     }
 
     async editWaypoint(req: Request, res: Response<ResponseBody>) {
-        const index_collection = this.db.collection('waypoint_current_index');
-        var current_index = await index_collection.findOne()
+        const config_collection = this.db.collection('waypoint_config');
+        var current_index = await config_collection.findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             });
         let message = "";
@@ -260,7 +306,6 @@ export default class Waypoints extends Base {
                     },
                     type: editedWaypoint.type,
                     description: editedWaypoint.description,
-                    details: editedWaypoint.details,
                     author: editedWaypoint.author
                 }
             }
@@ -322,13 +367,12 @@ export default class Waypoints extends Base {
             location: waypoint.location,
             type: waypoint.type,
             description: waypoint.description,
-            details: waypoint.details,
             author: waypoint.author,
             waypoint_letter: waypoint.waypointLetter
         }));
         const newWaypointsMessage: WaypointsMessage = {
             id: -1, // all astronauts
-            type: 'Waypoints',
+            type: 'WAYPOINTS',
             use: 'PUT',
             data: {
                 AllWaypoints: waypoints,
@@ -338,4 +382,10 @@ export default class Waypoints extends Base {
         this.dispatch("AR", newWaypointsMessage)
     }
 
+    private generateWaypointLetter(index: number): string {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const quotient = Math.floor(index / 26);
+        const remainder = index % 26;
+        return alphabet[quotient - 1] ? alphabet[quotient - 1] + alphabet[remainder] : alphabet[remainder];
+    }
 }

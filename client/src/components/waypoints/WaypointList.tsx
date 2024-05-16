@@ -174,9 +174,6 @@ export const WaypointForm: React.FC<WaypointFormProps> = props => {
                 latitude: parseFloat(matches[1]),
                 longitude: parseFloat(matches[2])
             },
-            details: "",
-            time:"",
-            date:""
         };
         if (isEqual(newWaypoint, props.waypoint)) return;
         const res = await fetch("/api/waypoint", {

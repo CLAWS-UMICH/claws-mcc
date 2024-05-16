@@ -1,206 +1,201 @@
-import React from 'react';
-import {GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader} from '@react-google-maps/api';
-import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "../waypoints/WaypointManager.tsx";
-import {Body1, Body1Stronger} from "@fluentui/react-components";
-import {ComposeFilled} from "@fluentui/react-icons";
-import {WaypointForm} from "../waypoints/WaypointList.tsx";
-import waypointImage from '../../assets/waypoint.png';
-import {isEqual} from "lodash";
-import { BaseGeosample, ManagerAction } from './Geosamples.tsx';
+import React from "react";
+import { Circle, GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { BaseGeosample, BaseZone, ManagerAction } from "./GeosampleTypes.tsx";
+import sampleImage from '../../assets/sampleImage.png';
+import starredImage from '../../assets/starredImage.png';
+import { Body1, Body1Stronger, Skeleton, makeStyles, Subtitle2Stronger } from "@fluentui/react-components";
 
-const key = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
+const useStyles = makeStyles({
+    mapContainer: {
+        width: '100%',
+        height: '400px',
+        marginLeft: '0',
+        marginRight: '0',
+        marginBottom: '0',
+        marginTop: '0'
+    },
+});
 
-type MapObject = {
-    location: string,
-    name: string,
-    zoomlevels: number,
-    copyright: string,
-    caption: string
-}
-
-/**
- * Adds custom map types for each type of Mars imagery.
- * @param {google.maps.Map} map The map to which to add these map types.
- */
-function addMarsMapTypes(map: google.maps.Map) {
-    const mapsServer = 'mw1.google.com/mw-planetary/mars/';
-    const maps: { [index: string]: MapObject } = {
-        elevation: {
-            location: mapsServer + 'elevation',
-            name: 'elevation',
-            zoomlevels: 9,
-            copyright: 'NASA / JPL / GSFC / Arizona State University',
-            caption: 'A shaded relief map color-coded by altitude'
-        },
-        visible: {
-            location: mapsServer + 'visible',
-            name: 'visible',
-            zoomlevels: 10,
-            copyright: 'NASA / JPL / MSSS / Arizona State University',
-            caption: 'A mosaic of images from the visible portion of the spectrum'
-        },
-        infrared: {
-            location: mapsServer + 'infrared',
-            name: 'infrared',
-            zoomlevels: 13,
-            copyright: 'NASA / JPL / Arizona State University',
-            caption: 'A mosaic of images from the infrared portion of the spectrum'
+const origin: google.maps.Point = {
+    x: 36.25,
+    y: 29.5,
+    equals: function (other: google.maps.Point | null): boolean {
+        if (!other) {
+            return false;
         }
-    };
+        return this.x === other.x && this.y === other.y;
+    }
+};
 
-    map.mapTypes.set('elevation', makeMarsMapType(maps['elevation']));
-    map.mapTypes.set('visible', makeMarsMapType(maps['visible']));
-    map.mapTypes.set('infrared', makeMarsMapType(maps['infrared']));
-
-    map.setMapTypeId('elevation');
-}
-
-/**
- * Builds a custom map type for Mars based on the provided parameters.
- * @param {Object} m JSON representing the map type options.
- * @return {google.maps.ImageMapType} .
- */
-function makeMarsMapType(m: MapObject): google.maps.ImageMapType {
-    const opts = {
-        baseUrl: 'https://' + m.location + '/',
-        getTileUrl: function (tile: google.maps.Point, zoom: number) {
-            let bound = Math.pow(2, zoom);
-            let x = tile.x;
-            let y = tile.y;
-            // Don't repeat across y-axis (vertically).
-            if (y < 0 || y >= bound) {
-                return null;
-            }
-
-            // Repeat across x-axis.
-            if (x < 0 || x >= bound) {
-                x = (x % bound + bound) % bound;
-            }
-            let qstr = 't';
-            for (let z = 0; z < zoom; z++) {
-                bound = bound / 2;
-                if (y < bound) {
-                    if (x < bound) {
-                        qstr += 'q';
-                    } else {
-                        qstr += 'r';
-                        x -= bound;
-                    }
-                } else {
-                    if (x < bound) {
-                        qstr += 't';
-                        y -= bound;
-                    } else {
-                        qstr += 's';
-                        x -= bound;
-                        y -= bound;
-                    }
-                }
-            }
-            return 'https://' + m.location + '/' + qstr + '.jpg';
-        },
-        tileSize: new google.maps.Size(256, 256),
-        maxZoom: m.zoomlevels - 1,
-        minZoom: 0,
-        name: m.name.charAt(0).toUpperCase() + m.name.substring(1)
-    };
-
-    return new google.maps.ImageMapType(opts);
-}
+const scaleSize: google.maps.Size = {
+    height: 70,
+    width: 70,
+    equals: function (other: google.maps.Size | null): boolean {
+        if (!other) {
+            return false;
+        }
+        return this.height === other.height && this.width === other.width;
+    }
+};
 
 interface GeosampleMapProps {
-    temp?: BaseWaypoint
     geosamples: BaseGeosample[];
-    selected?: BaseGeosample;
+    zones: BaseZone[];
     dispatch: React.Dispatch<ManagerAction>;
-}
+    ready: boolean;
+    selected?: BaseGeosample
+};
 
-export const GeosampleMap: React.FC<GeosampleMapProps> = props => {
+const API_KEY = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
+// const API_KEY = "AIzaSyDUzQIxpe2PuzxQdQLtW7NZ3X9mftd6bYE"; this is april's google maps key 
+
+const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch, ready, selected}) => {
+    const styles = useStyles();
     const [infoWindow, setInfoWindow] = React.useState<React.ReactNode | null>(null);
-    const [tempWindow, setTempWindow] = React.useState<React.ReactNode | null>(null);
-    const {isLoaded} = useJsApiLoader({
+    const [zIndices, setZIndices] = React.useState<{ [id: number]: number | undefined }>({});
+    const [prevSelected, setPrevSelected] = React.useState<BaseGeosample | null>(null);
+    const [circleStyles, setCircleStyles] = React.useState<{ [zone_id: string]: { fillOpacity: number, strokeOpacity: number } }>({});
+    const center : google.maps.LatLngLiteral = {lat: 29.564781, lng: -95.081189}
+    const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: key
-    })
-    const intToChar = (i: number): string => {
-        // If i > 26, add another letter.
-        if (i > 26) return String.fromCharCode(i / 26 + 65) + String.fromCharCode(i % 26 + 65);
-        return String.fromCharCode(i + 65);
+        googleMapsApiKey: API_KEY,
+    });
+
+    React.useEffect(() => {
+        const newStyles = {};
+        zones.forEach(zone => {
+            newStyles[zone.zone_id] = { fillOpacity: 0, strokeOpacity: 0 };
+        });
+        if (selected) {
+            newStyles[selected.zone_id] = { fillOpacity: 0.2, strokeOpacity: 0.7 };
+        }
+        setCircleStyles(newStyles);
+    }, [selected, geosamples]);
+
+    React.useEffect(() => {
+        if (selected && (!prevSelected || selected.geosample_id !== prevSelected.geosample_id)) {
+            setZIndices(prevState => {
+                const newZIndices = {};
+                newZIndices[selected.geosample_id] = 999; // Set the zIndex to 999 or any other value you need
+                return newZIndices;
+            });
+            setPrevSelected(selected);
+        } 
+    }, [selected, prevSelected]);
+
+    const getMarkerLabel = (zoneId: string, id?: number) : string => {
+        return id ? zoneId + id.toString() : zoneId;
     };
-    const handleRightClick = (e: google.maps.MapMouseEvent) => {
-        const latLng = e.latLng!;
-        setTempWindow(<InfoWindow
-                position={latLng}
-                onCloseClick={() => setTempWindow(null)}
+
+    if (!ready) {
+        return <Skeleton/>;
+    };
+
+    const handleRightClick = (e: google.maps.MapMouseEvent, marker: BaseGeosample) => {
+        let pos = {lat: e.latLng?.lat(), lng: e.latLng?.lng()}
+        if (pos.lat) pos.lat = pos.lat
+        if (pos.lng) pos.lng = pos.lng
+
+        const offset : google.maps.Size = {
+            height: -66,
+            width: 0,
+            equals: function (other: google.maps.Size | null): boolean {
+                if (!other) {
+                    return false;
+                }
+                return this.height === other.height && this.width === other.width;
+            }
+        }
+        
+        setInfoWindow(
+            <InfoWindow 
+                position={e.latLng}
+                options={{pixelOffset: offset}}
+                onCloseClick={() => setInfoWindow(null)}
             >
-                <div style={{display: "flex", flexDirection: "column", width: "max-content", color: "black"}}>
-                    <div>
-                        <Body1Stronger>Latitude: </Body1Stronger>
-                        <Body1>{latLng.lat().toFixed(5)}</Body1>
-                    </div>
-                    <div>
-                        <Body1Stronger>Longitude: </Body1Stronger>
-                        <Body1>{latLng.lng().toFixed(5)}</Body1>
-                    </div>
-                    {/* <WaypointForm
-                        afterSubmit={() => setTempWindow(null)}
-                        waypoint={props.temp!}
-                        temp={{
-                            waypoint_id: -1,
-                            type: WaypointType.NAV,
-                            description: "",
-                            location: {
-                                latitude: latLng.lat(),
-                                longitude: latLng.lng()
-                            },
-                            author: -1
-                        }}
-                        dispatch={props.dispatch}
-                        text={"Create Waypoint"}
-                        buttonProps={{icon: <ComposeFilled/>}}/> */}
+                <div style={{display: "flex", flexDirection: "column"}}>
+                <Subtitle2Stronger style={{color: "black"}}>
+                    {marker.eva_data.name}
+                </Subtitle2Stronger>
+                <Body1 style={{color: "black"}}>
+                    <b>Latitude:</b> {marker.location.latitude}
+                </Body1>
+                <Body1 style={{color: "black"}}>
+                    <b>Longitude:</b> {marker.location.longitude}
+                </Body1>
                 </div>
             </InfoWindow>
-        );
+        )
+        return;
     }
-    return isLoaded ? (
-        <div style={{padding: "0.5rem 2rem 2.5rem 2rem"}}>
-            <GoogleMap
-                mapContainerClassName={"map"}
-                center={{lat: 42.27697713747799, lng: -83.73820501490505}}
-                zoom={10}
-                onLoad={addMarsMapTypes}
-                onRightClick={handleRightClick}
-                options={{
-                    streetViewControl: false,
-                    mapTypeControlOptions: {mapTypeIds: ['elevation', 'visible', 'infrared']}
-                }}>
-                {props.geosamples.map(marker => {
-                    const position = {lat: marker.location.latitude, lng: marker.location.longitude};
-                    return (
-                        <div key={marker.geosample_id}>
-                            <Marker position={position} clickable={false}
-                                    label={{text: intToChar(marker.geosample_id), color: "white", fontWeight: "bold"}}
-                                    icon={waypointImage}/>
-                            <InfoBox
-                                position={new google.maps.LatLng(marker.location.latitude, marker.location.longitude)}
-                                options={{
-                                    closeBoxURL: ``,
-                                    enableEventPropagation: true,
-                                    pixelOffset: new google.maps.Size(10, -40),
-                                    pane: "markerLayer"
-                                }}
-                                onCloseClick={() => setInfoWindow(null)}>
-                                <div className={'info-box'}
-                                     style={{backgroundColor: isEqual(props.selected, marker) ? "grey" : undefined}}>
-                                    <Body1Stronger>Waypoint {marker.geosample_id}</Body1Stronger>
-                                    <Body1>{marker.description}</Body1>
-                                </div>
-                            </InfoBox>
-                        </div>);
+
+    return isLoaded ? ( 
+    <div key="map" style={{padding: "0.5rem 2rem 2.5rem 2rem"}}>
+        <GoogleMap
+            mapContainerClassName={styles.mapContainer}
+            zoom={20}
+            center={selected ? {lat: selected.location.latitude, lng: selected.location.longitude} : center}
+            mapTypeId="satellite"
+            tilt={0}
+            onLoad={() =>    
+                    setCircleStyles(prevStyles => {
+                    const newStyles = {};
+                    zones.forEach(zone => {
+                        newStyles[zone.zone_id] = { fillOpacity: 0, strokeOpacity: 0 };
+                    });
+                    if (selected) newStyles[selected.zone_id] = { fillOpacity: 0.2, strokeOpacity: 0.7 };
+                    return newStyles;
                 })}
-                {infoWindow}
-                {tempWindow}
-            </GoogleMap>
-        </div>
-    ) : <></>
+        >
+        {geosamples.map(marker => {
+            return (
+                <div key={marker.geosample_id}> 
+                    <Marker
+                        key={marker.id}
+                        position={{ lat: marker.location.latitude, lng: marker.location.longitude }}
+                        clickable={true}
+                        label={{ text: getMarkerLabel(marker.zone_id, marker.id), color: "white", fontWeight: "bold", fontSize: "26px" }}
+                        icon={{url: marker.starred ? starredImage : sampleImage, labelOrigin: origin, scaledSize: scaleSize}}                        
+                        zIndex={zIndices[marker.geosample_id]}
+                        onRightClick={(e) => handleRightClick(e, marker)}
+                    />
+                </div>
+            );
+        })}
+        {selected && selected?.geosample_id === selected.geosample_id &&                 
+            <Circle
+                center={{lat: selected.location.latitude+0.000023, lng: selected.location.longitude}}
+                radius={4}
+                options={{
+                    fillColor: "#FFFFFF",
+                    fillOpacity: circleStyles[selected.zone_id]?.fillOpacity || 0,
+                    strokeColor: "#FFFFFF",
+                    strokeWeight: 2,
+                    strokeOpacity: circleStyles[selected.zone_id]?.strokeOpacity || 0,
+                }}
+            />
+        }
+        {zones.map(zone => {
+            let latlng : google.maps.LatLngLiteral = {lat: zone.location.latitude, lng: zone.location.longitude}
+            return (
+                <Circle
+                    key={zone.zone_id}
+                    center={latlng}
+                    radius={zone.radius}
+                    options={{
+                        fillColor: "#A7865E",
+                        fillOpacity: circleStyles[zone.zone_id]?.fillOpacity || 0,
+                        strokeColor: "#FFFFFF",
+                        strokeWeight: 2,
+                        strokeOpacity: circleStyles[zone.zone_id]?.strokeOpacity || 0
+                    }}
+                />
+            );
+        })}
+        {infoWindow}
+        </GoogleMap>
+    </div>
+) : <></>;
 }
+
+export default GeosampleMap;

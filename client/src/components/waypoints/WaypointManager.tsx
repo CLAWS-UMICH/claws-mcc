@@ -34,9 +34,6 @@ export type ManagerAction =
 export type BaseWaypoint = {
     _id?: number; // server generated
     waypoint_id: number; //sequential
-    details: string // not in mongo
-    date: string// not in mongo
-    time: string// not in mongo
     location: { latitude: number, longitude: number };
     type: WaypointType;
     description: string;
@@ -147,9 +144,6 @@ export const WaypointManager: React.FC = () => {
                                         waypoint_id: -1,
                                         author: -1,
                                         type: WaypointType.NAV,
-                                        details:"",
-                                        date:"",
-                                        time:"",
                                         description: "",
                                         location: {latitude: 0, longitude: 0}
                                     }

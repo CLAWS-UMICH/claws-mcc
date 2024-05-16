@@ -10,6 +10,7 @@ import SuitControls from './components/suit_controls/SuitControls.tsx';
 import Communication from './components/communications/Communication.tsx';
 import CameraView from './components/camera_view/CameraView.tsx';
 import EmptyComponent from './components/common/EmptyComponent.tsx';
+import { TaskList } from './components/features/task-list.tsx';
 
 interface AstronautData {
   heartrate: number;
@@ -37,7 +38,7 @@ function App() {
                     <div>
                       <Routes>
                           <Route path="/" element={<EmptyComponent />} />
-                          <Route path="/tasks" element={<EmptyComponent />} />
+                          <Route path="/tasks" element={<TaskList />} />
                           <Route path="/vitals" element={<SuitControls/>} />
                           <Route path="/samples" element={<GeosampleManager />} />
                           <Route path="/navigation" element={<WaypointManager />} />

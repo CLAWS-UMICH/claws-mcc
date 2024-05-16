@@ -41,17 +41,14 @@ const NewView: React.FC<NewViewProps> = (props) => {
     author: -1,
     description: "",
     type: 0,
-    details: "",
     location: {
       latitude: 0,
       longitude: 0,
     },
-    time: "",
-    date: "",
   });
 
   const handleAdd = async () => {
-    setNewWaypoint((prev) => ({ ...prev, time: Date.now().toString() }));
+    setNewWaypoint((prev) => ({ ...prev }));
     const new_waypoints = [...props.waypoints, new_waypoint];
     try{
       const res = await Axios.put("/api/waypoint", {
@@ -95,13 +92,13 @@ const NewView: React.FC<NewViewProps> = (props) => {
 
       <form style={{ padding: "0% 2%" }}>
         <div className={styles.container}>
-          <Label htmlFor={"waypoint-details"}>Details</Label>
+          <Label htmlFor={"waypoint-details"}>Description</Label>
           <Input
             type="text"
             id={"waypoint-details"}
-            value={new_waypoint.details}
+            value={new_waypoint.description}
             onChange={(e) => {
-              setNewWaypoint((prev) => ({ ...prev, details: e.target.value }));
+              setNewWaypoint((prev) => ({ ...prev, description: e.target.value }));
             }}
           />
         </div>
@@ -158,21 +155,6 @@ const NewView: React.FC<NewViewProps> = (props) => {
                   setNewWaypoint((prev) => ({ ...prev, location: {latitude: new_waypoint.location.latitude , longitude: Number(data.value)}}));
                 }}
               />
-          </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
-            <Label htmlFor={"waypoint-time"}>Time</Label>
-            <Input disabled
-              type="text"
-              id={"waypoint-time"}
-              value={Date.now().toString()}
-            />
-          </div>
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-date"}>Date</Label>
-            <Input disabled
-              type="text"
-              id={"waypoint-date"}              
-            />
           </div>
         </div>
       </form>
@@ -236,13 +218,10 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
     author: -1,
     description: "",
     type: WaypointType.NAV,
-    details: "",
     location: {
       latitude: 0,
       longitude: 0,
     },
-    time: "",
-    date: "",
   });
 
   useEffect(() => {
@@ -263,7 +242,6 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
       //update waypoints to the value from input boxes
       props.waypoints[idx].description = new_waypoint.description;
       props.waypoints[idx].type = new_waypoint.type;
-      props.waypoints[idx].details = new_waypoint.details;
       props.waypoints[idx].location.latitude = new_waypoint.location.latitude;
       props.waypoints[idx].location.longitude = new_waypoint.location.longitude;
 
@@ -340,23 +318,23 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
 
       <form style={{ padding: "0% 2%" }}>
         <div className={styles.container}>
-          <Label htmlFor={"waypoint-details"}>Details</Label>
+          <Label htmlFor={"waypoint-details"}>Description</Label>
           {
             isEditing ? 
             <Input
             type="text"
             id={"waypoint-details"}
-            value={new_waypoint?.details}
+            value={new_waypoint?.description}
             onChange={(e) => {
               if(!new_waypoint) return; 
-              setNewWaypoint((prev) => ({ ...prev, details: e.target.value }));
+              setNewWaypoint((prev) => ({ ...prev, description: e.target.value }));
             }}
           /> : 
             <Input
             type="text"
             id={"waypoint-details"}
             style={{pointerEvents: "none"}}
-            value={props.selected?.details}
+            value={props.selected?.description}
           />
         } 
         </div>
@@ -445,24 +423,6 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
               style={{pointerEvents: "none"}}
             />
             }
-          </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
-            <Label htmlFor={"waypoint-time"}>Time</Label>
-            <Input 
-              {...(isEditing ? {disabled: true} : {})}
-              style={{pointerEvents: "none"}}
-              type="text"
-              id={"waypoint-time"}
-              value={props.selected?.time}
-            />
-          </div>
-          <div className={styles.container}>
-            <Label htmlFor={"waypoint-date"}>Date</Label>
-            <Input disabled
-              type="text"
-              id={"waypoint-date"}
-              value={props.selected?.date}
-            />
           </div>
         </div>
         {isEditing ? (

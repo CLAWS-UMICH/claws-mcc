@@ -24,6 +24,7 @@ const testData: BaseWaypoint[] = [
         },
         type: 1,
         description: 'Test waypoint',
+        details: '',
         author: -1
     }, {
         waypoint_id: 2,
@@ -33,6 +34,7 @@ const testData: BaseWaypoint[] = [
         },
         type: 2,
         description: 'Test waypoint 2',
+        details: '',
         author: -1
     }];
 
@@ -104,7 +106,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint',
-                    author: -1
+                    author: -1,
+                    details: ""
                 }
                 const req = {
                     body: {
@@ -138,7 +141,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint',
-                    author: -1
+                    author: -1,
+                    details: ""
                 }
                 const req = {
                     body: {
@@ -171,7 +175,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint',
-                    author: -1
+                    author: -1,
+                    details: ""
                 }
                 const req = {
                     body: {
@@ -205,7 +210,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint',
-                    author: -1
+                    author: -1,
+                    details: ""
                 };
                 const nonexistentWaypointId = 4;
                 const nonexistentWaypoint: BaseWaypoint = {
@@ -216,7 +222,8 @@ describe('API route', () => {
                     },
                     type: 3,
                     description: 'I do not exist',
-                    author: 21
+                    author: 21,
+                    details: ""
                 }
                 const req = {
                     body: {
@@ -250,7 +257,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint',
-                    author: -1
+                    author: -1,
+                    details: ""
                 };
                 const waypointId2 = 4;
                 const testWaypoint2: BaseWaypoint = {
@@ -261,7 +269,8 @@ describe('API route', () => {
                     },
                     type: 3,
                     description: 'I do not exist',
-                    author: 21
+                    author: 21,
+                    details: ""
                 };
                 const req = {
                     body: {
@@ -294,7 +303,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint',
-                    author: -1
+                    author: -1,
+                    details: ""
                 };
                 const waypointId2 = 2;
                 const testWaypoint2: BaseWaypoint = {
@@ -305,7 +315,8 @@ describe('API route', () => {
                     },
                     type: 2,
                     description: 'Test waypoint 2',
-                    author: -1
+                    author: -1,
+                    details: ""
                 };
                 const req = {
                     body: {
@@ -338,7 +349,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint',
-                    author: -1
+                    author: -1,
+                    details: ""
                 };
                 const waypointId2 = 2;
                 const testWaypoint2: BaseWaypoint = {
@@ -349,7 +361,8 @@ describe('API route', () => {
                     },
                     type: 3,
                     description: 'I do not exist',
-                    author: 21
+                    author: 21,
+                    details: ""
                 };
                 const req = {
                     body: {
@@ -383,7 +396,8 @@ describe('API route', () => {
                     },
                     type: 1,
                     description: 'Test waypoint 3',
-                    author: -1
+                    author: -1,
+                    details: ""
                 }
                 const setUpTest = async () => {
                     const frontendWs = new WebSocketServer({noServer: true});

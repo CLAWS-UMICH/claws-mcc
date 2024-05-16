@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "rootDir": "./",
+    "removeComments": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "allowImportingTsExtensions": true,
+    // Ensure this is set to "react"
+    "jsx": "react"
+  },
+  "include": [
+    "src/**/*",
+    "src/declarations.d.ts"
+    // "client/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
