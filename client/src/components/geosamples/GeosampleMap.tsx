@@ -164,8 +164,8 @@ const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch,
         })}
         {selected && selected?.geosample_id === selected.geosample_id &&                 
             <Circle
-                center={{lat: selected.location.latitude+0.00004, lng: selected.location.longitude}}
-                radius={5}
+                center={{lat: selected.location.latitude+0.000023, lng: selected.location.longitude}}
+                radius={4}
                 options={{
                     fillColor: "#FFFFFF",
                     fillOpacity: circleStyles[selected.zone_id]?.fillOpacity || 0,

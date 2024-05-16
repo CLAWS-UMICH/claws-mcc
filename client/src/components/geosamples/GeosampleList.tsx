@@ -67,6 +67,12 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
         return map;
     }, [geosamples]);
 
+    React.useEffect(() => {
+        if (sample_zones) {
+            setOpenItems(sample_zones.map(zone => zone.zone_id));
+        }
+    }, [sample_zones]);
+
     // Maintain state of accordion panels
     const handleToggle: AccordionToggleEventHandler<string> = (event, data) => {
         setOpenItems(data.openItems);
@@ -88,7 +94,7 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
     };
 
     return (
-        <Accordion className={styles.container} onToggle={handleToggle} openItems={openItems} multiple collapsible>
+        <Accordion className={styles.container} defaultOpenItems={sample_zones.map(zone => zone.zone_id)} onToggle={handleToggle} openItems={openItems} multiple collapsible>
             {sample_zones.map((zone) =>             
                 zone.geosample_ids.length > 0 && (<AccordionItem key={zone.zone_id} value={zone.zone_id}>
                     <AccordionHeader key={zone.zone_id} className={styles.header} size="large" expandIcon={openItems.includes(zone.zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
