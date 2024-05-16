@@ -9,22 +9,12 @@ import { useAstronaut } from "../waypoints/WaypointManager.tsx";
 import MessageDrawer from "./MessageDrawer.tsx";
 import MessageDisplay from "./MessageDisplay.tsx";
 import { Backpack12Filled } from "@fluentui/react-icons";
+import { BaseMessage } from "../../../../api/types/Messages.ts";
 
 
 export type MessageAction =
     { type: 'set', payload: BaseMessage[] } | // Should only be used by ServerListener
     { type: 'add', payload: BaseMessage }
-
-export type BaseMessage = {
-    message_id: number;
-    type: 'messaging'
-    use: 'PUT' | 'GET'; // these are the only two methods AR expects
-    data?: {
-        from: number
-        sent_to: number
-        message: string
-    };
-}
 
 function createConversations(setConversations, messages: BaseMessage[]) {
     // Map from astronaut ID to messages

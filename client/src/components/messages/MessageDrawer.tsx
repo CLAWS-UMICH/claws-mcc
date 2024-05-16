@@ -3,7 +3,7 @@ import { useAstronaut } from "../waypoints/WaypointManager.tsx";
 import { Body1, Body1Stronger, Skeleton, CompoundButton } from "@fluentui/react-components";
 import { isEqual } from "lodash";
 import { makeStyles } from '@fluentui/react-components';
-import { BaseMessage } from "./Messages.tsx";
+import { BaseMessage } from "../../../../api/types/Messages.ts";
 
 const useStyles = makeStyles({
     imageText: {
@@ -14,20 +14,28 @@ const useStyles = makeStyles({
     }
 });
 
-function DrawerItem({ astronaut, messages }) {
-}
-
-function SampleImage({ astro }) {
-    const styles = useStyles();
+function ContactImage({ astro }) {
+    const circleStyle = {
+        width: "30px",
+        height: "30px",
+        lineHeight: "500px",
+        borderRadius: "50%",
+        fontSize: "50px",
+        color: "#fff",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#006704",
+        border: "2px solid #4CAB50",
+    }
     return (
-        <div style={{ marginLeft: "-10px" }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 28 28" fill="none">
-                <circle cx="14" cy="14" r="13.5" fill="#006704" stroke="#4CAB50" />
-            </svg>
-            <div className={styles.imageText}><b>A{astro}</b></div>
+        <div style={circleStyle}>
+            <div style={{ fontSize: "13px" }}><b>A{astro}</b></div>
         </div>
     );
 }
+
+
 
 function MessageDrawer({ messages, conversations, setActiveConversation, activeConversation }) {
     const [hoveredButton, setHoveredButton] = React.useState(null);
@@ -60,11 +68,12 @@ function MessageDrawer({ messages, conversations, setActiveConversation, activeC
                             }}
                             shape='circular'
                             secondaryContent={<span style={{ display: "inline-block", width: "150px" }}>{recent_message}</span>}
-                            icon={<SampleImage astro={astro} />}
+                            icon={<ContactImage astro={astro} />}
                             onClick={() => {
                                 if (activeConversation === astro) {
                                     setActiveConversation(-1);
-                                } else setActiveConversation(astro);
+                                }
+                                setActiveConversation(astro);
                             }}
                             onMouseEnter={() => {
                                 handleMouseEnter(index);
