@@ -354,6 +354,8 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
     }
   };
 
+  // TODO: change fonts!!!!!!!
+
   const splitTimeString: (input: string) => [string, string] = (input) => {
       const match = input.match(/(.*? .*?) (.*)/);
       if (match) {

@@ -283,7 +283,7 @@ const dialogStyles = makeStyles({
         rowGap: "10px",
         width: "90%",
         justifyItems: "center",
-        ...shorthands.margin(0, "5%")
+        ...shorthands.margin(0, "5%"),
     },
     form: {
         display: "grid",
