@@ -1,20 +1,4 @@
-interface Alert {
-    code: string;
-    message: string;
-}
-
-export type DCUValues = {
-    batt: boolean,
-    oxy: boolean,
-    comm: boolean,
-    fan: boolean,
-    pump: boolean,
-    co2: boolean, 
-}
-
-export type VitalsData = {
-    id: number,
-    eva_time: number,
+export type TSSEvaData = {
     // TODO: MATCH TSS VALUES
     battery_time_left: number;
     primary_oxygen_storage: number;
@@ -38,17 +22,40 @@ export type VitalsData = {
     coolant_ml: number,
     h2o_gas_pressure: number,
     h2o_liquid_pressure: number,
-    alerts: Alert[],
-    dcu: DCUValues
+    alerts: Alert[]
 }
 
-// export type VitalsData = {
-//     id: number,
-//     eva_time: number;
-//     eva_1: TSSEvaData;
-//     eva_2: TSSEvaData;
-//     dcu: DCUValues;
-// }
+export type DCUValues = {
+    eva1: {
+        batt: boolean,
+        oxy: boolean,
+        comm: boolean,
+        fan: boolean,
+        pump: boolean,
+        co2: boolean, 
+    },
+    eva2: {
+        batt: boolean,
+        oxy: boolean,
+        comm: boolean,
+        fan: boolean,
+        pump: boolean,
+        co2: boolean,
+    }
+}
+
+export type VitalsData = {
+    id: number,
+    eva_time: number;
+    eva_1: TSSEvaData;
+    eva_2: TSSEvaData;
+    dcu: DCUValues;
+}
+
+interface Alert {
+    code: string;
+    message: string;
+}
 
 export type ManagerState = {
     vitals: VitalsData;
