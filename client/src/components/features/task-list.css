@@ -1,0 +1,439 @@
+.task-background {
+    background-color: #0F0F0F; /* Set background color */
+    color: #FFFFFF; /* Set text color */
+    height: 100%; /* Make the background fill the container height */
+    display: flex; /* Enable flexbox layout */
+}
+
+.task-list {
+    width: 100%; /* Make the task list fill the container width */
+    border: 1px solid #444444;
+    flex: 1; /* Allow task list to fill remaining space */
+}
+
+.task-list-items {
+    display: flex; /* Enable flexbox layout */
+    flex-direction: column; /* Arrange content in a column */
+    overflow-y: scroll; /* Add vertical scroll if needed */
+    padding: 0.5rem;
+    height: 85vh; /* Make the task list fill the container height */
+}
+
+.task-details {
+    display: flex; /* Enable flexbox layout */
+    flex-direction: column; /* Arrange content in a column */
+    flex: 1; /* Allow content to fill remaining space */
+    background-color: #000000;
+}
+
+.task-list-header {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+    background-color: #141414; /* Set background color */
+    border-bottom: 1px solid #444444; /* Add bottom border */
+    justify-content: space-between;
+    height: 3rem;
+}
+
+.task-list-header-left {
+    padding: 0.5rem;
+    font-size: 1rem;
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+}
+
+.task-list-header-center {
+    font-size: 1rem;
+    align-items: center;
+    display: flex; /* Enable flexbox layout */
+}
+
+.task-ratio {
+    margin-right: 1rem;
+}
+
+.task-list-header-right {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+}
+
+.add-task-button {
+    background-color: #292929;
+    background-image: url(../../assets/addtask.png);
+    background-size: 18px;
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: left center; /* Center the icon */
+    background-position-x: 0.5rem;
+    color: white;
+    padding-left: 35px;
+    padding-right: 8px;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+  }
+
+.progress-bar-container {
+    width: 200px; /* Adjust width as needed */
+    height: 5px; /* Adjust height as needed */
+    background-color: #333333; /* Light background for container */
+    border-radius: 5px; /* Add rounded corners (optional) */
+}
+  
+.progress-bar {
+height: 100%; /* Make the progress bar fill the container height */
+background-color: #479EF5; /* Color of the progress bar */
+border-radius: inherit; /* Inherit rounded corners from the container */
+transition: width 0.5s ease-in-out; /* Add a smooth transition for the progress bar */
+}
+
+.task-list-item {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+}
+
+.emergency-task-list-item {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+}
+
+.inprogress-task-list-item {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+    background-color: #004377;
+    border: 1px solid #5CAAE5; /* Add border */
+}
+
+.task-list-item.selected {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+    background-color: #272727;
+    border: 1px solid #707070;
+}
+
+.emergency-task-list-item input[type="checkbox"] {
+    /* Adjust checkbox size and styles here */
+    width: 26px;
+    height: 26px;
+    appearance: none; /* Remove default checkbox styles */
+    background-color: #590815; /* Set background color */
+    border-radius: 50%; /* Make it a circle */
+    border: 1px solid #962F3F; /* Add border */
+    cursor: pointer; /* Indicate clickable area */
+    margin-right: 1rem; /* Add margin for spacing */
+}
+
+.emergency-tasks {
+    background-color: #590815;
+    border: 1px solid #962F3F;
+}
+
+.inprogress-task-list-item input[type="checkbox"] {
+    /* Adjust checkbox size and styles here */
+    width: 26px;
+    height: 26px;
+    appearance: none; /* Remove default checkbox styles */
+    background-color: #1F1F1F; /* Set background color */
+    border-radius: 50%; /* Make it a circle */
+    border: 1px dashed #5CAAE5; /* Add border */
+    cursor: pointer; /* Indicate clickable area */
+    margin-right: 1rem; /* Add margin for spacing */
+}
+ 
+.task-list-item input[type="checkbox"] {
+    /* Adjust checkbox size and styles here */
+    width: 26px;
+    height: 26px;
+    appearance: none; /* Remove default checkbox styles */
+    background-color: #1F1F1F; /* Set background color */
+    border-radius: 50%; /* Make it a circle */
+    border: 1px solid #666666; /* Add border */
+    cursor: pointer; /* Indicate clickable area */
+    margin-right: 1rem; /* Add margin for spacing */
+}
+
+.task-list-item input[type="checkbox"]:checked {
+    background-image: url("../../assets/checkmark.png");
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: center; /* Center the icon */
+    background-color: #115EA3; /* Change background color on check */
+    border-color: #666666; /* Change border color on check */
+}
+
+.subtasks-container {
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+    margin-left: 1.5rem;
+    border-left: 2px solid #666666; /* Add left border */
+}
+
+.emergency-subtasks-container {
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+    margin-left: 1.5rem;
+    border-left: 2px solid #962F3F; /* Add left border */
+}
+
+.subtasks-container input[type="checkbox"]:checked {
+    background-image: url("../../assets/checkmark.png");
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: center; /* Center the icon */
+    background-color: #115EA3; /* Change background color on check */
+    border-color: #666666; /* Change border color on check */
+}
+
+.subtasks-container input[type="checkbox"] {
+    /* Adjust checkbox size and styles here */
+    width: 26px;
+    height: 26px;
+    appearance: none; /* Remove default checkbox styles */
+    background-color: #1F1F1F; /* Set background color */
+    border-radius: 50%; /* Make it a circle */
+    border: 1px solid #666666; /* Add border */
+    cursor: pointer; /* Indicate clickable area */
+    margin-right: 1rem; /* Add margin for spacing */
+}
+
+.emergency-subtasks-container input[type="checkbox"] {
+    /* Adjust checkbox size and styles here */
+    width: 26px;
+    height: 26px;
+    appearance: none; /* Remove default checkbox styles */
+    background-color: #590815; /* Set background color */
+    border-radius: 50%; /* Make it a circle */
+    border: 1px solid #962F3F; /* Add border */
+    cursor: pointer; /* Indicate clickable area */
+    margin-right: 1rem; /* Add margin for spacing */
+}
+
+.subtask {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+    margin-left: 1rem; /* Add margin for spacing */
+}
+
+.subtask.selected {
+    align-items: center; /* Align content vertically at center */
+    margin-left: 1rem; /* Add margin for spacing */
+    background-color: #272727;
+    border: 1px solid #707070;
+    /* border-radius: 5%;  */
+}
+
+.task-content {
+    flex: 1; /* Allow content to fill remaining space */
+}
+
+.task-text {
+    font-weight: bold;
+}
+
+.task-description {
+    margin-top: 0.1rem;
+    font-size: 0.8rem;
+    width: 25rem;
+    color: #FFFFFF;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.task-details-header {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    background-color: #141414; /* Set background color */
+    border-bottom: 1px solid #444444; /* Add bottom border */
+    justify-content: space-between;
+    height: 3rem;
+    padding: 0.5rem; /* Add padding for spacing */
+}
+
+.task-details-name {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+    font-size: 0.8rem;
+    font-weight: bold;
+    flex: 1
+}
+
+.title-form {
+    background-color: #292929;
+    color: white;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    height: 28px;
+    padding-left: 1rem;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.inprogress-details-button {
+    background-color: #292929;
+    background-image: url(../../assets/inprogress.png);
+    background-size: 18px;
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: left center; /* Center the icon */
+    background-position-x: 0.5rem;
+    color: white;
+    padding-left: 35px;
+    padding-right: 8px;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+    margin: 0.2rem;
+  }
+
+.subtask-details-button {
+    background-color: #292929;
+    background-image: url(../../assets/subtask.png);
+    background-size: 18px;
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: left center; /* Center the icon */
+    background-position-x: 0.5rem;
+    color: white;
+    padding-left: 35px;
+    padding-right: 8px;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+    margin: 0.2rem;
+  }
+
+.emergency-details-button {
+    background-color: #292929;
+    background-image: url(../../assets/emergency.png);
+    background-size: 18px;
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: center; /* Center the icon */
+    color: white;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+    padding: 0.8rem;
+    margin: 0.2rem;
+  }
+
+.edit-details-button {
+    background-color: #292929;
+    background-image: url(../../assets/edit.png);
+    background-size: 18px;
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: left center; /* Center the icon */
+    background-position-x: 0.5rem;
+    color: white;
+    padding-left: 35px;
+    padding-right: 8px;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+    margin: 0.2rem;
+}
+
+.delete-details-button {
+    background-color: #292929;
+    background-image: url(../../assets/delete.png);
+    background-size: 13px;
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: center; /* Center the icon */
+    color: white;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+    padding: 0.8rem;
+    margin: 0.2rem;
+}
+
+.task-details-description {
+    display: flex; /* Enable flexbox layout */
+    align-items: top; /* Align content vertically at center */
+    padding: 0rem; /* Add padding for spacing */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 0.8rem;
+    color: #FFFFFF;
+    border: 1px solid #444444;
+    margin: 1rem;
+    height: 300px;
+}
+
+.description-form {
+    display: flex; /* Enable flexbox layout */
+    align-items: top; /* Align content vertically at center */
+    background-color: #292929;
+    color: white;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    height: 200px;
+    width: 88%;
+    margin: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 1rem;
+}
+
+.task-details-bottom {
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Align content vertically at center */
+    padding: 0.5rem; /* Add padding for spacing */
+}
+
+.spacer {
+    flex: 1;
+}
+
+.save-details-button {
+    background-color: #009B00;
+    background-image: url(../../assets/subtask.png);
+    background-size: 18px;
+    background-repeat: no-repeat; /* Prevent tiling */
+    background-position: left center; /* Center the icon */
+    background-position-x: 0.5rem;
+    color: white;
+    padding-left: 35px;
+    padding-right: 8px;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+    margin: 0.2rem;
+}
+
+.cancel-details-button {
+    background-color: #292929;
+    color: white;
+    border: 0.5px solid #666666;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    height: 28px;
+    align-items: center;
+    margin: 0.5rem;
+}
