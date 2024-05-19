@@ -109,7 +109,7 @@ const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch,
         
         setInfoWindow(
             <InfoWindow 
-                position={e.latLng}
+                position={e.latLng ? e.latLng : undefined}
                 options={{pixelOffset: offset}}
                 onCloseClick={() => setInfoWindow(null)}
             >
