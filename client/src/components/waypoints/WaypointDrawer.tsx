@@ -83,14 +83,14 @@ export const WaypointDrawer: React.FC<WaypointsDrawerProps> = props => {
     const [key, setKey] = React.useState<GroupKey>(GroupKey.Astronaut);
     const grouper = useCallback((waypoints: BaseWaypoint[]) => {
         const astronauts: Map<number, BaseWaypoint[]> = new Map();
-        waypoints.forEach((waypoint) => {
+        waypoints?.forEach((waypoint) => {
             if (!astronauts.has(waypoint.author)) {
                 astronauts.set(waypoint.author, []);
             }
             astronauts.get(waypoint.author)?.push(waypoint);
         });
         const astronautList: React.ReactNode[] = [];
-        astronauts.forEach((waypoints, astronaut) =>
+        astronauts?.forEach((waypoints, astronaut) =>
             astronautList.push(<DrawerItem dispatch={props.dispatch} astronaut={astronaut} waypoints={waypoints}
                                            selected={props.selected}/>));
         return astronautList;

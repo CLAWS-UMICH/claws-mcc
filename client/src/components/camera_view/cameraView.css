@@ -25,6 +25,11 @@
     border-radius: 8px;
 }
 
+video {
+    width: 400px;
+    border-radius: 8px;
+}
+
 .camera-content {
     margin-top: 15px;
     display: flex;

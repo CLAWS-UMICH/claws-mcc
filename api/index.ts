@@ -7,6 +7,7 @@ import { URL } from 'url';
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import Logger from "./core/logger";
+import { IGNORED_TYPES } from "./Base";
 
 dotenv.config();
 
@@ -111,7 +112,9 @@ function setupWebSocketServers(server: any, routeInstances: Route[], eventRegist
                 return;
             }
             const data = JSON.parse(message.toString());
-            logger.info(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
+            if (!IGNORED_TYPES.includes(data.type)) {
+                logger.info(`Received message from FrontEnd: ${data.type || JSON.stringify(data)}`);
+            }
 
             if (eventRegistry[data.type.toUpperCase()]) {
                 eventRegistry[data.type.toUpperCase()](data);
@@ -129,7 +132,9 @@ function setupWebSocketServers(server: any, routeInstances: Route[], eventRegist
             }
 
             const data = JSON.parse(message.toString());
-            logger.info(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
+            if (!IGNORED_TYPES.includes(data.type)) {
+                logger.info(`Received message from HoloLens: ${data.type || JSON.stringify(data)}`);
+            }
 
             // Call the handler for the event type
             if (eventRegistry[data.type.toUpperCase()]) {
@@ -148,7 +153,9 @@ function setupWebSocketServers(server: any, routeInstances: Route[], eventRegist
             }
 
             const data = JSON.parse(message.toString());
-            logger.info(`Received message from VEGA: ${data.type || JSON.stringify(data)}`);
+            if (!IGNORED_TYPES.includes(data.type)) {
+                logger.info(`Received message from VEGA: ${data.type || JSON.stringify(data)}`);
+            }
 
             // Call the handler for the event type
             if (eventRegistry[data.type.toUpperCase()]) {

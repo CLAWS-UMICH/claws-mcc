@@ -16,6 +16,8 @@ export interface Route {
     handler: (...args: any[]) => any
 }
 
+// Types of messages to ignore when logging (typically for high-frequency messages)
+export const IGNORED_TYPES = ['UPTIME'];
 
 export default class Base {
     public readonly routes: Route[];
@@ -41,13 +43,20 @@ export default class Base {
     public async dispatch(target: 'AR' | 'FRONTEND' | 'VEGA', data: Message) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
         const dispatchLogger = new Logger('DISPATCH');
-        dispatchLogger.info(`Dispatching message ${data.type} to ${target}`);
+        if (!IGNORED_TYPES.includes(data.type)) {
+            dispatchLogger.info(`Dispatching message ${data.type} to ${target}`);
+        }
 
         if (target == 'AR') {
             data.type = data.type.toUpperCase();
         }
 
         const clients = this.getTargetClients(target);
+        if (!clients.size) {
+            console.error(`No clients connected for target ${target}, skipping ${data.type} dispatch`);
+            return;
+        }
+
         await Promise.all([...clients].map(async (client) => {
             if (client.readyState === WebSocket.OPEN) {
                 await new Promise((resolve, reject) => {

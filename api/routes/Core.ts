@@ -22,6 +22,10 @@ export default class Core extends Base {
         {
             type: 'KILL',
             handler: this.killAstronaut.bind(this),
+        },
+        {
+            type: 'UPTIME',
+            handler: this.dispatchUptime.bind(this),
         }
     ]
 
@@ -73,6 +77,18 @@ export default class Core extends Base {
         this.logger.info(`Killed astronaut ${astronaut.name} (and any other astronauts with the same id ${data.id})`);
 
         // What else do we need to do when an astronaut disconnects? Alert maybe?
+    }
+
+    async dispatchUptime() {
+        const uptime = Math.floor(process.uptime());
+        await this.dispatch('FRONTEND', {
+            id: -1,
+            type: 'UPTIME',
+            use: 'PUT',
+            data: uptime,
+        });
+
+        return uptime;
     }
 
     async dispatchWaypoints() {
