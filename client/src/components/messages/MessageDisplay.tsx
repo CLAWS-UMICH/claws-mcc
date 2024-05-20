@@ -2,8 +2,17 @@ import React, { useState } from 'react';
 import { Body1, Body1Stronger, Skeleton, Input, Button, DrawerHeaderTitle, makeStyles } from "@fluentui/react-components";
 import { isEqual } from "lodash";
 import axios from "axios";
-import { BaseMessage } from "../../../../api/types/Messages.ts";
 
+export type BaseMessage = {
+    message_id: number;
+    use: 'PUT' | 'GET'; // these are the only two methods AR expects
+    data?: {
+        from: number
+        sent_to: number
+        message: string
+        timestamp: string
+    };
+}
 
 async function addMessageHandler(setAllMessages, allMessages: BaseMessage[], new_message_data: string, activeConversation: number, setMessageData) {
     function getCurrentTime(): String { // Get current date and time

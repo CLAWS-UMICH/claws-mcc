@@ -3,7 +3,17 @@ import { useAstronaut } from "../waypoints/WaypointManager.tsx";
 import { Body1, Body1Stronger, Skeleton, CompoundButton } from "@fluentui/react-components";
 import { isEqual } from "lodash";
 import { makeStyles } from '@fluentui/react-components';
-import { BaseMessage } from "../../../../api/types/Messages.ts";
+
+export type BaseMessage = {
+    message_id: number;
+    use: 'PUT' | 'GET'; // these are the only two methods AR expects
+    data?: {
+        from: number
+        sent_to: number
+        message: string
+        timestamp: string
+    };
+}
 
 const useStyles = makeStyles({
     imageText: {
