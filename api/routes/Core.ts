@@ -118,7 +118,7 @@ export default class Core extends Base {
         const tasks = (await this.db.collection('tasks').find().toArray()) || [];
         await this.dispatch('AR', {
             id: -1,
-            type: 'Tasks',
+            type: 'TASK_LIST',
             use: 'PUT',
             data: tasks,
         });
