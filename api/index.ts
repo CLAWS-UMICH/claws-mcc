@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT || 8000;
 
 const logger = new Logger('Server');
-const TSS_URI = process.env.TSS_URI || '127.0.0.1:14141';
+const TSS_URI = process.env.TSS_URI || 'http://127.0.0.1:14141';
 
 if (!process.env.MONGO_URI) {
     logger.error(`No MONGO_URI environment variable found. 

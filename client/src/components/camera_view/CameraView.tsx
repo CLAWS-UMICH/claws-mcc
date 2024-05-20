@@ -4,10 +4,11 @@ import CameraView2 from '../../assets/cameraview2.jpeg';
 import './cameraView.css';
 import useDynamicWebSocket from "../../hooks/useWebSocket";
 
+const ipAddresses = [];
+
 const CameraView: React.FC = () => {
     const [uptime, setUpTime] = useState<number>(0);
     const [videoError, setVideoError] = useState<boolean>(false);
-    const ipAddresses = [];
 
     const { sendMessage, lastMessage } = useDynamicWebSocket({
         onOpen: () => {
@@ -50,25 +51,30 @@ const CameraView: React.FC = () => {
                 return;
             }
 
-            for (const ip of ipAddresses) {
-                try {
-                    const response = await fetch(`https://${ip}:8080/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=true&loopback=true&RenderFromCamera=true`, { method: 'HEAD' });
-                    if (!response.ok) {
-                        setTimeout(() => {
-                            setVideoError(true);
-                        }, 5000);
-                        return;
-                    }
-                } catch (error) {
-                    setVideoError(true);
-                    return;
-                }
-            }
             setVideoError(false);
         };
 
         checkVideoFeeds();
     }, [ipAddresses]);
+
+    useEffect(() => {
+        const playVideos = () => {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                if (video.paused) {
+                    video.play().catch(error => console.error('Error playing video:', error));
+                }
+            });
+        };
+
+        playVideos();
+
+        const interval = setInterval(() => {
+            playVideos();
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const formatUptime = (uptime: number) => {
         const hours = Math.floor(uptime / 3600);
@@ -97,7 +103,14 @@ const CameraView: React.FC = () => {
                 ) : (
                     ipAddresses.map((ip, index) => (
                         <div key={index} className='camera'>
-                            <video src={`https://${ip}:8080/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=true&loopback=true&RenderFromCamera=true`} controls className='video' />
+                            <video 
+                                src={`https://${ip}/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=false&loopback=true&RenderFromCamera=true`} 
+                                autoPlay 
+                                loop 
+                                controls={false}
+                                className='video' 
+                                muted
+                            />
                         </div>
                     ))
                 )}
