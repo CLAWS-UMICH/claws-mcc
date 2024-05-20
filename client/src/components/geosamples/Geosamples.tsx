@@ -108,7 +108,8 @@ const GeosampleManager: React.FC = () => {
     const [showSearchBar, setShowSearchBar] = useState(false);
 
     const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
-        onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'}))
+        onOpen: () => sendMessage(JSON.stringify({type: 'GET_SAMPLES'})),
+        type: 'SEND_SAMPLES'
     });
 
     useEffect(() => {

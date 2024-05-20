@@ -59,7 +59,8 @@ export const Messages: React.FC = () => {
     const [allMessages, setAllMessages] = useState<BaseMessage[]>([]);
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const { sendMessage, lastMessage, readyState } = useDynamicWebSocket({
-        onOpen: () => sendMessage(JSON.stringify({ type: 'GET_MESSAGES' }))
+        onOpen: () => sendMessage(JSON.stringify({ type: 'GET_MESSAGES' })),
+        type: 'MESSAGING'
     });
 
     const [conversations, setConversations] = useState<Map<number, BaseMessage[]>>(new Map());

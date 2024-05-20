@@ -12,7 +12,8 @@ const CameraView: React.FC = () => {
     const { sendMessage, lastMessage } = useDynamicWebSocket({
         onOpen: () => {
             sendMessage(JSON.stringify({ type: 'UPTIME' }));
-        }
+        },
+        type: 'UPTIME'
     });
 
     useEffect(() => {
