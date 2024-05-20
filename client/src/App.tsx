@@ -37,13 +37,12 @@ function App() {
                     <NavBar />
                     <div>
                       <Routes>
-                          <Route path="/" element={<EmptyComponent />} />
+                          <Route path="/" element={<TaskList />} />
                           <Route path="/tasks" element={<TaskList />} />
                           <Route path="/vitals" element={<EmptyComponent />} />
                           <Route path="/samples" element={<GeosampleManager />} />
                           <Route path="/navigation" element={<WaypointManager />} />
                           <Route path="/rover" element={<EmptyComponent />} />
-                          <Route path="/suits" element={<EmptyComponent />} />
                           <Route path="/messages" element={<Messages />} />
                           <Route path="/connect" element={<Communication />} />
                       </Routes>
