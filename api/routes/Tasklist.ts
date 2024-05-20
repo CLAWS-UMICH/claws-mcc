@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import Base from "../Base";
 import { Db, ObjectId } from "mongodb";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
+import Logger from "../core/logger";
 
 
 
@@ -61,6 +62,7 @@ export default class Tasklist extends Base {
 
 	//list of tasks
 	private tasks: Task[];
+	private logger = new Logger('TaskList');
 	//create th task list table inside of the database
 	
 	constructor(db: Db) {
@@ -125,6 +127,11 @@ export default class Tasklist extends Base {
 			type: 'TASK_LIST',
 			handler: this.getTasks.bind(this),
 		},
+		{ 
+			platform: 'FRONTEND',
+			type: 'TASKLIST_FOR_AR',
+			handler: this.proxyTaskList.bind(this),
+		},
 	]
 	// **PLEASE IGNORE ** 
 	//Code reference for frontend 
@@ -160,6 +167,18 @@ export default class Tasklist extends Base {
 			id: -1,
 			use: 'PUT',
 			data: this.tasks,
+			type: 'TASK_LIST',
+		});
+	}
+
+	proxyTaskList(data: any) {
+		this.logger.info(`Received task list from AR: ${JSON.stringify(data.data.tasks)}`)
+		this.dispatch("AR", {
+			id: 1,
+			use: 'PUT',
+			data: {
+				"AllTasks": data.data.tasks
+			},
 			type: 'TASK_LIST',
 		});
 	}

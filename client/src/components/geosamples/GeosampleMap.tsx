@@ -109,7 +109,7 @@ const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch,
         
         setInfoWindow(
             <InfoWindow 
-                position={e.latLng}
+                position={e.latLng ? e.latLng : undefined}
                 options={{pixelOffset: offset}}
                 onCloseClick={() => setInfoWindow(null)}
             >
@@ -147,7 +147,7 @@ const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch,
                     return newStyles;
                 })}
         >
-        {geosamples.map(marker => {
+        {geosamples?.map(marker => {
             return (
                 <div key={marker.geosample_id}> 
                     <Marker
@@ -175,7 +175,7 @@ const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch,
                 }}
             />
         }
-        {zones.map(zone => {
+        {zones?.map(zone => {
             let latlng : google.maps.LatLngLiteral = {lat: zone.location.latitude, lng: zone.location.longitude}
             return (
                 <Circle

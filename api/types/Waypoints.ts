@@ -58,6 +58,7 @@ export interface WaypointsMessage extends Message {
     data: {
         AllWaypoints: BaseWaypoint[];
         currentIndex: number;
+        isLocation?: boolean;
     };
 }
 

@@ -23,6 +23,7 @@ type EvaData = {
 
 export type BaseGeosample = {
     _id?: number;
+    id?: number;
     geosample_id: number;
     zone_id: string;
     starred: boolean;
@@ -78,10 +79,8 @@ export const isZone = (zone: any) : zone is BaseZone => {
 export interface SampleMessage extends Message {
     id: number;
     type: string;
-    data: {
-        AllGeosamples: BaseGeosample[];
-        AllZones: BaseZone[];
-    };
+    data: {AllGeosamples: BaseGeosample[]};
+    zones: {AllGeosampleZones: BaseZone[]};
 }
 
 export const SampleRequestMessage = (id: number) : Message => (

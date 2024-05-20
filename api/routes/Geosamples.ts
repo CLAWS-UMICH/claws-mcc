@@ -35,7 +35,7 @@ export default class Geosamples extends Base {
     ];
 
     private static messageId: number = 0;
-    private static sampleIds: { [zone_id : string] : number };
+    private static sampleIds: { [zone_id : string] : number } = {};
     private samplesCollection: Collection<BaseGeosample>;
     private zonesCollection: Collection<BaseZone>;
     private logger = new Logger('Geosampling');
@@ -51,7 +51,7 @@ export default class Geosamples extends Base {
     }
 
     private static incrementSampleId(sample: BaseGeosample): number {
-        if (!this.sampleIds.hasOwnProperty(sample.zone_id)) {
+        if (!this.sampleIds || !this.sampleIds.hasOwnProperty(sample.zone_id)) {
             this.sampleIds[sample.zone_id] = 1;
         }
         return this.sampleIds[sample.zone_id]++;
@@ -85,46 +85,59 @@ export default class Geosamples extends Base {
         this.updateARSamples(messageId, { samples: sampleData, zones: zoneData });
     }
 
-    async addGeosamples(req: Request, res: Response) : Promise<{}> {
+    async addGeosamples(message: SampleMessage) : Promise<{}> {
         this.logger.info("Received samples from Hololens, sending samples to frontend");
-        const samples = req.body.data;
-        const zones = req.body.zones;
+        const samples = message.data.AllGeosamples;
+        const zones = message.zones.AllGeosampleZones;
+        this.logger.info(JSON.stringify(message.data))
+        this.logger.info(JSON.stringify(message.zones))
+        this.logger.info(zones.length);
 
-        for (let i = 0; i < zones.length(); i++) {
-            if (!isZone(zones[i])) {
-                res.status(400).send("Geosample zones in incorrect format.");
-                return "Error";
-            }
-            Geosamples.sampleIds[zones[i].zone_id] = 1;
+
+        if (!zones || !samples) {
+            this.logger.error("No samples/zones received");
+            return "Error";
         }
-        for (let i = 0; i < samples.length(); i++) {
-            if (!isGeosample(samples[i])) {
-                res.status(400).send("Geosample in incorrect format.");
-                return "Error";
+        if (zones.length > 0) {
+            for (let i = 0; i < zones.length; i++) {
+                if (!zones[i] || !isZone(zones[i])) {
+                    this.logger.error("Geosample zones in incorrect format.");
+                    return "Error";
+                }
+                Geosamples.sampleIds[zones[i].zone_id.toString()] = 1;
             }
-            samples[i].id = Geosamples.incrementSampleId(samples[i]);
+            for (let i = 0; i < samples.length; i++) {
+                if (!isGeosample(samples[i])) {
+                    this.logger.error("Geosample in incorrect format.");
+                    return "Error";
+                }
+                samples[i].id = Geosamples.incrementSampleId(samples[i]);
+            }
         }
 
         try {
             await this.samplesCollection.deleteMany({});
             await this.samplesCollection.insertMany(samples);
+            this.logger.info("samples got hereeee")
             await this.zonesCollection.deleteMany({});
             await this.zonesCollection.insertMany(zones);
+            this.logger.info("zones got hereeee")
             const allSamples = this.samplesCollection.find();
             const allZones = this.zonesCollection.find();
             const sampleData = await allSamples.toArray();
             const zoneData = await allZones.toArray();
+            this.logger.info("this the problem?")
             this.dispatch('FRONTEND', {
                 id: -1,
                 type: 'SEND_SAMPLES',
                 use: 'PUT',
                 data: { samples: sampleData, zones: zoneData }
             });
-            res.status(200).send({ samples: samples, zones: zones });
-            this.updateARSamples(Geosamples.incrementMessageId(), { samples: samples, zones: zones });
+            this.logger.info({ samples: samples, zones: zones });
+            // this.updateARSamples(Geosamples.incrementMessageId(), { samples: samples, zones: zones });
             return "Received geosamples";
         } catch (e) {
-            res.status(400).send(e.message);
+            this.logger.error(e.message);
             return e.message;
         }
     }
@@ -188,10 +201,8 @@ export default class Geosamples extends Base {
             id: messageId,
             type: 'GEOSAMPLES',
             use: 'PUT',
-            data: {
-                AllGeosamples: data.samples,
-                AllZones: data.zones,
-            }
+            data: {AllGeosamples: data.samples},
+            zones: {AllGeosampleZones: data.zones},
         }
         this.dispatch("AR", newGeosampleMessage);
     }

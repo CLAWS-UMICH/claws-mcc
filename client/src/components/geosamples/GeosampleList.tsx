@@ -10,12 +10,11 @@ import {
     CompoundButton,
     makeStyles
 } from '@fluentui/react-components';
-import { ChevronUp16Regular, ChevronDown16Regular } from '@fluentui/react-icons';
+import { ChevronUp16Regular, ChevronDown16Regular, Gesture20Filled } from '@fluentui/react-icons';
 import { BaseGeosample, BaseZone, ManagerAction } from './GeosampleTypes.tsx';
 import './Geosamples.css'
 import StarredSample from './StarredImage.tsx';
 import SampleImage from './SampleImage.tsx';
-import { stringify } from 'querystring';
 
 const useStyles = makeStyles({
     container: {
@@ -59,11 +58,13 @@ interface SampleListProps {
 
 const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dispatch, ready, selected}) => {
     const styles = useStyles();
-    const [openItems, setOpenItems] = React.useState<string[]>(sample_zones.map(zone => zone.zone_id));
+    const [openItems, setOpenItems] = React.useState<string[]>([]);
 
     const geosampleMap = React.useMemo(() => {
         const map = new Map();
-        geosamples.forEach(sample => map.set(sample.geosample_id, sample));
+        if (geosamples && geosamples?.length) {
+            geosamples.forEach(sample => map.set(sample.geosample_id, sample));
+        }
         return map;
     }, [geosamples]);
 
@@ -89,7 +90,7 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
     };
 
     // If no zones are available or page is not ready, return empty list
-    if (!ready || !sample_zones || sample_zones.length === 0) {
+    if (!ready || !sample_zones || sample_zones.length === 0 || !geosamples || geosamples.length === 0) {
         return <Skeleton />
     };
 
@@ -104,11 +105,11 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
                         <AccordionPanel style={{marginLeft: "-15px", marginRight: "-12px", marginBottom: "1px"}} className={styles.sampleContainer} key={id}>
                             {geosampleMap.has(Number(id)) && (
                                 <CompoundButton
-                                    style={{fontSize: "13px", width: "210px", height: "45px", border: "0px"}}
+                                    style={{fontSize: "13px", width: "210px", height: "45px", border: "0px", background: "#0F0F0F"}}
                                     onClick={() => handleSelect(dispatch, geosampleMap.get(Number(id)))}
                                     shape='circular'
                                     secondaryContent={geosampleMap.get(Number(id)).rock_type}
-                                    icon={!geosampleMap.get(Number(id)).starred ? <SampleImage sample={geosampleMap.get(Number(id))} index={index}/> : <StarredSample sample={geosampleMap.get(Number(id))} index={index}/>}
+                                    icon={!geosampleMap.get(Number(id)).starred ? <SampleImage sample={geosampleMap.get(Number(id))}/> : <StarredSample sample={geosampleMap.get(Number(id))}/>}
                                 >
                                     {geosampleMap.get(Number(id)).eva_data.name}
                                 </CompoundButton>

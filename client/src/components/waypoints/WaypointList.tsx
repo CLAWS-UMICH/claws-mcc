@@ -16,7 +16,8 @@ import {
     Label,
     makeStyles,
     Option,
-    shorthands, Tooltip
+    shorthands, Tooltip,
+    CompoundButton
 } from "@fluentui/react-components"
 import {
     BuildingFilled,
@@ -312,8 +313,6 @@ export const WaypointList: React.FC<WaypointListProps> = props => {
                         dispatch={props.dispatch}/>)
                 )}
             </div>
-            {/*TODO: remove waypoint props */}
-
         </div>
     );
 };

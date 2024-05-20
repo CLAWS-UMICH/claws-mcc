@@ -13,10 +13,9 @@ const useStyles = makeStyles({
 
 interface SampleImageProps {
     sample: BaseGeosample,
-    index: number,
 };
 
-const SampleImage : React.FC<SampleImageProps> = ({sample, index}) => {
+const SampleImage : React.FC<SampleImageProps> = ({sample}) => {
     const styles = useStyles();
 
     return (
@@ -24,7 +23,7 @@ const SampleImage : React.FC<SampleImageProps> = ({sample, index}) => {
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 28 28" fill="none">
                 <circle cx="14" cy="14" r="13.5" fill="#006704" stroke="#4CAB50"/>
             </svg>
-        <div className={styles.imageText}><b>{sample.zone_id}{index + 1}</b></div>
+        <div className={styles.imageText}><b>{sample.zone_id}{sample.geosample_id}</b></div>
         </div>
     );
 };

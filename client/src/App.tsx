@@ -4,6 +4,7 @@ import axios from 'axios';
 import { FluentProvider, webDarkTheme, webLightTheme } from "@fluentui/react-components";
 import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import WaypointManager from "./components/waypoints/WaypointManager.tsx";
+import Messages from "./components/messages/Messages.tsx";
 import GeosampleManager from './components/geosamples/Geosamples.tsx';
 import NavBar from './components/layout/NavBar/NavBar.tsx';
 import Communication from './components/communications/Communication.tsx';
@@ -11,6 +12,7 @@ import CameraView from './components/camera_view/CameraView.tsx';
 import EmptyComponent from './components/common/EmptyComponent.tsx';
 import { TaskList } from './components/features/task-list.tsx';
 import Vitals from './components/vitals/Vitals.tsx';
+import RoverView from './components/rover_view/RoverView.tsx';
 
 interface AstronautData {
   heartrate: number;
@@ -37,14 +39,13 @@ function App() {
                     <NavBar />
                     <div>
                       <Routes>
-                          <Route path="/" element={<EmptyComponent />} />
+                          <Route path="/" element={<TaskList />} />
                           <Route path="/tasks" element={<TaskList />} />
                           <Route path="/vitals" element={<Vitals/>} />
                           <Route path="/samples" element={<GeosampleManager />} />
                           <Route path="/navigation" element={<WaypointManager />} />
-                          <Route path="/rover" element={<EmptyComponent />} />
-                          <Route path="/suits" element={<EmptyComponent />} />
-                          <Route path="/messages" element={<EmptyComponent />} />
+                          <Route path="/rover" element={<RoverView />} />
+                          <Route path="/messages" element={<Messages />} />
                           <Route path="/connect" element={<Communication />} />
                       </Routes>
                     </div>

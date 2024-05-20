@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT || 8000;
 
 const logger = new Logger('Server');
+const TSS_URI = process.env.TSS_URI || 'http://127.0.0.1:14141';
 
 if (!process.env.MONGO_URI) {
     logger.error(`No MONGO_URI environment variable found. 
@@ -46,6 +47,7 @@ async function loadRoutes(db: any) {
 
     const routeInstances: Route[] = [];
     const eventRegistry: any = {};
+    const tssRegistry: any = {};
 
     for (const file of files) {
         if (path.extname(file) === '.js') {
@@ -57,15 +59,28 @@ async function loadRoutes(db: any) {
                 routeInstances.push(routeInstance);
 
                 // Register routes defined in the routeInstance
-                for (const route of routeInstance.routes) {
-                    app[route.method as Method](route.path, route.handler);
-                    logger.info(`Registered route ${route.method.toUpperCase()} ${route.path}`);
+                if (!routeInstance.routes?.length) {
+                    for (const route of routeInstance.routes) {
+                        app[route.method as Method](route.path, route.handler);
+                        logger.info(`Registered route ${route.method.toUpperCase()} ${route.path}`);
+                    }
                 }
 
                 // Register events defined in the routeInstance
-                for (const event of routeInstance.events) {
-                    eventRegistry[event.type.toUpperCase()] = event.handler;
-                    logger.info(`Registered event ${event.type}`);
+                if (routeInstance.events?.length) {
+                    for (const event of routeInstance.events) {
+                        eventRegistry[event.type.toUpperCase()] = event.handler;
+                        logger.info(`Registered event ${event.type}`);
+                    }
+                }
+
+                // Register TSS keys defined in the routeInstance
+                if (routeInstance.tssFiles?.length) {
+                    for (const tssSubscription of routeInstance?.tssFiles) {
+                        tssRegistry[tssSubscription.path] = tssRegistry[tssSubscription.path] ?? [];
+                        tssRegistry[tssSubscription.path].push(tssSubscription.handler);
+                        logger.info(`Registered TSS file ${tssSubscription.path}.json for route ${file}`);
+                    }
                 }
             } catch (err) {
                 logger.error(`Failed to load route ${file}: ${err.message}`);
@@ -74,7 +89,7 @@ async function loadRoutes(db: any) {
     }
 
     logger.info(`Initialized ${routeInstances.length} routes and ${Object.keys(eventRegistry).length} events`);
-    return { routeInstances, eventRegistry };
+    return { routeInstances, eventRegistry, tssRegistry };
 }
 
 // Set up WebSocket servers
@@ -170,10 +185,46 @@ function setupWebSocketServers(server: any, routeInstances: Route[], eventRegist
     }
 }
 
+async function setupTSSWatchers(tssRegistry: TSSRegistry) {
+    const tssLogger = new Logger('TSS');
+    const prevTSSData: any = {};
+
+    tssLogger.info(`Watching TSS files: ${Object.keys(tssRegistry).join(', ')}`);
+
+    async function checkTSSData() {
+        for (const path in tssRegistry) {
+            const handlers = tssRegistry[path];
+            const url = `${TSS_URI}/json_data${path}`;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch TSS data for ${url}: ${res.statusText}`);
+                }
+                const tssData = await res.json();
+                if (JSON.stringify(tssData) !== JSON.stringify(prevTSSData[path])) {
+                    // tssLogger.info(`TSS data for ${url} has changed, calling all handlers`);
+                    handlers.forEach((handler) => handler({ ...tssData }));
+                } else {
+                    // tssLogger.info(`TSS data for ${url} has not changed`);
+                }
+
+                prevTSSData[path] = tssData;
+            } catch (err) {
+                tssLogger.error(`Failed to fetch TSS data for ${url}: ${err.message}`);
+            }
+        }
+
+        setTimeout(checkTSSData, 1000);
+    }
+
+    checkTSSData();
+}
+
 async function startServer() {
     // Connect to mongo first
     const db = await connectToMongoDB();
-    const { routeInstances, eventRegistry } = await loadRoutes(db);
+    const { routeInstances, eventRegistry, tssRegistry } = await loadRoutes(db);
 
     // Serve the files for our built React app
     app.use(express.static(path.resolve(__dirname, '../../client/build')));
@@ -197,6 +248,7 @@ async function startServer() {
     });
 
     setupWebSocketServers(server, routeInstances, eventRegistry);
+    setupTSSWatchers(tssRegistry);
 }
 
 startServer().catch((err) => {
@@ -205,3 +257,4 @@ startServer().catch((err) => {
 });
 
 type Method = 'get' | 'post' | 'put';
+type TSSRegistry = { [path: string]: any[] };

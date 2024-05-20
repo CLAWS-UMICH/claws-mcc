@@ -1,6 +1,4 @@
-import redis from "./core/redis";
 import { Db } from "mongodb";
-import { Redis } from "ioredis";
 import { WebSocket, WebSocketServer } from "ws";
 import Message from "./types/message";
 import Logger from "./core/logger";
@@ -16,14 +14,19 @@ export interface Route {
     handler: (...args: any[]) => any
 }
 
+export interface TSSEvent {
+    path: string,
+    handler: (...args: any[]) => any
+}
+
 // Types of messages to ignore when logging (typically for high-frequency messages)
 export const IGNORED_TYPES = ['UPTIME'];
 
 export default class Base {
     public readonly routes: Route[];
     public readonly events: RouteEvent[];
+    public readonly tssFiles: TSSEvent[]
     public db: Db;
-    public redis: Redis;
     private wsFrontend: WebSocketServer;
     private wsHoloLens: WebSocketServer;
     private wsVega: WebSocketServer;
@@ -31,7 +34,6 @@ export default class Base {
     constructor(db: Db) {
         this.routes = [];
         this.db = db;
-        this.redis = redis;
     }
 
     public setWebSocketInstances(wsFrontend: WebSocketServer, wsHoloLens: WebSocketServer, wsVega: WebSocketServer) {
