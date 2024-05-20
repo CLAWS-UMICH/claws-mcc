@@ -16,31 +16,31 @@ export const vitalsReducer = (state: ManagerState, action: ManagerAction): Manag
 }
 
 const initialState: ManagerState = { vitals: {
-  id: 0,
   eva_time: 0,
-  battery_time_left: 0,
-  primary_oxygen_storage: 0,
-  secondary_oxygen_storage: 0,
-  primary_oxygen_pressure: 0,
-  secondary_oxygen_pressure: 0,
-  oxygen_time_left: 0,
-  heart_rate: 0,
-  oxygen_consumption: 0,
-  co2_production: 0,
-  suit_oxygen_pressure: 0,
-  suit_cO2_pressure: 0,
-  suit_other_pressure: 0,
-  suit_total_pressure: 0,
-  primary_fan_rpm: 0,
-  secondary_fan_rpm: 0,
-  helmet_co2_pressure: 0,
-  scrubber_a_co2_capacity: 0,
-  scrubber_b_co2_capacity: 0,
-  temperature: 0,
-  coolant_ml: 0,
-  h2o_gas_pressure: 0,
-  h2o_liquid_pressure: 0,
-  alerts: [],
+  tss_data: {
+    batt_time_left: 0,
+    oxy_pri_storage: 0,
+    oxy_sec_storage: 0,
+    oxy_pri_pressure: 0,
+    oxy_sec_pressure: 0,
+    oxy_time_left: 0,
+    heart_rate: 0,
+    oxy_consumption: 0,
+    co2_production: 0,
+    suit_pressure_oxy: 0,
+    suit_pressure_co2: 0,
+    suit_pressure_other: 0,
+    suit_pressure_total: 0,
+    fan_pri_rpm: 0,
+    fan_sec_rpm: 0,
+    helmet_pressure_co2: 0,
+    scrubber_a_co2_storage: 0,
+    scrubber_b_co2_storage: 0,
+    temperature: 0,
+    coolant_ml: 0,
+    coolant_gas_pressure: 0,
+    coolant_liquid_pressure: 0
+  },
   dcu: {
     batt: false,
     oxy: false,
@@ -56,7 +56,8 @@ const VitalsManager: React.FC = () => {
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
 
   const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
-    onOpen: () => sendMessage(JSON.stringify({type: 'VITALS'}))
+    onOpen: () => sendMessage(JSON.stringify({ type: 'VITALS' })),
+    type: "VITALS"
   })
 
   useEffect(() => {
@@ -70,10 +71,10 @@ const VitalsManager: React.FC = () => {
 
   return (
     <div>
-      <div>
-        <h4 style={{paddingLeft:'1.5rem', paddingRight:'1.5rem', display:'flex', justifyContent: 'start', marginTop: "11px", marginBottom: "11px", alignItems: 'center'}}>
+      <div style={{background: "#141414"}}>
+        <h4 style={{paddingLeft:'1.5rem', paddingRight:'1.5rem', display:'flex', justifyContent: 'start', height: "53.111px", marginTop: '0px', marginBottom: '0px', alignItems: 'center'}}>
           <div className="circle">S</div>
-          <Dropdown appearance="filled-lighter" defaultValue="Steve's Vitals" defaultSelectedOptions={["steve"]}>
+          <Dropdown style={{background: "#141414"}} appearance="filled-lighter" defaultValue="Steve's Vitals" defaultSelectedOptions={["steve"]}>
             <Option text="Steve's Vitals" value="steve">
               Steve's Vitals
             </Option>

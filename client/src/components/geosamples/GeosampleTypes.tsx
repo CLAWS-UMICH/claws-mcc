@@ -21,7 +21,6 @@ export type EvaData = {
 
 export type BaseGeosample = {
     _id?: number;
-    id?: number;
     geosample_id: number;
     zone_id: string;
     starred: boolean;

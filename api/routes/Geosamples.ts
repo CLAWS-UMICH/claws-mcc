@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
 import {Collection, Db,  WithId} from "mongodb";
-import { BaseGeosample, BaseZone, SampleMessage, isGeosample, isZone } from "../types/Geosamples";
+import { BaseGeosample, BaseZone, EvaData, SampleMessage, isGeosample, isZone } from "../types/Geosamples";
 import Logger from "../core/logger";
 
 export interface ResponseBody {
@@ -56,13 +56,6 @@ export default class Geosamples extends Base {
         }
         return this.sampleIds[sample.zone_id]++;
     }
-        
-    private static resetSampleIds(sample: BaseGeosample): number {
-        if (!this.sampleIds.hasOwnProperty(sample.zone_id)) {
-            this.sampleIds[sample.zone_id] = 1;
-        }
-        return this.sampleIds[sample.zone_id]++;
-    }
 
     async sendSamples() {
         this.logger.info("GEOSAMPLES: sending samples to frontend");
@@ -89,10 +82,6 @@ export default class Geosamples extends Base {
         this.logger.info("Received samples from Hololens, sending samples to frontend");
         const samples = message.data.AllGeosamples;
         const zones = message.zones.AllGeosampleZones;
-        this.logger.info(JSON.stringify(message.data))
-        this.logger.info(JSON.stringify(message.zones))
-        this.logger.info(zones.length);
-
 
         if (!zones || !samples) {
             this.logger.error("No samples/zones received");
@@ -111,22 +100,23 @@ export default class Geosamples extends Base {
                     this.logger.error("Geosample in incorrect format.");
                     return "Error";
                 }
-                samples[i].id = Geosamples.incrementSampleId(samples[i]);
+
+                if (!samples[i].starred) {
+                    samples[i].starred = this.determineSignificance(samples[i].eva_data);
+                }
+                // samples[i].id = Geosamples.incrementSampleId(samples[i]);
             }
         }
 
         try {
             await this.samplesCollection.deleteMany({});
             await this.samplesCollection.insertMany(samples);
-            this.logger.info("samples got hereeee")
             await this.zonesCollection.deleteMany({});
             await this.zonesCollection.insertMany(zones);
-            this.logger.info("zones got hereeee")
             const allSamples = this.samplesCollection.find();
             const allZones = this.zonesCollection.find();
             const sampleData = await allSamples.toArray();
             const zoneData = await allZones.toArray();
-            this.logger.info("this the problem?")
             this.dispatch('FRONTEND', {
                 id: -1,
                 type: 'SEND_SAMPLES',
@@ -205,5 +195,21 @@ export default class Geosamples extends Base {
             zones: {AllGeosampleZones: data.zones},
         }
         this.dispatch("AR", newGeosampleMessage);
+    }
+
+    private determineSignificance(eva_data: EvaData): boolean{
+        var significant = true;
+        const total = eva_data.data.SiO2 + eva_data.data.TiO2 + eva_data.data.Al2O3 + eva_data.data.FeO + eva_data.data.MnO + eva_data.data.MgO + eva_data.data.CaO + eva_data.data.K2O + eva_data.data.P2O3;
+        if (eva_data.data.SiO2 >= .10) significant = false;
+        if (eva_data.data.TiO2 <= .01) significant = false;
+        if (eva_data.data.Al2O3 <= .10) significant = false;
+        if (eva_data.data.FeO <= .29) significant = false;
+        if (eva_data.data.MnO <= .01) significant = false;
+        if (eva_data.data.MgO <= .20) significant = false;
+        if (eva_data.data.CaO <= .10) significant = false;
+        if (eva_data.data.K2O <= .01) significant = false;
+        if (eva_data.data.P2O3 <= 0.015) significant = false;
+        if (1-total <= 0.50) significant = false;
+        return significant;
     }
 }

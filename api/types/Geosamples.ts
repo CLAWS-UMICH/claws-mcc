@@ -5,7 +5,7 @@ type ARLocation = {
     longitude: number;
 }
 
-type EvaData = {
+export type EvaData = {
     name: string;
     id: number;
     data: {
@@ -23,7 +23,6 @@ type EvaData = {
 
 export type BaseGeosample = {
     _id?: number;
-    id?: number;
     geosample_id: number;
     zone_id: string;
     starred: boolean;
