@@ -196,10 +196,9 @@ async function setupTSSWatchers(tssRegistry: TSSRegistry) {
                     throw new Error(`Failed to fetch TSS data for ${url}: ${res.statusText}`);
                 }
                 const tssData = await res.json();
-
                 if (JSON.stringify(tssData) !== JSON.stringify(prevTSSData[path])) {
                     // tssLogger.info(`TSS data for ${url} has changed, calling all handlers`);
-                    handlers.forEach((handler) => handler(tssData));
+                    handlers.forEach((handler) => handler({ ...tssData }));
                 } else {
                     // tssLogger.info(`TSS data for ${url} has not changed`);
                 }

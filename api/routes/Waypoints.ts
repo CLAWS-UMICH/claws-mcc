@@ -38,6 +38,13 @@ export default class Waypoints extends Base {
             handler: this.handleReceiveWaypoints.bind(this),
         }
     ]
+
+    public tssFiles = [
+        {
+            path: '/IMU.json',
+            handler: this.handleTSSWaypointsUpdate.bind(this),
+        }
+    ]
     private collection: Collection<BaseWaypoint>
     private logger = new Logger('Waypoints');
 
@@ -45,6 +52,28 @@ export default class Waypoints extends Base {
         super(db);
         // If no collection is passed in, use the default one
         this.collection = collection || db.collection<BaseWaypoint>('waypoints');
+    }
+
+    async handleTSSWaypointsUpdate(data: WaypointsMessage) {
+        this.logger.info('Handling TSS Waypoints Update', data);
+        // Ensure data.data is defined before setting isLocation
+        if (!data.data) {
+            data.data = {
+                AllWaypoints: [],
+                currentIndex: 0,
+            };
+        }
+
+        // add isLocation to data
+        data.data.isLocation = true;
+        // Send location data to Waypoints frontend
+        const messageId = -1;
+        this.dispatch('FRONTEND', {
+            id: messageId,
+            type: 'WAYPOINTS',
+            use: 'GET',
+            data: data,
+        })
     }
 
     async sendWaypoints() {
@@ -82,7 +111,7 @@ export default class Waypoints extends Base {
         // update current_index in the config collection
         const config_collection = this.db.collection('waypoint_config');
         await config_collection.updateOne({}, { $set: { current_index: data.data.currentIndex } });
-        this.logger.info('Updated current_index in config collection');    
+        this.logger.info('Updated current_index in config collection');
 
         const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
         this.dispatch('FRONTEND', {
@@ -376,7 +405,7 @@ export default class Waypoints extends Base {
             use: 'PUT',
             data: {
                 AllWaypoints: waypoints,
-                currentIndex: current_index
+                currentIndex: current_index,
             }
         }
         this.dispatch("AR", newWaypointsMessage)

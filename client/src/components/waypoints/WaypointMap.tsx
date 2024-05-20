@@ -1,11 +1,11 @@
 import React from 'react';
 import './Waypoints.css'
-import {GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader} from '@react-google-maps/api';
-import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "./WaypointManager.tsx";
-import {Body1, Body1Stronger, Button} from "@fluentui/react-components";
-import {ComposeFilled} from "@fluentui/react-icons";
+import { GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { BaseWaypoint, ManagerAction as MapAction, WaypointType } from "./WaypointManager.tsx";
+import { Body1, Body1Stronger, Button } from "@fluentui/react-components";
+import { ComposeFilled } from "@fluentui/react-icons";
 import waypointImage from '../../assets/waypoint.png';
-import {isEqual} from "lodash";
+import { isEqual } from "lodash";
 
 const key = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
 
@@ -112,12 +112,13 @@ interface WaypointMapProps {
     waypoints: BaseWaypoint[];
     selected?: BaseWaypoint;
     dispatch: React.Dispatch<MapAction>;
+    EVALocations: Array<object>;
 }
 
 export const WaypointMap: React.FC<WaypointMapProps> = props => {
     const [infoWindow, setInfoWindow] = React.useState<React.ReactNode | null>(null);
     const [tempWindow, setTempWindow] = React.useState<React.ReactNode | null>(null);
-    const {isLoaded} = useJsApiLoader({
+    const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: key
     })
@@ -131,61 +132,72 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
         const lat = latLng.lat().toFixed(5);
         const lng = latLng.lng().toFixed(5);
         setTempWindow(<InfoWindow
-                position={latLng}
-                onCloseClick={() => setTempWindow(null)}
-            >
-                <div style={{display: "flex", flexDirection: "column", width: "max-content", color: "black"}}>
-                    <div>
-                        <Body1Stronger>Latitude: </Body1Stronger>
-                        <Body1>{lat}</Body1>
-                    </div>
-                    <div>
-                        <Body1Stronger>Longitude: </Body1Stronger>
-                        <Body1>{lng}</Body1>
-                    </div>
-                    <Button 
-                        onClick={() => {
-                            setTempWindow(null);
-                            props.dispatch({type: "deselect" });
-                            props.dispatch({
-                                type: "writeTemp",
-                                payload: {
-                                    waypoint_id: -1,
-                                    author: -1,
-                                    type: WaypointType.NAV,
-                                    description: "",
-                                    location: {latitude: Number(lat), longitude: Number(lng)}
-                                }
-                            });
-                        }}
-                        icon={<ComposeFilled/>}
-                        
-                    >
-                        New Waypoint
-                    </Button>
+            position={latLng}
+            onCloseClick={() => setTempWindow(null)}
+        >
+            <div style={{ display: "flex", flexDirection: "column", width: "max-content", color: "black" }}>
+                <div>
+                    <Body1Stronger>Latitude: </Body1Stronger>
+                    <Body1>{lat}</Body1>
                 </div>
-            </InfoWindow>
+                <div>
+                    <Body1Stronger>Longitude: </Body1Stronger>
+                    <Body1>{lng}</Body1>
+                </div>
+                <Button
+                    onClick={() => {
+                        setTempWindow(null);
+                        props.dispatch({ type: "deselect" });
+                        props.dispatch({
+                            type: "writeTemp",
+                            payload: {
+                                waypoint_id: -1,
+                                author: -1,
+                                type: WaypointType.NAV,
+                                description: "",
+                                location: { latitude: Number(lat), longitude: Number(lng) }
+                            }
+                        });
+                    }}
+                    icon={<ComposeFilled />}
+
+                >
+                    New Waypoint
+                </Button>
+            </div>
+        </InfoWindow>
         );
     }
     return isLoaded ? (
-        <div style={{gridColumn: "1"}}>
+        <div style={{ gridColumn: "1" }}>
             <GoogleMap
                 mapContainerClassName={"map"}
-                center={{lat: 42.27697713747799, lng: -83.73820501490505}}
+                center={{ lat: 42.27697713747799, lng: -83.73820501490505 }}
                 zoom={10}
                 onLoad={addMarsMapTypes}
                 onRightClick={handleRightClick}
                 options={{
                     streetViewControl: false,
-                    mapTypeControlOptions: {mapTypeIds: ['elevation', 'visible', 'infrared']}
+                    mapTypeControlOptions: { mapTypeIds: ['elevation', 'visible', 'infrared'] }
                 }}>
+                {
+                    props.EVALocations.map((location: any) => {
+                        return (
+                            <Marker
+                                label={{ text: location.name, color: "white", fontWeight: "bold" }}
+                                position={{ lat: location.posx, lng: location.posy }}
+                                icon={waypointImage}
+                            />
+                        )
+                    })
+                }
                 {props.waypoints.map(marker => {
-                    const position = {lat: marker.location.latitude, lng: marker.location.longitude};
+                    const position = { lat: marker.location.latitude, lng: marker.location.longitude };
                     return (
                         <div key={marker.waypoint_id}>
                             <Marker position={position} clickable={false}
-                                    label={{text: intToChar(marker.waypoint_id), color: "white", fontWeight: "bold"}}
-                                    icon={waypointImage}/>
+                                label={{ text: intToChar(marker.waypoint_id), color: "white", fontWeight: "bold" }}
+                                icon={waypointImage} />
                             <InfoBox
                                 position={new google.maps.LatLng(marker.location.latitude, marker.location.longitude)}
                                 options={{
@@ -196,7 +208,7 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                                 }}
                                 onCloseClick={() => setInfoWindow(null)}>
                                 <div className={'info-box'}
-                                     style={{backgroundColor: isEqual(props.selected, marker) ? "grey" : undefined}}>
+                                    style={{ backgroundColor: isEqual(props.selected, marker) ? "grey" : undefined }}>
                                     <Body1Stronger>Waypoint {marker.waypoint_id}</Body1Stronger>
                                     <Body1>{marker.description}</Body1>
                                 </div>

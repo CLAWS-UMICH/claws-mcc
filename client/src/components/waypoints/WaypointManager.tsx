@@ -115,6 +115,10 @@ export const waypointsReducer = (state: ManagerState, action: ManagerAction): Ma
 const initialState: ManagerState = { waypoints: [] }
 
 export const WaypointManager: React.FC = () => {
+    const [EVALocations, setEVALocations] = useState<Array<object>>([
+        { name: "EVA1", posx: 0, posy: 0 },
+        { name: "EVA2", posx: 0, posy: 0 }
+    ]);
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const { sendMessage, lastMessage, readyState } = useDynamicWebSocket({
@@ -123,8 +127,24 @@ export const WaypointManager: React.FC = () => {
     });
     useEffect(() => {
         if (lastMessage !== null) {
-            setMessageHistory((prev) => prev.concat(lastMessage.data));
-            dispatch({ type: 'set', payload: JSON.parse(lastMessage.data).data });
+            const data = JSON.parse(lastMessage.data);
+            if (data?.data?.data?.isLocation) {
+                setEVALocations([
+                    {
+                        name: "EVA1",
+                        posx: data?.data?.imu.eva1.posx,
+                        posy: data?.data?.imu.eva1.posy,
+                    },
+                    {
+                        name: "EVA2",
+                        posx: data?.data?.imu.eva2.posx,
+                        posy: data?.data?.imu.eva2.posy
+                    }
+                ])
+            } else {
+                setMessageHistory((prev) => prev.concat(lastMessage.data));
+                dispatch({ type: 'set', payload: JSON.parse(lastMessage.data).data });
+            }
         }
     }, [lastMessage, setMessageHistory]);
     return (
@@ -146,16 +166,16 @@ export const WaypointManager: React.FC = () => {
                                 onClick={() => {
                                     dispatch({ type: "deselect" });
                                     dispatch({
-                                    type: "writeTemp",
-                                    payload: {
-                                        waypoint_id: -1,
-                                        author: -1,
-                                        type: WaypointType.NAV,
-                                        description: "",
-                                        location: {latitude: 0, longitude: 0}
-                                    }
-                                });
-                                
+                                        type: "writeTemp",
+                                        payload: {
+                                            waypoint_id: -1,
+                                            author: -1,
+                                            type: WaypointType.NAV,
+                                            description: "",
+                                            location: { latitude: 0, longitude: 0 }
+                                        }
+                                    });
+
                                 }}>New Waypoint</Button>}>
                         Navigation
                     </DrawerHeaderTitle>
@@ -168,7 +188,9 @@ export const WaypointManager: React.FC = () => {
                 <Divider className="waypoints-container-divider" />
                 <WaypointMap waypoints={state.waypoints}
                     selected={state.selected}
-                    dispatch={dispatch} />
+                    dispatch={dispatch}
+                    EVALocations={EVALocations}
+                />
             </div>
         </div>
     );
