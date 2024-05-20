@@ -149,7 +149,7 @@ const GeosampleManager: React.FC = () => {
             </InlineDrawer>
             <DrawerBody style={{paddingLeft: '0px', paddingRight: '0px', background: "black"}}>
                 <DetailScreen geosample={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
-                {state.selected && <GeosampleMap geosamples={state.geosamples} zones={state.sample_zones} dispatch={dispatch} ready={readyState === ReadyState.OPEN} selected={state.selected}/>}
+                {state.selected && state.geosamples && state.sample_zones && <GeosampleMap geosamples={state.geosamples} zones={state.sample_zones} dispatch={dispatch} ready={readyState === ReadyState.OPEN} selected={state.selected}/>}
             </DrawerBody>
         </div>
     );

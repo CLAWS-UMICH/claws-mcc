@@ -13,10 +13,9 @@ const useStyles = makeStyles({
 
 interface StarredImageProps {
     sample: BaseGeosample,
-    index: number,
 };
 
-const StarredImage : React.FC<StarredImageProps> = ({sample, index}) => {
+const StarredImage : React.FC<StarredImageProps> = ({sample}) => {
     const styles = useStyles();
 
     return (
@@ -26,7 +25,7 @@ const StarredImage : React.FC<StarredImageProps> = ({sample, index}) => {
                     <circle cx="16" cy="16" r="13.5" fill="#835B00" stroke="#F2C661"/>
                 </g>
             </svg>
-        <div className={styles.imageText}><b>{sample.zone_id}{index + 1}</b></div>
+        <div className={styles.imageText}><b>{sample.zone_id}{sample.geosample_id}</b></div>
         </div>
     );
 };

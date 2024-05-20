@@ -15,7 +15,6 @@ import { BaseGeosample, BaseZone, ManagerAction } from './GeosampleTypes.tsx';
 import './Geosamples.css'
 import StarredSample from './StarredImage.tsx';
 import SampleImage from './SampleImage.tsx';
-import { stringify } from 'querystring';
 
 const useStyles = makeStyles({
     container: {
@@ -63,7 +62,7 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
 
     const geosampleMap = React.useMemo(() => {
         const map = new Map();
-        if (geosamples?.length) {
+        if (geosamples && geosamples?.length) {
             geosamples.forEach(sample => map.set(sample.geosample_id, sample));
         }
         return map;
@@ -91,7 +90,7 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
     };
 
     // If no zones are available or page is not ready, return empty list
-    if (!ready || !sample_zones || sample_zones.length === 0) {
+    if (!ready || !sample_zones || sample_zones.length === 0 || !geosamples || geosamples.length === 0) {
         return <Skeleton />
     };
 
@@ -110,7 +109,7 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
                                     onClick={() => handleSelect(dispatch, geosampleMap.get(Number(id)))}
                                     shape='circular'
                                     secondaryContent={geosampleMap.get(Number(id)).rock_type}
-                                    icon={!geosampleMap.get(Number(id)).starred ? <SampleImage sample={geosampleMap.get(Number(id))} index={index}/> : <StarredSample sample={geosampleMap.get(Number(id))} index={index}/>}
+                                    icon={!geosampleMap.get(Number(id)).starred ? <SampleImage sample={geosampleMap.get(Number(id))}/> : <StarredSample sample={geosampleMap.get(Number(id))}/>}
                                 >
                                     {geosampleMap.get(Number(id)).eva_data.name}
                                 </CompoundButton>

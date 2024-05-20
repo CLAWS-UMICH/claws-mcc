@@ -47,7 +47,7 @@ const useStyles = makeStyles({
   field: {
     display: "flex",
     flexDirection: "column",
-    flexGrow: "1"
+    flexGrow: "1",
   },
   composition: {
     display: "flex",
@@ -82,44 +82,44 @@ const CompositionValues : React.FC<CompositionValuesProps> = ({sample}) => {
   return (
     <div style={{display: "flex", flexWrap: "wrap", flexGrow: "1", flexBasis: "50%", minWidth: "390px"}}>
       <div className={styles.composition}>
-          <Label style={{color: "#BB6BD9", fontSize: "12.5px", textAlign: "center"}} htmlFor="sio2">SiO<sub>2</sub></Label>
-          <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="sio2" readOnly={true} value={sample.data.SiO2.toString()} />
+        <Label style={{color: "#BB6BD9", fontSize: "12.5px", textAlign: "center"}} htmlFor="sio2">SiO<sub>2</sub></Label>
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="sio2" readOnly={true} value={sample.data.SiO2.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{fontSize: "12.5px", textAlign:"center"}} htmlFor="tio2">TiO<sub>2</sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="tio2" readOnly={true} value={sample.data.TiO2.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="tio2" readOnly={true} value={sample.data.TiO2.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#EB5757", fontSize: "12.5px", textAlign:"center"}} htmlFor="al2o3">Al<sub>2</sub>O<sub>3</sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="al2o3" readOnly={true} value={sample.data.Al2O3.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="al2o3" readOnly={true} value={sample.data.Al2O3.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#6FCF97", fontSize: "12.5px", textAlign:"center"}} htmlFor="feo">FeO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="feo" readOnly={true} value={sample.data.FeO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="feo" readOnly={true} value={sample.data.FeO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#2D9CDB", fontSize: "12.5px", textAlign:"center"}} htmlFor="mno">MnO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="mno" readOnly={true} value={sample.data.MnO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="mno" readOnly={true} value={sample.data.MnO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#219653", fontSize: "12.5px", textAlign:"center"}} htmlFor="mgo">MgO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="mgo" readOnly={true} value={sample.data.MgO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="mgo" readOnly={true} value={sample.data.MgO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#9B51E0", fontSize: "12.5px", textAlign:"center"}} htmlFor="cao">CaO<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="cao" readOnly={true} value={sample.data.CaO.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="cao" readOnly={true} value={sample.data.CaO.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#F2C94C", fontSize: "12.5px", textAlign:"center"}} htmlFor="k2o">K<sub>2</sub>O</Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="k2o" readOnly={true} value={sample.data.K2O.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="k2o" readOnly={true} value={sample.data.K2O.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#6FCF97", fontSize: "12.5px", textAlign:"center"}} htmlFor="p2o3">P<sub>2</sub>O<sub>3</sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="p2o3" readOnly={true} value={sample.data.P2O3.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="p2o3" readOnly={true} value={sample.data.P2O3.toString()} />
       </div>
       <div className={styles.composition}>
         <Label style={{color: "#F2994A", fontSize: "12.5px", textAlign:"center"}} htmlFor="other">Other<sub></sub></Label>
-        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px"}} appearance="outline" id="other" readOnly={true} value={other.toString()} />
+        <Input style={{fontSize: "12px", padding: "0px 0px 0px 0px", background: "black"}} appearance="outline" id="other" readOnly={true} value={other.toString()} />
       </div>
     </div>
   )
@@ -374,9 +374,9 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
   return (
     <div>
         <div>
-          <h4 style={{paddingLeft:'1rem', paddingRight:'1rem', display:'flex', justifyContent: 'space-between', marginTop: "11px", marginBottom: "11px"}}>
+          <h4 style={{height: "53.111px", background: "#141414", paddingLeft:'1rem', paddingRight:'1rem', display:'flex', justifyContent: 'space-between', marginTop: "0px", marginBottom: "0px"}}>
               <div style={{ display: 'flex', alignItems: 'center', gap:'10px' }}>
-                <Input style={{border: "0px", flexGrow: "1", fontSize: "17.5px", font: "bold", marginLeft:"-10px"}} 
+                <Input style={{border: "0px", flexGrow: "1", fontSize: "17.5px", font: "bold", marginLeft:"-10px", background: edit ? "" : "#141414"}} 
                        appearance="outline" 
                        id="geosample_name" 
                        readOnly={!edit} 
@@ -385,12 +385,12 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
                        onChange={(e) => handleChange('eva_data', e.target.value)} />
                 <Button icon={geosample.starred ? <Star16Filled style={{color:"#EAA300", flexGrow: "1"}}/> : <Star16Regular />} onClick={() => handleFavoriting(dispatch, geosample)}></Button>
               </div>
-              <div style={{display:'flex', gap:'10px'}}>
-                  <Button icon={<Map16Regular/>}>View on map</Button>
-                  <Button icon={<Edit16Regular/>} onClick={() => setEdit(!edit)}>Edit</Button>
+              <div style={{display:'flex', gap:'10px', alignItems: 'center'}}>
+                  <Button style={{height: "30.556px"}} icon={<Map16Regular/>}>View on map</Button>
+                  <Button style={{height: "30.556px"}} icon={<Edit16Regular/>} onClick={() => setEdit(!edit)}>Edit</Button>
                   <Popover open={open} onOpenChange={handleOpenChange}>
                     <PopoverTrigger disableButtonEnhancement>
-                      <Button icon={<Delete16Regular/>}>Delete</Button>
+                      <Button style={{height: "30.556px"}} icon={<Delete16Regular/>}>Delete</Button>
                     </PopoverTrigger>
 
                   <PopoverSurface aria-labelledby="delete_screen">
@@ -443,7 +443,7 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
                   <Option text="Unknown">
                       <Question16Regular/> Unknown
                   </Option>
-              </Dropdown> ) : <Input appearance="outline" id="shape_dropdown" readOnly={true} value={currentSample ? currentSample?.shape.charAt(0).toUpperCase() + currentSample?.shape.slice(1) : ""} />}
+              </Dropdown> ) : <Input style={{background: "black"}} appearance="outline" id="shape_dropdown" readOnly={true} value={currentSample ? currentSample?.shape.charAt(0).toUpperCase() + currentSample?.shape.slice(1) : ""} />}
           </div>
           <div className={styles.root}>
               <Label htmlFor="color_dropdown">Color</Label>
@@ -460,21 +460,21 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
                         {option}
                     </Option>
                   ))}
-                </Dropdown>) : <Input appearance="outline" id="color_dropdown" readOnly={true} value={currentSample ? currentSample?.color.charAt(0).toUpperCase() + currentSample?.color.slice(1) : ""} /> }
+                </Dropdown>) : <Input style={{background: "black"}} appearance="outline" id="color_dropdown" readOnly={true} value={currentSample ? currentSample?.color.charAt(0).toUpperCase() + currentSample?.color.slice(1) : ""} /> }
           </div>
           <div className={styles.field}>
             <Label htmlFor="rock_type">Rock Type<sub></sub></Label>
-            <Input appearance="outline" id="rock_type" readOnly={true} value={geosample.rock_type} />
+            <Input style={{background: "black"}} appearance="outline" id="rock_type" readOnly={true} value={geosample.rock_type} />
           </div>
           <div className={styles.field}>
             <Label htmlFor="sample_id">ID<sub></sub></Label>
-            <Input appearance="outline" id="sample_id" readOnly={true} value={geosample.eva_data.id.toString()} />
+            <Input style={{background: "black"}} appearance="outline" id="sample_id" readOnly={true} value={geosample.eva_data.id.toString()} />
           </div>
         </div>
         <div className={styles.line}>
           <div style={{display: "flex", flexDirection: "column", flexGrow: "1"}}>
             <Label htmlFor="description">Description<sub></sub></Label>
-            <Textarea style={{height: "120px"}} appearance="outline" id="description" readOnly={!edit} defaultValue={geosample.description} value={edit ? editedSample?.description : currentSample?.description || ''}  onChange={(e) => handleChange('description', e.target.value)} />
+            <Textarea style={{height: "120px", background: edit ? "" : "black"}} appearance="outline" id="description" readOnly={!edit} defaultValue={geosample.description} value={edit ? editedSample?.description : currentSample?.description || ''}  onChange={(e) => handleChange('description', e.target.value)} />
           </div>
           <img src={`data:image/jpeg;base64,${geosample.photo_jpg}`} height={143.8} width={230}/>
         </div>
@@ -482,22 +482,22 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
           <CompositionVisualization sample={geosample.eva_data}/>
             <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "30%" }}>              
               <Label htmlFor="location">Location<sub></sub></Label>
-              <Input contentBefore={<Location16Regular/>} appearance="outline" id="location" readOnly={true} value={location_string} />
+              <Input style={{background: "black"}} contentBefore={<Location16Regular/>} appearance="outline" id="location" readOnly={true} value={location_string} />
             </div>
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
               <Label htmlFor="time">Time<sub></sub></Label>
-              <Input contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={splitTimeString(geosample.time)[0]} />
+              <Input style={{background: "black"}} contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={splitTimeString(geosample.time)[0]} />
             </div>
         </div>
         <div className={styles.line}>
           <CompositionValues sample={geosample.eva_data} />
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "30%" }}>
               <Label htmlFor="date">Date<sub></sub></Label>
-              <Input contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={splitTimeString(geosample.time)[1]} />
+              <Input style={{background: "black"}} contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={splitTimeString(geosample.time)[1]} />
             </div>
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
               <Label htmlFor="zone">Zone<sub></sub></Label>
-              <Input contentBefore={<Tag16Regular/>} appearance="outline" id="zone" readOnly={true} value={geosample.zone_id} />
+              <Input style={{background: "black"}} contentBefore={<Tag16Regular/>} appearance="outline" id="zone" readOnly={true} value={geosample.zone_id} />
             </div>
         </div>
         { edit && <div style={{paddingRight: "1rem", display: "flex", float: "right", gap: "15px", marginBottom: "1rem"}}>
