@@ -26,6 +26,7 @@ export type MessageAction =
     { type: 'add', payload: BaseMessage }
 
 function createConversations(setConversations, messages: BaseMessage[]) {
+    if (!messages || messages.length === 0) return;
     // Map from astronaut ID to messages
     const conversations = new Map();
     for (const message of messages) {

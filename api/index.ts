@@ -59,22 +59,28 @@ async function loadRoutes(db: any) {
                 routeInstances.push(routeInstance);
 
                 // Register routes defined in the routeInstance
-                for (const route of routeInstance.routes) {
-                    app[route.method as Method](route.path, route.handler);
-                    logger.info(`Registered route ${route.method.toUpperCase()} ${route.path}`);
+                if (!routeInstance.routes?.length) {
+                    for (const route of routeInstance.routes) {
+                        app[route.method as Method](route.path, route.handler);
+                        logger.info(`Registered route ${route.method.toUpperCase()} ${route.path}`);
+                    }
                 }
 
                 // Register events defined in the routeInstance
-                for (const event of routeInstance.events) {
-                    eventRegistry[event.type.toUpperCase()] = event.handler;
-                    logger.info(`Registered event ${event.type}`);
+                if (routeInstance.events?.length) {
+                    for (const event of routeInstance.events) {
+                        eventRegistry[event.type.toUpperCase()] = event.handler;
+                        logger.info(`Registered event ${event.type}`);
+                    }
                 }
 
                 // Register TSS keys defined in the routeInstance
-                for (const tssSubscription of routeInstance?.tssFiles) {
-                    tssRegistry[tssSubscription.path] = tssRegistry[tssSubscription.path] ?? [];
-                    tssRegistry[tssSubscription.path].push(tssSubscription.handler);
-                    logger.info(`Registered TSS file ${tssSubscription.path}.json for route ${file}`);
+                if (routeInstance.tssFiles?.length) {
+                    for (const tssSubscription of routeInstance?.tssFiles) {
+                        tssRegistry[tssSubscription.path] = tssRegistry[tssSubscription.path] ?? [];
+                        tssRegistry[tssSubscription.path].push(tssSubscription.handler);
+                        logger.info(`Registered TSS file ${tssSubscription.path}.json for route ${file}`);
+                    }
                 }
             } catch (err) {
                 logger.error(`Failed to load route ${file}: ${err.message}`);
