@@ -190,7 +190,7 @@ export default class Geosamples extends Base {
             res.status(200).send({samples: sampleData, zones: zoneData});
             return "Edited sample";
         } catch (e) {
-            this.logger.info(e.message)
+            this.logger.error(e.message)
             res.status(400).send(e.message);
             return e.message;
         }
