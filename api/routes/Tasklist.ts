@@ -172,11 +172,13 @@ export default class Tasklist extends Base {
 	}
 
 	proxyTaskList(data: any) {
-		this.logger.info(`Received task list from AR: ${JSON.stringify(data)}`)
+		console.log("sending data !!!");
+		console.log(data);
+		this.logger.info(`Received task list from AR: ${JSON.stringify(data.data.tasks)}`)
 		this.dispatch("AR", {
-			id: -1,
+			id: 1,
 			use: 'PUT',
-			data: data.data,
+			data: data,
 			type: 'TASK_LIST',
 		});
 	}

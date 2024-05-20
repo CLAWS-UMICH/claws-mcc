@@ -504,7 +504,8 @@ export function TaskList() {
   //                              Convert to JSON
   // ------------------------------------------------------------------------
   function sendToAR() {
-    sendMessage(JSON.stringify({ type: 'TASKLIST_FOR_AR', data: convertToTargetTypes(tasksEmergency.concat(tasksCompleted).concat(tasksInProgress).concat(tasksToDo)) }));
+    console.log(JSON.stringify({ type: 'TASKLIST_FOR_AR', data: convertToTargetTypes(tasksEmergency.concat(tasksCompleted).concat(tasksInProgress).concat(tasksToDo)) }));
+    sendMessage(JSON.stringify({type: 'TASKLIST_FOR_AR', data: {apple: 'pie'}));
   }
   // ------------------------------------------------------------------------
   //                              Convert to AR JSON
