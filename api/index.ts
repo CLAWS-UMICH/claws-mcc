@@ -71,7 +71,7 @@ async function loadRoutes(db: any) {
                 }
 
                 // Register TSS keys defined in the routeInstance
-                for (const tssSubscription of routeInstance.tssFiles) {
+                for (const tssSubscription of routeInstance?.tssFiles) {
                     tssRegistry[tssSubscription.path] = tssRegistry[tssSubscription.path] ?? [];
                     tssRegistry[tssSubscription.path].push(tssSubscription.handler);
                     logger.info(`Registered TSS file ${tssSubscription.path}.json for route ${file}`);
