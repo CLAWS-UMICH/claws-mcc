@@ -230,6 +230,7 @@ export function TaskList() {
         setTasksEmergency(tasksEmergency.filter((t) => t.id !== taskID));
       }
     }
+
     sendToAR();
   }
 
@@ -257,76 +258,81 @@ export function TaskList() {
   //                              Edit Task Handler
   // ------------------------------------------------------------------------
   function handleTaskEdit(event, taskID, taskStatus, task) {
+
     // split taskID into task and subtask IDs
     let [task_id, subtask_id] = String(taskID).split('-');
-    console.log(taskID);
+
+    console.log(`Editing task ${task_id} with subtask ${subtask_id}`, task)
+
     // set bool if subtask
     let subtask = Boolean(subtask_id ? true : false);
-    console.log(subtask);
-    console.log({ taskStatus });
-    console.log({ selectedTaskParent })
-    // find task in array and update it
-    if (taskStatus == TaskStatus.COMPLETED) {
-      const taskIndex = tasksCompleted.findIndex((t) => t.id === Number(task_id));
-      if (subtask) {
-        const subtaskIndex = tasksCompleted[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
-        if (subtaskIndex !== -1) {
-          tasksCompleted[taskIndex].subtasks![subtaskIndex] = task;
+
+    try {
+      // find task in array and update it
+      if (taskStatus == TaskStatus.COMPLETED) {
+        const taskIndex = tasksCompleted.findIndex((t) => t.id === Number(task_id));
+        if (subtask) {
+          const subtaskIndex = tasksCompleted[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+          if (subtaskIndex !== -1) {
+            tasksCompleted[taskIndex].subtasks![subtaskIndex] = task;
+          }
         }
-      }
-      else {
-        if (taskIndex !== -1) {
-          tasksCompleted[taskIndex] = task;
+        else {
+          if (taskIndex !== -1) {
+            tasksCompleted[taskIndex] = task;
+          }
         }
+        setTasksCompleted([...tasksCompleted]);
       }
-      setTasksCompleted([...tasksCompleted]);
+      else if (taskStatus == TaskStatus.INPROGRESS) {
+        const taskIndex = tasksInProgress.findIndex((t) => t.id === Number(task_id));
+        if (subtask) {
+          const subtaskIndex = tasksInProgress[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+          if (subtaskIndex !== -1) {
+            tasksInProgress[taskIndex].subtasks![subtaskIndex] = task;
+          }
+        }
+        else {
+          if (taskIndex !== -1) {
+            tasksInProgress[taskIndex] = task;
+          }
+        }
+        setTasksInProgress([...tasksInProgress]);
+      }
+      else if (taskStatus == TaskStatus.TODO) {
+        const taskIndex = tasksToDo.findIndex((t) => t.id === Number(task_id));
+        if (subtask) {
+          const subtaskIndex = tasksToDo[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+          if (subtaskIndex !== -1) {
+            tasksToDo[taskIndex].subtasks![subtaskIndex] = task;
+          }
+        }
+        else {
+          if (taskIndex !== -1) {
+            tasksToDo[taskIndex] = task;
+          }
+        }
+        setTasksToDo([...tasksToDo]);
+      }
+      else if (taskStatus == TaskStatus.EMERGENCY) {
+        const taskIndex = tasksEmergency.findIndex((t) => t.id === Number(task_id));
+        if (subtask) {
+          const subtaskIndex = tasksEmergency[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+          if (subtaskIndex !== -1) {
+            tasksEmergency[taskIndex].subtasks![subtaskIndex] = task;
+          }
+        }
+        else {
+          if (taskIndex !== -1) {
+            tasksEmergency[taskIndex] = task;
+          }
+        }
+        setTasksEmergency([...tasksEmergency]);
+      }
+      setEditMode(false);
+    } catch (err) {
+      console.log(err);
     }
-    else if (taskStatus == TaskStatus.INPROGRESS) {
-      const taskIndex = tasksInProgress.findIndex((t) => t.id === Number(task_id));
-      if (subtask) {
-        const subtaskIndex = tasksInProgress[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
-        if (subtaskIndex !== -1) {
-          tasksInProgress[taskIndex].subtasks![subtaskIndex] = task;
-        }
-      }
-      else {
-        if (taskIndex !== -1) {
-          tasksInProgress[taskIndex] = task;
-        }
-      }
-      setTasksInProgress([...tasksInProgress]);
-    }
-    else if (taskStatus == TaskStatus.TODO) {
-      const taskIndex = tasksToDo.findIndex((t) => t.id === Number(task_id));
-      if (subtask) {
-        const subtaskIndex = tasksToDo[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
-        if (subtaskIndex !== -1) {
-          tasksToDo[taskIndex].subtasks![subtaskIndex] = task;
-        }
-      }
-      else {
-        if (taskIndex !== -1) {
-          tasksToDo[taskIndex] = task;
-        }
-      }
-      setTasksToDo([...tasksToDo]);
-    }
-    else if (taskStatus == TaskStatus.EMERGENCY) {
-      const taskIndex = tasksEmergency.findIndex((t) => t.id === Number(task_id));
-      if (subtask) {
-        const subtaskIndex = tasksEmergency[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
-        if (subtaskIndex !== -1) {
-          tasksEmergency[taskIndex].subtasks![subtaskIndex] = task;
-        }
-      }
-      else {
-        if (taskIndex !== -1) {
-          tasksEmergency[taskIndex] = task;
-        }
-      }
-      setTasksEmergency([...tasksEmergency]);
-    }
-    setEditMode(false);
 
     sendToAR();
   }
@@ -504,8 +510,7 @@ export function TaskList() {
   //                              Convert to JSON
   // ------------------------------------------------------------------------
   function sendToAR() {
-    console.log(JSON.stringify({ type: 'TASKLIST_FOR_AR', data: convertToTargetTypes(tasksEmergency.concat(tasksCompleted).concat(tasksInProgress).concat(tasksToDo)) }));
-    sendMessage(JSON.stringify({type: 'TASKLIST_FOR_AR', data: {apple: 'pie'}));
+    sendMessage(JSON.stringify({type: 'TASKLIST_FOR_AR', data: { tasks: convertToTargetTypes({AllTasks: [...tasksInProgress, ...tasksToDo, ...tasksCompleted, ...tasksEmergency]}) } }));
   }
   // ------------------------------------------------------------------------
   //                              Convert to AR JSON
@@ -537,9 +542,7 @@ export function TaskList() {
     // Convert the main task list data
     const convertedTasks = convertTasks(data.AllTasks);
 
-    return {
-      tasks: convertedTasks
-    };
+    return convertedTasks;
   }
 
   // ------------------------------------------------------------------------

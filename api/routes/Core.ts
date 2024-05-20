@@ -120,7 +120,9 @@ export default class Core extends Base {
             id: -1,
             type: 'TASK_LIST',
             use: 'PUT',
-            data: tasks,
+            data: {
+                "AllTasks": tasks,
+            },
         });
 
         return tasks.length;
