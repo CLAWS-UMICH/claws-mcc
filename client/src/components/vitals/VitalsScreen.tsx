@@ -15,12 +15,17 @@ interface VitalsScreenProps {
 
 const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
     const secondsToHours = (seconds: number) => {
+        if (!seconds) {
+            return "N/A";
+        }
         var hours = seconds / 3600;
         var minutes = Math.trunc(hours) * 60;
         var timeString = (hours < 1) ? ("") : (hours.toString() + " hr ") 
         timeString += (minutes.toString() + " min") 
         return timeString;
     }
+
+    console.log({vitals})
 
     return (
         <div>
@@ -33,7 +38,7 @@ const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
                             <Battery10Regular></Battery10Regular>
                             <Caption2Strong><sub></sub>Battery</Caption2Strong>
                         </div>
-                        <VitalsGauge id="battery" text="%" name={vitals.battery_time_left/10800*100} value={vitals.battery_time_left/10800*100}></VitalsGauge>
+                        <VitalsGauge id="battery" text="min" name={vitals.battery_time_left/60} value={vitals.battery_time_left/10800*100}></VitalsGauge>
                     </div>
                     <div className="ring">
                         <Caption2Strong>O<sub>2</sub>  Pri Storage</Caption2Strong>
@@ -75,6 +80,7 @@ const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
                         </div>
                         <div className="card"><Body1Strong>{secondsToHours(vitals.battery_time_left)}</Body1Strong></div>
                     </div>
+
                 </div>
             </div>
             <div className="atmosphere">
@@ -175,29 +181,29 @@ const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
                     <div style={{display: "flex", flexDirection: "column", justifyItems: "space-evenly", gap: "30px"}}>
                         <div className="ring">
                             <Caption1Strong>Fan<sub></sub></Caption1Strong>
-                            <div className="switch"><Body1Strong>{vitals.dcu.fan ? "PRI" : "SEC"}</Body1Strong></div>
+                            <div className="switch"><Body1Strong>{vitals.dcu?.fan ? "PRI" : "SEC"}</Body1Strong></div>
                         </div>
                         <div className="ring">
                             <Caption1Strong>Battery<sub></sub></Caption1Strong>
-                            <div className="switch"><Body1Strong>{vitals.dcu.batt ? "LOCAL" : "BACKUP"}LOCAL</Body1Strong></div>
+                            <div className="switch"><Body1Strong>{vitals.dcu?.batt ? "LOCAL" : "BACKUP"}</Body1Strong></div>
                         </div>
                         <div className="ring">
                             <Caption1Strong>Comms<sub></sub></Caption1Strong>
-                            <div className="switch"><Body1Strong>{vitals.dcu.comm ? "A" : "B"}</Body1Strong></div>
+                            <div className="switch"><Body1Strong>{vitals.dcu?.comm ? "A" : "B"}</Body1Strong></div>
                         </div>
                     </div>
                     <div style={{display: "flex", flexDirection: "column", justifyItems: "space-around", gap: "30px"}}>
                         <div className="ring">
                             <Caption1Strong>Oxygen<sub></sub></Caption1Strong>
-                            <div className="switch"><Body1Strong>{vitals.dcu.oxy ? "PRI" : "SEC"}</Body1Strong></div>
+                            <div className="switch"><Body1Strong>{vitals.dcu?.oxy ? "PRI" : "SEC"}</Body1Strong></div>
                         </div>
                         <div className="ring">
                             <Caption1Strong>CO<sub>2</sub></Caption1Strong>
-                            <div className="switch"><Body1Strong>{vitals.dcu.co2 ? "A": "B"}</Body1Strong></div>
+                            <div className="switch"><Body1Strong>{vitals.dcu?.co2 ? "A": "B"}</Body1Strong></div>
                         </div>
                         <div className="ring">
                             <Caption1Strong>Pump<sub></sub></Caption1Strong>
-                            <div className="switch"><Body1Strong>{vitals.dcu.pump ? "OPEN" : "CLOSED"}</Body1Strong></div>
+                            <div className="switch"><Body1Strong>{vitals.dcu?.pump ? "OPEN" : "CLOSED"}</Body1Strong></div>
                         </div>
                     </div>
                 </div>

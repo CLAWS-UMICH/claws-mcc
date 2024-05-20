@@ -103,7 +103,7 @@ const CameraView: React.FC = () => {
                     config.EVA_IP_ADDRESSES.map((ip, index) => (
                         <div key={index} className='camera'>
                             <video 
-                                src={`https://${ip}/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=false&loopback=true&RenderFromCamera=true`} 
+                                src={`http://${ip}/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=false&loopback=true&RenderFromCamera=true`} 
                                 autoPlay 
                                 loop 
                                 controls={false}

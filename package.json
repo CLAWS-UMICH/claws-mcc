@@ -8,6 +8,7 @@
     "@types/ws": "^8.5.10",
     "@vis.gl/react-google-maps": "^1.0.0",
     "apexcharts": "^3.49.1",
+    "axios": "^1.7.0",
     "chart.js": "^4.4.1",
     "concurrently": "^8.2.2",
     "connect-redis": "^7.1.0",

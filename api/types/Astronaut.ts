@@ -31,5 +31,13 @@ export interface VitalsMessage extends Message {
         oxygen_primary_time: number;
         oxygen_secondary_time: number;
         water_capacity: number;
+        dcu?: {
+            batt: boolean,
+            oxy: boolean,
+            comm: boolean,
+            fan: boolean,
+            pump: boolean,
+            co2: boolean
+        }
     };
 }

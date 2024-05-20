@@ -10,6 +10,7 @@ interface Alert {
 const CURRENT_EVA = process.env.CURRENT_EVA || 'eva2';
 
 export default class Vitals extends Base {
+    private vitals: any;
     public events = [
         {
             type: 'VITALS', // to handle incoming messages from hololens (vitals update)
@@ -24,6 +25,10 @@ export default class Vitals extends Base {
         {
             path: '/teams/2/TELEMETRY.json',
             handler: this.handleTSSVitalsUpdate.bind(this),
+        },
+        {
+            path: '/DCU.json',
+            handler: this.handleDCUUpdate.bind(this),
         }
     ]
     private logger = new Logger('Vitals');
@@ -31,37 +36,72 @@ export default class Vitals extends Base {
     async handleVitalsUpdate(data: VitalsMessage) {
         const alerts = handleAlerts(data.data);
         this.logger.info('Handling vitals update', data);
+        if (!data?.data) {
+            return;
+        }
 
         await this.db.collection('vitals').updateOne(
             { id: data.id },
             { $set: { ...data.data, alerts } },
             { upsert: true }
         );
+        this.vitals = {
+            ...this.vitals,
+            ...data.data
+        };
 
         await this.sendVitalsMessage();
     }
 
     async handleTSSVitalsUpdate(data: VitalsMessage) {
-        this.logger.info('Handling TSS vitals update', data);
+        const eva_data = convertData(data["telemetry"][CURRENT_EVA]);
+
+        this.logger.info('Handling TSS vitals update', eva_data);
+
+        await this.handleVitalsUpdate({
+            id: -1,
+            type: 'VITALS',
+            use: 'PUT',
+            data: eva_data,
+        });
+    }
+
+    async handleDCUUpdate(data) {
+        console.log({dcu: data["dcu"]})
+        const dcu_data = data["dcu"][CURRENT_EVA];
+
+        this.logger.info('Handling TSS DCU update', dcu_data);
+
+        await this.handleVitalsUpdate({
+            id: -1,
+            type: 'VITALS',
+            use: 'PUT',
+            data: { ...this.vitals, dcu: dcu_data },
+        });
     }
 
     async sendVitalsMessage() {
-        this.logger.info("Sending vitals to frontend");
-        const allVitals = this.db.collection('vitals').find();
-        const vitalsData = await allVitals.toArray();
+        this.logger.info("Sending vitals to frontend" + JSON.stringify(this.vitals));
+        // const allVitals = this.db.collection('vitals').find();
+        // const vitalsData = await allVitals.toArray();
+        const vitalsData = this.vitals;
         const messageId = 0;
 
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'VITALS',
             use: 'PUT',
-            data: vitalsData,
+            data: this.vitals,
         });
     }
 }
 
 function handleAlerts(data: any) {
     const alerts: Alert[] = [];
+
+    if (!data) {
+        return [];
+    }
 
     // Primary Oxygen
     if (20 <= data.oxy_pri_storage && data.oxy_pri_storage <= 80) {
@@ -117,4 +157,38 @@ function handleAlerts(data: any) {
     }
 
     return alerts;
+}
+
+
+function convertData(data) {
+    return {
+        room_id: 0, // This should be set based on your application's context
+        is_running: false, // This should be set based on your application's context
+        is_paused: false, // This should be set based on your application's context
+        time: 0, // This should be set based on your application's context
+        timer: "", // This should be set based on your application's context
+        started_at: "", // This should be set based on your application's context
+        primary_oxygen: data.oxy_pri_storage,
+        secondary_oxygen: data.oxy_sec_storage,
+        suit_pressure: data.suit_pressure_total,
+        sub_pressure: 0, // This should be set based on your application's context
+        o2_pressure: data.oxy_pri_pressure,
+        o2_rate: data.oxy_consumption,
+        h2o_gas_pressure: data.coolant_gas_pressure,
+        h2o_liquid_pressure: data.coolant_liquid_pressure,
+        sop_pressure: 0, // This should be set based on your application's context
+        sop_rate: 0, // This should be set based on your application's context
+        heart_rate: data.heart_rate,
+        fan_tachometer: data.fan_pri_rpm,
+        battery_capacity: 0, // This should be set based on your application's context
+        temperature: data.temperature,
+        battery_time_left: data.batt_time_left,
+        o2_time_left: data.oxy_time_left,
+        h2o_time_left: "", // This should be set based on your application's context
+        battery_percentage: 0, // This should be set based on your application's context
+        battery_outputput: 0, // This should be set based on your application's context
+        oxygen_primary_time: 0, // This should be set based on your application's context
+        oxygen_secondary_time: 0, // This should be set based on your application's context
+        water_capacity: data.coolant_ml
+    };
 }
