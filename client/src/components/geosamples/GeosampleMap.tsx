@@ -84,6 +84,7 @@ const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch,
     }, [selected, prevSelected]);
 
     const getMarkerLabel = (zoneId: string, id?: number) : string => {
+        zoneId = String.fromCharCode(Number(zoneId));
         return id ? zoneId + id.toString() : zoneId;
     };
 

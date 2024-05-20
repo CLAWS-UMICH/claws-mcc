@@ -97,11 +97,11 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
     return (
         <Accordion className={styles.container} defaultOpenItems={sample_zones.map(zone => zone.zone_id)} onToggle={handleToggle} openItems={openItems} multiple collapsible>
             {sample_zones.map((zone) =>             
-                zone.geosample_ids.length > 0 && (<AccordionItem key={zone.zone_id} value={zone.zone_id}>
+                zone.ZoneGeosamplesIds.length > 0 && (<AccordionItem key={zone.zone_id} value={zone.zone_id}>
                     <AccordionHeader key={zone.zone_id} className={styles.header} size="large" expandIcon={openItems.includes(zone.zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
-                        <b style={{fontSize:"15px"}}>Zone {zone.zone_id}</b>
+                        <b style={{fontSize:"15px"}}>Zone {String.fromCharCode(Number(zone.zone_id))}</b>
                     </AccordionHeader>
-                    {zone.geosample_ids.map((id, index) => (
+                    {zone.ZoneGeosamplesIds.map((id, index) => (
                         <AccordionPanel style={{marginLeft: "-15px", marginRight: "-12px", marginBottom: "1px"}} className={styles.sampleContainer} key={id}>
                             {geosampleMap.has(Number(id)) && (
                                 <CompoundButton

@@ -104,7 +104,7 @@ export default class Geosamples extends Base {
                     this.logger.error("Geosample zones in incorrect format.");
                     return "Error";
                 }
-                Geosamples.sampleIds[zones[i].zone_id.toString()] = 1;
+                Geosamples.sampleIds[zones[i].zone_id] = 1;
             }
             for (let i = 0; i < samples.length; i++) {
                 if (!isGeosample(samples[i])) {

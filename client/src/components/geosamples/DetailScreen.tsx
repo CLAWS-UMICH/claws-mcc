@@ -364,7 +364,12 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
   };
 
   const splitTimeString: (input: string) => [string, string] = (input) => {
-      const match = input.match(/(.*? .*?) (.*)/);
+    // Define the regex pattern to match date and time
+    const regex = /^(\d{1,2}\/\d{1,2}\/\d{4}) (\d{1,2}:\d{2} [AP]M)$/;
+
+    // Apply the regex to the string
+    const match = input.match(regex);
+      // const match = input.match(/(.*) (.*? .*?)/);
       if (match) {
           return [match[1], match[2]]; // match[1] is the part before the second space
       }
@@ -486,18 +491,18 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
             </div>
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
               <Label htmlFor="time">Time<sub></sub></Label>
-              <Input style={{background: "black"}} contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={splitTimeString(geosample.time)[0]} />
+              <Input style={{background: "black"}} contentBefore={<Clock16Regular/>} appearance="outline" id="time" readOnly={true} value={splitTimeString(geosample.time)[1]} />
             </div>
         </div>
         <div className={styles.line}>
           <CompositionValues sample={geosample.eva_data} />
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "30%" }}>
               <Label htmlFor="date">Date<sub></sub></Label>
-              <Input style={{background: "black"}} contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={splitTimeString(geosample.time)[1]} />
+              <Input style={{background: "black"}} contentBefore={<Calendar16Regular/>} appearance="outline" id="date" readOnly={true} value={splitTimeString(geosample.time)[0]} />
             </div>
            <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", maxWidth: "20%" }}>
               <Label htmlFor="zone">Zone<sub></sub></Label>
-              <Input style={{background: "black"}} contentBefore={<Tag16Regular/>} appearance="outline" id="zone" readOnly={true} value={geosample.zone_id} />
+              <Input style={{background: "black"}} contentBefore={<Tag16Regular/>} appearance="outline" id="zone" readOnly={true} value={String.fromCharCode(Number(geosample.zone_id))} />
             </div>
         </div>
         { edit && <div style={{paddingRight: "1rem", display: "flex", float: "right", gap: "15px", marginBottom: "1rem"}}>

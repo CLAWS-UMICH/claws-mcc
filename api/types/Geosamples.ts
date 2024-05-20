@@ -40,7 +40,7 @@ export type BaseGeosample = {
 
 export type BaseZone = {
     zone_id: string;
-    geosample_ids: number[];
+    ZoneGeosamplesIds: number[];
     location: Location;
     radius: number;
 }

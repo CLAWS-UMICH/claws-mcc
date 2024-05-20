@@ -57,7 +57,7 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
                 ),
                 sample_zones: state.sample_zones.map(zone => ({
                     ...zone,
-                    geosample_ids: zone.geosample_ids.filter(id => id !== action.payload.geosample_id)
+                    geosample_ids: zone.ZoneGeosamplesIds.filter(id => id !== action.payload.geosample_id)
                 })),
             };
         case 'update':
@@ -75,7 +75,7 @@ export const geosampleReducer = (state: ManagerState, action: ManagerAction): Ma
                 }),
                 sample_zones: state.sample_zones.map(zone => ({
                     ...zone,
-                    geosample_ids: zone.geosample_ids.map(id => {
+                    geosample_ids: zone.ZoneGeosamplesIds.map(id => {
                         if (id === action.payload.geosample_id) {
                             return action.payload.geosample_id;
                         }
