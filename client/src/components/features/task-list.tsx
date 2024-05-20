@@ -6,6 +6,7 @@ import ProgressBar from './progress-bar';
 import TitleForm from './title-form';
 import Description from '../common/Description/Description';
 import DescriptionForm from './description-form';
+import useDynamicWebSocket from '../../hooks/useWebSocket';
 // import TwoColumnLayout from './column-layout.tsx';
 
 export type Astronaut = {
@@ -122,8 +123,13 @@ export function TaskList() {
     const [tasksEmergency, setTasksEmergency] = useState<Array<Task>>([]);
     const [selectedTaskId, setSelectedTaskId] = useState<string>(''); // Stores ID of selected task (or subtask)
     const [selectedTask, setSelectedTask] = useState<Task>();
+    const [selectedTaskParent, setSelectedTaskParent] = useState<Task>(); // Stores parent task of selected subtask
     const [editMode, setEditMode] = useState<boolean>(false);
     const [nextId, setNextId] = useState(100); // Initial counter value
+
+    const { sendMessage, lastMessage } = useDynamicWebSocket({
+      type: 'TASK_LIST'
+    });
 
     const generateUniqueId = () => {
       setNextId((prevId) => prevId + 1);
@@ -172,17 +178,20 @@ export function TaskList() {
       // Update selected state for the clicked task
       setSelectedTaskId(task.id);
       setSelectedTask(task);
+      setSelectedTaskParent(undefined);
       setEditMode(false);
     };
   
-    const handleSubtaskClick = (subtask, parentTaskId) => {
+    const handleSubtaskClick = (subtask, parentTask) => {
       // Deselect any previously selected task/subtask
       setSelectedTaskId('');
   
       // Update selected state for the clicked subtask (considering parent)
-      setSelectedTaskId(`${parentTaskId}-${subtask.id}`); // Combine parent and subtask ID
+      setSelectedTaskId(`${parentTask.id}-${subtask.id}`); // Combine parent and subtask ID
       setSelectedTask(subtask);
+      setSelectedTaskParent(parentTask);
       setEditMode(false);
+      
     };
   
     // ------------------------------------------------------------------------
@@ -219,7 +228,7 @@ export function TaskList() {
             setTasksEmergency(tasksEmergency.filter((t) => t.id !== taskID));
           }
         }
-        // TODO: send updated tasklist to AR
+        sendToAR();
     }
 
     // ------------------------------------------------------------------------
@@ -239,45 +248,85 @@ export function TaskList() {
             setTasksCompleted(tasksCompleted.filter((t) => t.id !== taskID));
           }
         }
-        //TODO: send updated tasklist to AR
+        sendToAR();
     }
 
     // ------------------------------------------------------------------------
     //                              Edit Task Handler
     // ------------------------------------------------------------------------
     function handleTaskEdit(event, taskID, taskStatus, task) {
+        // split taskID into task and subtask IDs
+        let [task_id, subtask_id] = String(taskID).split('-');
+        console.log(taskID);
+        // set bool if subtask
+        let subtask = Boolean(subtask_id ? true : false);
+        console.log(subtask);
+        console.log({ taskStatus });
+        console.log({ selectedTaskParent })
         // find task in array and update it
         if (taskStatus == TaskStatus.COMPLETED) {
-          const taskIndex = tasksCompleted.findIndex((t) => t.id === taskID);
-          if (taskIndex !== -1) {
-            tasksCompleted[taskIndex] = task;
-            setTasksCompleted([...tasksCompleted]);
+          const taskIndex = tasksCompleted.findIndex((t) => t.id === Number(task_id));
+          if (subtask) {
+            const subtaskIndex = tasksCompleted[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+            if (subtaskIndex !== -1) {
+              tasksCompleted[taskIndex].subtasks![subtaskIndex] = task;
+            }
           }
+          else {
+            if (taskIndex !== -1) {
+              tasksCompleted[taskIndex] = task;
+            }
+          }
+          setTasksCompleted([...tasksCompleted]);
         }
         else if (taskStatus == TaskStatus.INPROGRESS) {
-          const taskIndex = tasksInProgress.findIndex((t) => t.id === taskID);
-          if (taskIndex !== -1) {
-            tasksInProgress[taskIndex] = task;
-            setTasksInProgress([...tasksInProgress]);
+          const taskIndex = tasksInProgress.findIndex((t) => t.id === Number(task_id));
+          if (subtask) {
+            const subtaskIndex = tasksInProgress[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+            if (subtaskIndex !== -1) {
+              tasksInProgress[taskIndex].subtasks![subtaskIndex] = task;
+            }
           }
+          else {
+            if (taskIndex !== -1) {
+              tasksInProgress[taskIndex] = task;
+            }
+          }
+          setTasksInProgress([...tasksInProgress]);
         }
         else if (taskStatus == TaskStatus.TODO) {
-          const taskIndex = tasksToDo.findIndex((t) => t.id === taskID);
-          if (taskIndex !== -1) {
-            tasksToDo[taskIndex] = task;
-            setTasksToDo([...tasksToDo]);
+          const taskIndex = tasksToDo.findIndex((t) => t.id === Number(task_id));
+          if (subtask) {
+            const subtaskIndex = tasksToDo[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+            if (subtaskIndex !== -1) {
+              tasksToDo[taskIndex].subtasks![subtaskIndex] = task;
+            }
           }
+          else {
+            if (taskIndex !== -1) {
+              tasksToDo[taskIndex] = task;
+            }
+          }
+          setTasksToDo([...tasksToDo]);
         }
         else if (taskStatus == TaskStatus.EMERGENCY) {
-          const taskIndex = tasksEmergency.findIndex((t) => t.id === taskID);
-          if (taskIndex !== -1) {
-            tasksEmergency[taskIndex] = task;
-            setTasksEmergency([...tasksEmergency]);
+          const taskIndex = tasksEmergency.findIndex((t) => t.id === Number(task_id));
+          if (subtask) {
+            const subtaskIndex = tasksEmergency[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+            if (subtaskIndex !== -1) {
+              tasksEmergency[taskIndex].subtasks![subtaskIndex] = task;
+            }
           }
+          else {
+            if (taskIndex !== -1) {
+              tasksEmergency[taskIndex] = task;
+            }
+          }
+          setTasksEmergency([...tasksEmergency]);
         }
         setEditMode(false);
 
-        //TODO: send updated tasklist to AR
+        sendToAR();
     }
 
     // ------------------------------------------------------------------------
@@ -296,7 +345,7 @@ export function TaskList() {
         };
         setTasksToDo([...tasksToDo, task]);
 
-        //TODO: send updated tasklist to AR
+        sendToAR();
     }
 
     // ------------------------------------------------------------------------
@@ -328,6 +377,7 @@ export function TaskList() {
             setTasksToDo(tasksToDo.filter((t) => t.id !== taskID));
           }
         }
+        sendToAR();
       }
 
     // ------------------------------------------------------------------------
@@ -359,7 +409,171 @@ export function TaskList() {
             setTasksEmergency(tasksEmergency.filter((t) => t.id !== taskID));
           }
         }
+        sendToAR();
       }
+    
+    // ------------------------------------------------------------------------
+    //                          Add Subtask Handler
+    // ------------------------------------------------------------------------
+    function handleAddSubtask(event, taskID, taskStatus) {
+        if (taskStatus === TaskStatus.COMPLETED || taskStatus === TaskStatus.EMERGENCY) {
+          return;
+        }
+        // check if - in taskID
+        const [task_id, subtask_id] = taskID.split('-');
+        if (subtask_id) {
+          return;
+        }
+        console.log(taskID);
+        // Create a new subtask
+        const subtask = {
+          id: generateUniqueId(),
+          subtask: true,
+          title: "New Subtask",
+          description: "New Subtask Description",
+          status: TaskStatus.TODO,
+          astronauts: [],
+        };
+        // Find task in array and add subtask to it
+        if (taskStatus === TaskStatus.INPROGRESS) {
+          console.log("adding subtask to in progress");
+          const taskIndex = tasksInProgress.findIndex((t) => t.id === Number(taskID));
+          if (taskIndex !== -1) {
+            console.log("found task");
+            const updatedTasksInProgress = [...tasksInProgress]; // Create a copy of the array
+            updatedTasksInProgress[taskIndex].subtasks = updatedTasksInProgress[taskIndex].subtasks ?? []; // Ensure subtasks exist
+            updatedTasksInProgress[taskIndex].subtasks!.push(subtask); // Push the new subtask
+            setTasksInProgress(updatedTasksInProgress); // Update state using the new array
+          }
+        } else if (taskStatus === TaskStatus.TODO) {
+          console.log("adding subtask to todo");
+          const taskIndex = tasksToDo.findIndex((t) => t.id === Number(taskID));
+          if (taskIndex !== -1) {
+            console.log("found task");
+            const updatedTasksToDo = [...tasksToDo]; // Create a copy of the array
+            updatedTasksToDo[taskIndex].subtasks = updatedTasksToDo[taskIndex].subtasks ?? []; // Ensure subtasks exist
+            updatedTasksToDo[taskIndex].subtasks!.push(subtask); // Push the new subtask
+            setTasksToDo(updatedTasksToDo); // Update state using the new array
+          }
+        }
+        sendToAR();
+      }
+        
+
+    // ------------------------------------------------------------------------
+    //                          Complete Subtask Handler
+    // ------------------------------------------------------------------------
+    function handleToggleCompleteSubtask(event, task_id, subtask_id, taskStatus) {
+      // split taskID into task and subtask IDs
+      // find task in array and set status to completed
+      if (taskStatus === TaskStatus.INPROGRESS) {
+        const taskIndex = tasksInProgress.findIndex((t) => t.id === Number(task_id));
+        if (taskIndex !== -1) {
+          const subtaskIndex = tasksInProgress[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+          if (subtaskIndex !== -1) {
+            if (tasksInProgress[taskIndex].subtasks![subtaskIndex].status === TaskStatus.COMPLETED) {
+              tasksInProgress[taskIndex].subtasks![subtaskIndex].status = TaskStatus.TODO;
+            }
+            else {
+              tasksInProgress[taskIndex].subtasks![subtaskIndex].status = TaskStatus.COMPLETED;
+            }
+            setTasksInProgress([...tasksInProgress]);
+          }
+        }
+      }
+      else if (taskStatus === TaskStatus.TODO) {
+        const taskIndex = tasksToDo.findIndex((t) => t.id === Number(task_id));
+        if (taskIndex !== -1) {
+          const subtaskIndex = tasksToDo[taskIndex].subtasks!.findIndex((s) => s.id === Number(subtask_id));
+          if (subtaskIndex !== -1) {
+            if (tasksToDo[taskIndex].subtasks![subtaskIndex].status === TaskStatus.COMPLETED) {
+              tasksToDo[taskIndex].subtasks![subtaskIndex].status = TaskStatus.TODO;
+            }
+            else {
+              tasksToDo[taskIndex].subtasks![subtaskIndex].status = TaskStatus.COMPLETED;
+            }
+            setTasksToDo([...tasksToDo]);
+          }
+        }
+      }
+      sendToAR();
+    }
+    // ------------------------------------------------------------------------
+    //                              Convert to JSON
+    // ------------------------------------------------------------------------
+    function sendToAR() {
+      sendMessage(JSON.stringify({ type: 'TASKLIST_FOR_AR', data: convertToTargetTypes(tasksEmergency.concat(tasksCompleted).concat(tasksInProgress).concat(tasksToDo))}));
+    }
+    // ------------------------------------------------------------------------
+    //                              Convert to AR JSON
+    // ------------------------------------------------------------------------
+    function convertToTargetTypes(data) {
+      // Helper function to convert status
+      function convertStatus(status) {
+        switch(status) {
+          case TaskStatus.TODO: return 0;
+          case TaskStatus.INPROGRESS: return 1;
+          case TaskStatus.COMPLETED: return 2;
+          default: return 0;
+        }
+      }
+  
+      function convertTasks(tasks) {
+        return tasks.map(task => ({
+          id: task.task_id,
+          title: task.title,
+          description: task.description,
+          status: convertStatus(task.status),
+          astronauts: [],
+          subtasks: task.subtasks ? convertTasks(task.subtasks) : [],
+          isEmergency: task.status === TaskStatus.EMERGENCY,
+        }));
+      }
+    
+      // Convert the main task list data
+      const convertedTasks = convertTasks(data.AllTasks);
+    
+      return {
+        tasks: convertedTasks
+      };
+    }
+
+    // ------------------------------------------------------------------------
+    //                              Convert from AR JSON
+    // ------------------------------------------------------------------------
+
+    function convertFromTargetTypes(data: any): Task[] {
+      // Helper function to convert status from C# to JavaScript
+      function convertStatus(status: number): TaskStatus {
+        if (data.isEmergency) {
+          return TaskStatus.EMERGENCY;
+        }
+        switch (status) {
+          case 0: return TaskStatus.INPROGRESS;
+          case 1: return TaskStatus.TODO;
+          case 2: return TaskStatus.COMPLETED;
+          default: return TaskStatus.TODO;
+        }
+      }
+    
+      // Helper function to convert tasks from C# to JavaScript
+      function convertTasks(tasks: any[]): Task[] {
+        return tasks.map(task => ({
+          id: task.task_id,
+          subtask: task.subtask.length > 0,
+          title: task.title,
+          description: task.description,
+          status: convertStatus(task.status),
+          astronauts: [],
+          subtasks: task.subtasks ? convertTasks(task.subtasks) : []
+        }));
+      }
+    
+      // Convert the main task list data
+      const convertedTasks = convertTasks(data.AllTasks);
+    
+      return convertedTasks;
+    }
 
     // ------------------------------------------------------------------------
     //                                   Render
@@ -403,7 +617,7 @@ export function TaskList() {
                               <div 
                               key={subtask.id} 
                               className={`subtask ${(`${task.id}-${subtask.id}`) == selectedTaskId ? 'selected' : ''}`}
-                              onClick={() => handleSubtaskClick(subtask, task.id)}>
+                              onClick={() => handleSubtaskClick(subtask, task)}>
                                 <label htmlFor={`subtask-${subtask.id}`}> {/* Update ID format */}
                                   <input type="checkbox" id={`subtask-${subtask.id}`} />
                                 </label>
@@ -440,7 +654,7 @@ export function TaskList() {
                             <div 
                             key={subtask.id} 
                             className={`subtask ${(`${task.id}-${subtask.id}`) == selectedTaskId ? 'selected' : ''}`}
-                            onClick={() => handleSubtaskClick(subtask, task.id)}>
+                            onClick={() => handleSubtaskClick(subtask, task)}>
                               <label htmlFor={`subtask-${subtask.id}`}> {/* Update ID format */}
                                 <input type="checkbox" id={`subtask-${subtask.id}`} checked={true} />
                               </label>
@@ -475,9 +689,9 @@ export function TaskList() {
                             <div 
                             key={subtask.id} 
                             className={`subtask ${(`${task.id}-${subtask.id}`) == selectedTaskId ? 'selected' : ''}`}
-                            onClick={() => handleSubtaskClick(subtask, task.id)}>
+                            onClick={() => handleSubtaskClick(subtask, task)}>
                               <label htmlFor={`subtask-${subtask.id}`}> {/* Update ID format */}
-                                <input type="checkbox" id={`subtask-${subtask.id}`} />
+                                <input onClick={() => handleToggleCompleteSubtask(null, task.id, subtask.id, task.status)} type="checkbox" id={`subtask-${subtask.id}`} checked={subtask.status === TaskStatus.COMPLETED} />
                               </label>
                               <div className="task-content">
                                 <span className="task-text">{subtask.title}</span>
@@ -510,9 +724,9 @@ export function TaskList() {
                             <div 
                             key={subtask.id} 
                             className={`subtask ${(`${task.id}-${subtask.id}`) == selectedTaskId ? 'selected' : ''}`}
-                            onClick={() => handleSubtaskClick(subtask, task.id)}>
+                            onClick={() => handleSubtaskClick(subtask, task)}>
                               <label htmlFor={`subtask-${subtask.id}`}> {/* Update ID format */}
-                                <input type="checkbox" id={`subtask-${subtask.id}`} />
+                                <input onClick={() => handleToggleCompleteSubtask(null, task.id, subtask.id, task.status)} type="checkbox" id={`subtask-${subtask.id}`} checked={subtask.status === TaskStatus.COMPLETED} />
                               </label>
                               <div className="task-content">
                                 <span className="task-text">{subtask.title}</span>
@@ -535,7 +749,7 @@ export function TaskList() {
                     {!editMode && (<p className='task-details-name'>{selectedTask.title}</p>)}
                     {editMode && (<TitleForm task={selectedTask} onTaskChange={setSelectedTask}/>)}
                     <button className='inprogress-details-button' onClick={() => handleInProgressTask(null, selectedTaskId, selectedTask.status)}>In-Progress</button>
-                    <button className='subtask-details-button' onClick={handleNewTask}>Subtask</button>
+                    <button className='subtask-details-button' onClick={() => handleAddSubtask(null, String(selectedTaskId), selectedTask.status)}>Subtask</button>
                     <button className='emergency-details-button' onClick={() => handleEmergencyTask(null, selectedTaskId, selectedTask.status)}></button>
                     <button className='edit-details-button' onClick={() => setEditMode(true)}>Edit</button>
                     <button className='delete-details-button' onClick={handleNewTask}></button>
@@ -550,7 +764,7 @@ export function TaskList() {
                         <DescriptionForm task={selectedTask} onTaskChange={setSelectedTask} />
                         <div className='task-details-bottom'>
                           <div className='spacer' />
-                          <button className='save-details-button' onClick={() => { handleTaskEdit(null, selectedTaskId, selectedTask.status, selectedTask) }}>Save Details</button>
+                          <button className='save-details-button' onClick={() => { handleTaskEdit(null, selectedTaskId, selectedTaskParent?.status ?? selectedTask.status, selectedTask) }}>Save Details</button>
                           <button className='cancel-details-button' onClick={() => { setEditMode(false) }}>Cancel</button>
                         </div>
                       </div>
