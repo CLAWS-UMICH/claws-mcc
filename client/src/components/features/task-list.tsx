@@ -144,6 +144,8 @@ export function TaskList() {
         // Declare a boolean flag that we can use to cancel the API request.
         console.log("initializing tasks");
         setTasksToDo(dummyTasks);
+        setSelectedTask(dummyTasks[0]);
+        setSelectedTaskId(dummyTasks[0].id.toString());
         // let ignoreStaleRequest = false;
     
         // // Call api to get initial list of all tasks
