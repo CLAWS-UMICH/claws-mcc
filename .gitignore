@@ -5,3 +5,5 @@ dist
 .DS_STORE
 *.pem
 /client/build
+dumps
+.env*
