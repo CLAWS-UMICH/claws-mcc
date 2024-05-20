@@ -106,7 +106,7 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
                         <AccordionPanel style={{marginLeft: "-15px", marginRight: "-12px", marginBottom: "1px"}} className={styles.sampleContainer} key={id}>
                             {geosampleMap.has(Number(id)) && (
                                 <CompoundButton
-                                    style={{fontSize: "13px", width: "210px", height: "45px", border: "0px"}}
+                                    style={{fontSize: "13px", width: "210px", height: "45px", border: "0px", background: "#0F0F0F"}}
                                     onClick={() => handleSelect(dispatch, geosampleMap.get(Number(id)))}
                                     shape='circular'
                                     secondaryContent={geosampleMap.get(Number(id)).rock_type}

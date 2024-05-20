@@ -210,12 +210,21 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
 
   if (!ready || !geosample) {
     return (
-        <Skeleton/>
+      <div style={{background: "#141414"}}>
+          <h4 style={{height: "53.111px", paddingLeft:'1rem', paddingRight:'1rem', display:'flex', justifyContent: 'space-between', marginTop: "0px", marginBottom: "0px", alignItems: "center"}}>
+              <div>
+              </div>
+              <div style={{display:'flex', gap:'10px'}}>
+                  <Button style={{height: "30.556px"}} icon={<Map16Regular/>} disabled={true}>View on map</Button>
+                  <Button style={{height: "30.556px"}} icon={<Edit16Regular/>} disabled={true}>Edit</Button>
+                  <Button style={{height: "30.556px"}} icon={<Delete16Regular/>} disabled={true}>Delete</Button>
+              </div>
+          </h4>
+          <Divider></Divider>
+      </div>
     )
   }
-  // console.log(geosample.date)
 
-  // console.log(geosample);
   const color_options = [ "Brown", "Copper Red", "Black", "Multi-color" ];
   const location_string = geosample.location.latitude + "˚ " + geosample.location.longitude + "˚";
 

@@ -24,7 +24,7 @@ const useStyles = makeStyles({
     ...shorthands.overflow("hidden"),
     display: "flex",
     height: "100vh",
-    backgroundColor: "#fff",
+    backgroundColor: "#000",
   },
   dividerContainer: {
     width: "100%",
@@ -32,10 +32,12 @@ const useStyles = makeStyles({
     flexDirection: "column",
     justifyContent: "space-between",
     ...shorthands.gap("10px"),
+    backgroundColor: "#0F0F0F"
   },
   header: {
     paddingTop: "11px",
     paddingBottom: "11px",
+
   },
 });
 
@@ -127,7 +129,7 @@ const GeosampleManager: React.FC = () => {
 
     return (
         <div className={styles.root}>
-            <InlineDrawer style={{width:"220px"}}separator open>
+            <InlineDrawer style={{width:"220px", background: "#141414", borderTopColor: "rgb(82, 82, 82)", borderRightColor: "rgb(82, 82, 82)"}}separator open>
                 <DrawerHeader className={styles.header}>
                     <DrawerHeaderTitle action={<Button size="medium" icon={<Search20Regular/>} onClick={() => setShowSearchBar(!showSearchBar)}></Button>}>
                         <b style={{fontSize:"18px"}}>Samples</b>
@@ -140,11 +142,11 @@ const GeosampleManager: React.FC = () => {
                                             <Divider></Divider>
                                         </div>)}
                 </div>
-                <DrawerBody>
+                <DrawerBody style={{background: "#0F0F0F"}}>
                     <GeosampleList geosamples={state.geosamples} sample_zones={state.sample_zones} selected={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
                 </DrawerBody>
             </InlineDrawer>
-            <DrawerBody style={{paddingLeft: '0px', paddingRight: '0px'}}>
+            <DrawerBody style={{paddingLeft: '0px', paddingRight: '0px', background: "black"}}>
                 <DetailScreen geosample={state.selected} dispatch={dispatch} ready={readyState === ReadyState.OPEN}/>
                 {state.selected && <GeosampleMap geosamples={state.geosamples} zones={state.sample_zones} dispatch={dispatch} ready={readyState === ReadyState.OPEN} selected={state.selected}/>}
             </DrawerBody>
