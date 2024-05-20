@@ -128,7 +128,7 @@ export function TaskList() {
   const [nextId, setNextId] = useState(100); // Initial counter value
 
   const { sendMessage, lastMessage } = useDynamicWebSocket({
-    type: 'TASK_LIST'
+    type: 'TASKLIST'
   });
 
   const generateUniqueId = () => {
@@ -510,7 +510,7 @@ export function TaskList() {
   //                              Convert to JSON
   // ------------------------------------------------------------------------
   function sendToAR() {
-    sendMessage(JSON.stringify({type: 'TASKLIST_FOR_AR', data: { tasks: convertToTargetTypes({AllTasks: [...tasksInProgress, ...tasksToDo, ...tasksCompleted, ...tasksEmergency]}) } }));
+    sendMessage(JSON.stringify({type: 'TASKLIST_FOR_AR', data: { tasks: convertToTargetTypes({AllTasks: [...tasksEmergency, ...tasksCompleted, ...tasksToDo, ...tasksInProgress]}) } }));
   }
   // ------------------------------------------------------------------------
   //                              Convert to AR JSON

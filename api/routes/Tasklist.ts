@@ -124,7 +124,7 @@ export default class Tasklist extends Base {
 	public events = [
 		{ 
 			platform: 'FRONTEND',
-			type: 'TASK_LIST',
+			type: 'TASKLIST',
 			handler: this.getTasks.bind(this),
 		},
 		{ 
@@ -140,13 +140,13 @@ export default class Tasklist extends Base {
 	// ws.on('error', console.error);
 
 	// ws.on('open', function open() {
-	// 	ws.send({ type: 'TASK_LIST' });
+	// 	ws.send({ type: 'TASKLIST' });
 	// });
 
 	// ws.on('message', function message(data) {
 	// 	data = JSON.parse(data);
 
-	//  if (data.type == 'TASK_LIST') {
+	//  if (data.type == 'TASKLIST') {
 	// 		setTasks(data.data);	
 	// 	}
 	// });
@@ -167,7 +167,7 @@ export default class Tasklist extends Base {
 			id: -1,
 			use: 'PUT',
 			data: this.tasks,
-			type: 'TASK_LIST',
+			type: 'TASKLIST',
 		});
 	}
 
@@ -179,7 +179,7 @@ export default class Tasklist extends Base {
 			data: {
 				"AllTasks": data.data.tasks
 			},
-			type: 'TASK_LIST',
+			type: 'TASKLIST',
 		});
 	}
 
