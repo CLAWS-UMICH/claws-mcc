@@ -3,8 +3,7 @@ import CameraView1 from '../../assets/cameraview1.jpeg';
 import CameraView2 from '../../assets/cameraview2.jpeg';
 import './cameraView.css';
 import useDynamicWebSocket from "../../hooks/useWebSocket";
-
-const ipAddresses = [];
+import config from "../../config";
 
 const CameraView: React.FC = () => {
     const [uptime, setUpTime] = useState<number>(0);
@@ -46,7 +45,7 @@ const CameraView: React.FC = () => {
 
     useEffect(() => {
         const checkVideoFeeds = async () => {
-            if (ipAddresses.length === 0) {
+            if (config.EVA_IP_ADDRESSES.length === 0) {
                 setVideoError(true);
                 return;
             }
@@ -55,7 +54,7 @@ const CameraView: React.FC = () => {
         };
 
         checkVideoFeeds();
-    }, [ipAddresses]);
+    }, []);
 
     useEffect(() => {
         const playVideos = () => {
@@ -101,7 +100,7 @@ const CameraView: React.FC = () => {
                         </div>
                     </>
                 ) : (
-                    ipAddresses.map((ip, index) => (
+                    config.EVA_IP_ADDRESSES.map((ip, index) => (
                         <div key={index} className='camera'>
                             <video 
                                 src={`https://${ip}/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=false&loopback=true&RenderFromCamera=true`} 
