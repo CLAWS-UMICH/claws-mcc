@@ -162,11 +162,13 @@ export default class Tasklist extends Base {
 		
 
 	// GET for web frontend
-	getTasks() {
+	async getTasks() {
+        const tasks = (await this.db.collection('tasks').find().toArray()) || [];
+
 		this.dispatch("FRONTEND", {
 			id: -1,
 			use: 'PUT',
-			data: this.tasks,
+			data: tasks,
 			type: 'TASKLIST',
 		});
 	}

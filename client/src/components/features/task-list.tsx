@@ -136,6 +136,26 @@ export function TaskList() {
     return nextId;
   };
 
+  useEffect(() => {
+    if (lastMessage) {
+      console.log({ lastMessage });
+      let data = JSON.parse(lastMessage.data);
+      data = convertFromTargetTypes({ AllTasks: data })
+
+      for (const task of data) {
+        if (task.status == TaskStatus.INPROGRESS) {
+          setTasksInProgress([...tasksInProgress, task]);
+        } else if (task.status == TaskStatus.TODO) {
+          setTasksToDo([...tasksToDo, task]);
+        } else if (task.status == TaskStatus.COMPLETED) {
+          setTasksCompleted([...tasksCompleted, task]);
+        } else if (task.status == TaskStatus.EMERGENCY) {
+          setTasksEmergency([...tasksEmergency, task]);
+        }
+      }
+    }
+  }, [lastMessage]);
+
 
   // ------------------------------------------------------------------------
   //                      Initalize tasks (todo: status??)
