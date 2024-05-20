@@ -198,10 +198,10 @@ async function setupTSSWatchers(tssRegistry: TSSRegistry) {
                 const tssData = await res.json();
 
                 if (JSON.stringify(tssData) !== JSON.stringify(prevTSSData[path])) {
-                    tssLogger.info(`TSS data for ${url} has changed, calling all handlers`);
+                    // tssLogger.info(`TSS data for ${url} has changed, calling all handlers`);
                     handlers.forEach((handler) => handler(tssData));
                 } else {
-                    tssLogger.info(`TSS data for ${url} has not changed`);
+                    // tssLogger.info(`TSS data for ${url} has not changed`);
                 }
 
                 prevTSSData[path] = tssData;
