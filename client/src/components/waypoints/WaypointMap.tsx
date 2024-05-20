@@ -2,9 +2,8 @@ import React from 'react';
 import './Waypoints.css'
 import {GoogleMap, InfoBox, InfoWindow, Marker, useJsApiLoader} from '@react-google-maps/api';
 import {BaseWaypoint, ManagerAction as MapAction, WaypointType} from "./WaypointManager.tsx";
-import {Body1, Body1Stronger} from "@fluentui/react-components";
+import {Body1, Body1Stronger, Button} from "@fluentui/react-components";
 import {ComposeFilled} from "@fluentui/react-icons";
-import {WaypointForm} from "./WaypointList.tsx";
 import waypointImage from '../../assets/waypoint.png';
 import {isEqual} from "lodash";
 
@@ -129,6 +128,8 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
     };
     const handleRightClick = (e: google.maps.MapMouseEvent) => {
         const latLng = e.latLng!;
+        const lat = latLng.lat().toFixed(5);
+        const lng = latLng.lng().toFixed(5);
         setTempWindow(<InfoWindow
                 position={latLng}
                 onCloseClick={() => setTempWindow(null)}
@@ -136,28 +137,35 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                 <div style={{display: "flex", flexDirection: "column", width: "max-content", color: "black"}}>
                     <div>
                         <Body1Stronger>Latitude: </Body1Stronger>
-                        <Body1>{latLng.lat().toFixed(5)}</Body1>
+                        <Body1>{lat}</Body1>
                     </div>
                     <div>
                         <Body1Stronger>Longitude: </Body1Stronger>
-                        <Body1>{latLng.lng().toFixed(5)}</Body1>
+                        <Body1>{lng}</Body1>
                     </div>
-                    <WaypointForm
-                        afterSubmit={() => setTempWindow(null)}
-                        waypoint={props.temp!}
-                        temp={{
-                            waypoint_id: -1,
-                            type: WaypointType.NAV,
-                            description: "",
-                            location: {
-                                latitude: latLng.lat(),
-                                longitude: latLng.lng()
-                            },
-                            author: -1
+                    <Button 
+                        onClick={() => {
+                            setTempWindow(null);
+                            props.dispatch({type: "deselect" });
+                            props.dispatch({
+                                type: "writeTemp",
+                                payload: {
+                                    waypoint_id: -1,
+                                    author: -1,
+                                    type: WaypointType.NAV,
+                                    details:"",
+                                    date:"",
+                                    time:"",
+                                    description: "",
+                                    location: {latitude: Number(lat), longitude: Number(lng)}
+                                }
+                            });
                         }}
-                        dispatch={props.dispatch}
-                        text={"Create Waypoint"}
-                        buttonProps={{icon: <ComposeFilled/>}}/>
+                        icon={<ComposeFilled/>}
+                        
+                    >
+                        New Waypoint
+                    </Button>
                 </div>
             </InfoWindow>
         );

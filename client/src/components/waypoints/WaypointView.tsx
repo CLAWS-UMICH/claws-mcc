@@ -36,6 +36,14 @@ const NewView: React.FC<NewViewProps> = (props) => {
     isNaN(Number(key))
   );
 
+  useEffect(() => {
+    setNewWaypoint((prev) => ({ ...prev, 
+      details: "",
+      type: 1,
+      description: "",
+      location: {latitude: props.temp.location.latitude || 0, longitude: props.temp.location.longitude || 0}}));
+  } , [props.temp.location]);
+
   const [new_waypoint, setNewWaypoint] = useState<BaseWaypoint>({
     waypoint_id: -1,
     author: -1,
@@ -104,7 +112,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
         </div>
         <br />
         <div className={styles.container2}>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"}}>
             <Label htmlFor={"waypoint-type"}>Type</Label>
             <Dropdown 
               placeholder={"Select Waypoint Type"}
@@ -134,7 +142,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
                 ))}
               </Dropdown>
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{  margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1" }}>
             <Label htmlFor={"waypoint-location"}>Latitude</Label>
               <Input
               type="text"
@@ -145,7 +153,7 @@ const NewView: React.FC<NewViewProps> = (props) => {
                 }}
             />
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1" }}>
             <Label htmlFor={"waypoint-location"}>Longitude</Label>
               <Input
               type="text"
@@ -176,6 +184,7 @@ type NewViewProps = {
   waypoints:BaseWaypoint[]
   selected?: BaseWaypoint;
   dispatch: React.Dispatch<ManagerAction>;
+  temp: BaseWaypoint;
 };
 
 
@@ -188,8 +197,11 @@ const listStyles = makeStyles({
   },
   container2: {
     display: "flex",
-    justifyContent: "space-between",
+    flexDirection: "row",
     width: "100%",
+    height: "100%",
+    flexWrap: "wrap",
+    alignItems: "center",
   },
   edit: {
     display: "flex",
@@ -340,7 +352,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
         </div>
         <br />
         <div className={styles.container2}>
-          <div style={{ margin: "0% 1% 0% 0%" }}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column" }}>
             <Label htmlFor={"waypoint-type"}>Type</Label>
             {
               isEditing ?
@@ -380,7 +392,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
               </Dropdown>
             }
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"  }}>
             <Label htmlFor={"waypoint-location"}>Latitude</Label>
             {
               isEditing ?
@@ -402,7 +414,7 @@ const SelectedView: React.FC<SelectedViewProps> = (props) => {
             />
             }
           </div>
-          <div style={{ margin: "0% 1% 0% 0%" }} className={styles.container}>
+          <div style={{ margin: "0% 1% 0% 0%", display:"flex", flexDirection: "column", flexGrow: "1"   }}>
             <Label htmlFor={"waypoint-location"}>Longitude</Label>
             {
               isEditing ?
@@ -459,6 +471,6 @@ export const WaypointView: React.FC<WaypointViewProps> = (props) => {
     if (isUndefined(props.selected)) return <EmptyView />;
     return <SelectedView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected} />;
   }
-  return <NewView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected}/>;
+  return <NewView waypoints={props.waypoints} dispatch={props.dispatch} selected={props.selected} temp={props.temp}/>;
 };
 

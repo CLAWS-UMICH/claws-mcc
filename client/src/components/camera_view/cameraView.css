@@ -1,4 +1,5 @@
 .camera-view-container{
+    background: black;
     flex: 0 0 25%;
 }
 
