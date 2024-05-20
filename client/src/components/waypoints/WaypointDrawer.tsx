@@ -39,7 +39,7 @@ function SampleImage({ astro }: { astro: number }) {
 const DrawerSubItem: React.FC<DrawerSubItemProps> = ({ waypoint, selected, dispatch }) => {
     const [hovering, setHovering] = React.useState(false);
     let preview_length = 25;
-    let details = waypoint.details;
+    let details = waypoint.description;
     if (!details) details = "";
     if (details.length > preview_length) {
         details = details.substring(0, (preview_length - 3)) + "...";
