@@ -38,7 +38,6 @@ const NewView: React.FC<NewViewProps> = (props) => {
 
   useEffect(() => {
     setNewWaypoint((prev) => ({ ...prev, 
-      details: "",
       type: 1,
       description: "",
       location: {latitude: props.temp.location.latitude || 0, longitude: props.temp.location.longitude || 0}}));

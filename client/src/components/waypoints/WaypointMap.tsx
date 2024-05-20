@@ -153,9 +153,6 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                                     waypoint_id: -1,
                                     author: -1,
                                     type: WaypointType.NAV,
-                                    details:"",
-                                    date:"",
-                                    time:"",
                                     description: "",
                                     location: {latitude: Number(lat), longitude: Number(lng)}
                                 }
