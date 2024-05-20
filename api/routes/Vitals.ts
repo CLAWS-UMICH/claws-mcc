@@ -7,6 +7,8 @@ interface Alert {
     message: string;
 }
 
+const CURRENT_EVA = process.env.CURRENT_EVA || 'eva2';
+
 export default class Vitals extends Base {
     public events = [
         {
@@ -16,6 +18,12 @@ export default class Vitals extends Base {
         {
             type: 'GET_VITALS', // to handle requesting messages from frontend (vitals get)
             handler: this.sendVitalsMessage.bind(this),
+        }
+    ]
+    public tssFiles = [
+        {
+            path: '/teams/2/TELEMETRY.json',
+            handler: this.handleTSSVitalsUpdate.bind(this),
         }
     ]
     private logger = new Logger('Vitals');
@@ -31,6 +39,10 @@ export default class Vitals extends Base {
         );
 
         await this.sendVitalsMessage();
+    }
+
+    async handleTSSVitalsUpdate(data: VitalsMessage) {
+        this.logger.info('Handling TSS vitals update', data);
     }
 
     async sendVitalsMessage() {
