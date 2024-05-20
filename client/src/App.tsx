@@ -11,6 +11,7 @@ import Communication from './components/communications/Communication.tsx';
 import CameraView from './components/camera_view/CameraView.tsx';
 import EmptyComponent from './components/common/EmptyComponent.tsx';
 import { TaskList } from './components/features/task-list.tsx';
+import Vitals from './components/vitals/Vitals.tsx';
 import RoverView from './components/rover_view/RoverView.tsx';
 
 interface AstronautData {
@@ -40,7 +41,7 @@ function App() {
                       <Routes>
                           <Route path="/" element={<TaskList />} />
                           <Route path="/tasks" element={<TaskList />} />
-                          <Route path="/vitals" element={<EmptyComponent />} />
+                          <Route path="/vitals" element={<Vitals/>} />
                           <Route path="/samples" element={<GeosampleManager />} />
                           <Route path="/navigation" element={<WaypointManager />} />
                           <Route path="/rover" element={<RoverView />} />

@@ -28,10 +28,10 @@ export default class Astronauts extends Base {
         }
     ];
     public events = [
-        {
-            type: 'VITALS',
-            handler: this.handleVitalsMessage.bind(this),
-        },
+        // {
+        //     type: 'VITALS',
+        //     handler: this.handleVitalsMessage.bind(this),
+        // },
         {
             type: 'GET_ASTRONAUT',
             handler: this.fetchAstronaut.bind(this),

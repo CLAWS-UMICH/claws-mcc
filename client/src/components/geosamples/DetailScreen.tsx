@@ -363,6 +363,8 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
     }
   };
 
+  // TODO: change fonts!!!!!!!
+
   const splitTimeString: (input: string) => [string, string] = (input) => {
     // Define the regex pattern to match date and time
     const regex = /^(\d{1,2}\/\d{1,2}\/\d{4}) (\d{1,2}:\d{2} [AP]M)$/;
