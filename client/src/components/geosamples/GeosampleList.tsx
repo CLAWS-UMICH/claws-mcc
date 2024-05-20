@@ -10,7 +10,7 @@ import {
     CompoundButton,
     makeStyles
 } from '@fluentui/react-components';
-import { ChevronUp16Regular, ChevronDown16Regular } from '@fluentui/react-icons';
+import { ChevronUp16Regular, ChevronDown16Regular, Gesture20Filled } from '@fluentui/react-icons';
 import { BaseGeosample, BaseZone, ManagerAction } from './GeosampleTypes.tsx';
 import './Geosamples.css'
 import StarredSample from './StarredImage.tsx';
@@ -59,11 +59,13 @@ interface SampleListProps {
 
 const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dispatch, ready, selected}) => {
     const styles = useStyles();
-    const [openItems, setOpenItems] = React.useState<string[]>(sample_zones.map(zone => zone.zone_id));
+    const [openItems, setOpenItems] = React.useState<string[]>([]);
 
     const geosampleMap = React.useMemo(() => {
         const map = new Map();
-        geosamples.forEach(sample => map.set(sample.geosample_id, sample));
+        if (geosamples?.length) {
+            geosamples.forEach(sample => map.set(sample.geosample_id, sample));
+        }
         return map;
     }, [geosamples]);
 

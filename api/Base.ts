@@ -1,4 +1,4 @@
-import redis from "./core/redis";
+// import redis from "./core/redis";
 import { Db } from "mongodb";
 import { Redis } from "ioredis";
 import { WebSocket, WebSocketServer } from "ws";
@@ -31,7 +31,7 @@ export default class Base {
     constructor(db: Db) {
         this.routes = [];
         this.db = db;
-        this.redis = redis;
+        // this.redis = redis;
     }
 
     public setWebSocketInstances(wsFrontend: WebSocketServer, wsHoloLens: WebSocketServer, wsVega: WebSocketServer) {
