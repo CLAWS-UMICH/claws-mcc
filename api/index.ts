@@ -60,7 +60,7 @@ async function loadRoutes(db: any) {
                 routeInstances.push(routeInstance);
 
                 // Register routes defined in the routeInstance
-                if (!routeInstance.routes?.length) {
+                if (routeInstance.routes?.length) {
                     for (const route of routeInstance.routes) {
                         app[route.method as Method](route.path, route.handler);
                         logger.info(`Registered route ${route.method.toUpperCase()} ${route.path}`);
