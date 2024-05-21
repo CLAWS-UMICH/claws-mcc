@@ -1,5 +1,5 @@
 import React from "react";
-import Chart from "react-apexcharts";
+import Chart, { Props as ChartProps } from "react-apexcharts";
 
 type VitalsGaugeProps = {
     id: string;
@@ -64,8 +64,8 @@ const VitalsGauge: React.FC<VitalsGaugeProps> = ({ id, text, name, value }) => {
         <div style={{ width: '80px', height: '80px', overflow: 'hidden', position: 'relative' }}>
             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                 <Chart
-                    options={options}
-                    series={series}
+                    options={options as ChartProps["options"]}
+                    series={series as ChartProps["series"]}
                     type="radialBar"
                     height="125"
                     width="125"
