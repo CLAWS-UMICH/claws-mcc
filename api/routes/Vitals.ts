@@ -10,7 +10,16 @@ interface Alert {
 const CURRENT_EVA = process.env.CURRENT_EVA || 'eva2';
 
 export default class Vitals extends Base {
-    private vitals: any;
+    private vitals: any = {
+        dcu: {
+            batt: false,
+            oxy: false,
+            comm: false,
+            fan: false,
+            pump: false,
+            co2: false,
+        }
+    };
     public events = [
         {
             type: 'VITALS', // to handle incoming messages from hololens (vitals update)
@@ -53,7 +62,7 @@ export default class Vitals extends Base {
     }
 
     async handleTSSVitalsUpdate(data: VitalsMessage) {
-        const eva_data = convertData(data["telemetry"][CURRENT_EVA]);
+        const eva_data = data["telemetry"][CURRENT_EVA];
 
         this.logger.info('Handling TSS vitals update', eva_data);
 
@@ -66,7 +75,7 @@ export default class Vitals extends Base {
     }
 
     async handleDCUUpdate(data) {
-        const dcu_data = data["dcu"][CURRENT_EVA];
+        const dcu_data = data["dcu"];
 
         this.logger.info('Handling TSS DCU update', dcu_data);
 
@@ -74,14 +83,18 @@ export default class Vitals extends Base {
             id: -1,
             type: 'VITALS',
             use: 'PUT',
-            data: { ...this.vitals, dcu: dcu_data },
+            data: { 
+                ...this.vitals, 
+                dcu: {
+                    ...this.vitals.dcu, // Retain existing dcu data
+                    ...dcu_data // Update with new dcu data
+                } 
+            },
         });
     }
 
     async sendVitalsMessage() {
         this.logger.info("Sending vitals to frontend" + JSON.stringify(this.vitals));
-        // const allVitals = this.db.collection('vitals').find();
-        // const vitalsData = await allVitals.toArray();
         const vitalsData = this.vitals;
         const messageId = 0;
 
@@ -89,7 +102,7 @@ export default class Vitals extends Base {
             id: messageId,
             type: 'VITALS',
             use: 'PUT',
-            data: this.vitals,
+            data: { tss_data: this.vitals },
         });
     }
 }
@@ -157,7 +170,6 @@ function handleAlerts(data: any) {
     return alerts;
 }
 
-
 function convertData(data) {
     return {
         room_id: 0, // This should be set based on your application's context
@@ -187,6 +199,14 @@ function convertData(data) {
         battery_outputput: 0, // This should be set based on your application's context
         oxygen_primary_time: 0, // This should be set based on your application's context
         oxygen_secondary_time: 0, // This should be set based on your application's context
-        water_capacity: data.coolant_ml
+        water_capacity: data.coolant_ml,
+        dcu: {
+            batt: false,
+            oxy: false,
+            comm: false,
+            fan: false,
+            pump: false,
+            co2: false,
+        }
     };
 }
