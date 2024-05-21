@@ -15,12 +15,17 @@ interface VitalsScreenProps {
 
 const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
     const secondsToHours = (seconds: number) => {
+        if (!seconds) {
+            return "N/A";
+        }
         var hours = seconds / 3600;
         var minutes = Math.trunc(hours) * 60;
         var timeString = (hours < 1) ? ("") : (hours.toString() + " hr ") 
         timeString += (minutes.toString() + " min") 
         return timeString;
     }
+
+    console.log({vitals})
 
     return (
         <div>
@@ -74,6 +79,7 @@ const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
                         </div>
                         <div className="card"><Body1Strong>{secondsToHours(vitals.tss_data.batt_time_left)}</Body1Strong></div>
                     </div>
+
                 </div>
             </div>
             <div className="atmosphere">

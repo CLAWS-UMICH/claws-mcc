@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import Logger from "./core/logger";
 import { IGNORED_TYPES } from "./Base";
+import * as axios from 'axios';
 
 dotenv.config();
 
@@ -205,9 +206,10 @@ async function setupTSSWatchers(tssRegistry: TSSRegistry) {
                 if (JSON.stringify(tssData) !== JSON.stringify(prevTSSData[path])) {
                     // tssLogger.info(`TSS data for ${url} has changed, calling all handlers`);
                     handlers.forEach((handler) => handler({ ...tssData }));
-                } else {
-                    // tssLogger.info(`TSS data for ${url} has not changed`);
                 }
+                // } else {
+                    // tssLogger.info(`TSS data for ${url} has not changed`);
+                // }
 
                 prevTSSData[path] = tssData;
             } catch (err) {

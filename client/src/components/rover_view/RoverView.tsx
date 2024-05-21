@@ -7,20 +7,18 @@ import config from "../../config";
 
 const RoverView: React.FC = () => {
     useEffect(() => {
-        const playVideos = () => {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                if (video.paused) {
-                    video.play().catch(error => console.error('Error playing video:', error));
-                }
+        const updateImages = () => {
+            const images = document.querySelectorAll('img');
+            images.forEach((img) => {
+                img.src = img.src.split('?')[0] + '?' + new Date().getTime();
             });
         };
 
-        playVideos();
+        updateImages();
 
         const interval = setInterval(() => {
-            playVideos();
-        }, 1000);
+            updateImages();
+        }, 500);
 
         return () => clearInterval(interval);
     }, []);
@@ -46,23 +44,15 @@ const RoverView: React.FC = () => {
                 ) : (
                     <>
                         <div className='top-image camera'>
-                            <video
+                            <img
                                 src={`http://${config.ROVER_IP_ADDRESS}/native_feed`}
-                                autoPlay
-                                loop
-                                controls={false}
                                 className='video'
-                                muted
                             />
                         </div>
                         <div className='bottom-image camera'>
-                            <video
+                            <img
                                 src={`http://${config.ROVER_IP_ADDRESS}/thermal_feed`}
-                                autoPlay
-                                loop
-                                controls={false}
                                 className='video'
-                                muted
                             />
                         </div>
                     </>

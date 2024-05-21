@@ -55,9 +55,14 @@ export default class Base {
 
         const clients = this.getTargetClients(target);
         if (!clients.size) {
-            console.error(`No clients connected for target ${target}, skipping ${data.type} dispatch`);
-            return;
+            console.error(`No clients connected for target ${target}, sending again in 2s ${data.type} dispatch`);
+            return setTimeout(() => {
+                this.dispatch(target, data); 
+            }, 2000);
         }
+
+
+        console.log(`Dispatching ${data.type} to ${target} ${JSON.stringify(data)}`)
 
         await Promise.all([...clients].map(async (client) => {
             if (client.readyState === WebSocket.OPEN) {

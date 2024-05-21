@@ -39,7 +39,7 @@ function App() {
                     <NavBar />
                     <div>
                       <Routes>
-                          <Route path="/" element={<TaskList />} />
+                          <Route path="/" element={<Vitals />} />
                           <Route path="/tasks" element={<TaskList />} />
                           <Route path="/vitals" element={<Vitals/>} />
                           <Route path="/samples" element={<GeosampleManager />} />

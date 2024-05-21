@@ -82,6 +82,9 @@ const NavBar: React.FC = () => {
         <Tab onClick={handleTabSelect} icon={<Truck />} value='/rover'>
           <span>Rover</span>
         </Tab>
+        {/* <Tab onClick={handleTabSelect} icon={<Accessibility />} value='/suits'>
+          Suits
+        </Tab> */}
         <Tab onClick={handleTabSelect} icon={<Chat />} value='/messages'>
           <span>Messages</span>
         </Tab>

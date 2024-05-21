@@ -3,7 +3,7 @@ import { Dropdown, Option, Divider } from "@fluentui/react-components";
 import './Vitals.css'
 import VitalsScreen from "./VitalsScreen.tsx";
 import useDynamicWebSocket from "../../hooks/useWebSocket.tsx";
-import { ManagerAction, ManagerState } from "./VitalsTypes.tsx";
+import { ManagerAction, ManagerState, VitalsData } from "./VitalsTypes.tsx";
 import { initial } from "lodash";
 
 export const vitalsReducer = (state: ManagerState, action: ManagerAction): ManagerState => {
@@ -52,8 +52,9 @@ const initialState: ManagerState = { vitals: {
 }}
 
 const VitalsManager: React.FC = () => {
-  const [state, dispatch] = useReducer(vitalsReducer, initialState);
-  const [messageHistory, setMessageHistory] = useState<string[]>([]);
+  // const [state, dispatch] = useReducer(vitalsReducer, initialState);
+  const [vitals, setVitals] = useState(initialState.vitals)
+  const [messageHistory, setMessageHistory] = useState<VitalsData[]>([]);
 
   const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
     onOpen: () => sendMessage(JSON.stringify({ type: 'VITALS' })),
@@ -62,13 +63,17 @@ const VitalsManager: React.FC = () => {
 
   useEffect(() => {
     if (lastMessage !== null) {
-      setMessageHistory((prev) => prev.concat(lastMessage.data));
+      // setMessageHistory((prev) => prev.concat(JSON.parse(lastMessage.data)));
+      const data = JSON.parse(lastMessage.data);
+      console.log({data});
+
+      setVitals(data.data);
     }
-  }, [lastMessage, setMessageHistory]);
+  }, [lastMessage]);
 
   // Determine which eva sequence is being initiated
   var eva_seq = "eva_1"
-
+  
   return (
     <div>
       <div style={{background: "#141414"}}>
@@ -82,7 +87,7 @@ const VitalsManager: React.FC = () => {
         </h4>
         <Divider></Divider>
       </div>
-      <VitalsScreen vitals={state.vitals}/>
+      <VitalsScreen vitals={vitals}/>
     </div>
   );
 }
