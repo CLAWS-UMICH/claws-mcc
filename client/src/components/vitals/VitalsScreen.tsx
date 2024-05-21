@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useState } from "react";
 import Ring from "./ProgressRing.tsx";
 import { Subtitle2, Card, Caption1Strong, Caption2Strong, Body1Strong, Body1 } from "@fluentui/react-components";
-import { Battery0Regular, Battery1016Regular, Battery10Filled, Battery10Regular, Battery9Filled, Battery9Regular, BatteryChargeRegular, Drop12Filled, Drop16Filled, Drop16Regular, Heart12Filled, Heart16Filled, Temperature16Filled, VoteRegular } from "@fluentui/react-icons";
+import { Battery10Regular, Battery9Filled, Battery9Regular, BatteryChargeRegular, Drop12Filled, Drop16Filled, Drop16Regular, Heart12Filled, Heart16Filled, Temperature16Filled, VoteRegular } from "@fluentui/react-icons";
 import './Vitals.css'
 import VitalsGauge from "./VitalsGauge.tsx";
 import fanWhite from "../../assets/fanWhite.png"
@@ -24,8 +24,6 @@ const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
         timeString += (minutes.toString() + " min") 
         return timeString;
     }
-
-    console.log({vitals})
 
     return (
         <div>
