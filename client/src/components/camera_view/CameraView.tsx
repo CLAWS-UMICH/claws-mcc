@@ -4,12 +4,14 @@ import CameraView2 from '../../assets/cameraview2.jpeg';
 import './cameraView.css';
 import useDynamicWebSocket from "../../hooks/useWebSocket";
 import config from "../../config";
+import { Spinner } from "@fluentui/react-components";
 
 const CameraView: React.FC = () => {
     const [uptime, setUpTime] = useState<number>(0);
-    const [videoError, setVideoError] = useState<boolean>(false);
+    const [videoErrors, setVideoErrors] = useState<boolean[]>(config.EVA_IP_ADDRESSES.map(() => false));
+    const [loading, setLoading] = useState<boolean[]>(config.EVA_IP_ADDRESSES.map(() => true));
 
-    const { sendMessage, lastMessage } = useDynamicWebSocket({
+    const { sendMessage, lastMessage, connected } = useDynamicWebSocket({
         onOpen: () => {
             sendMessage(JSON.stringify({ type: 'UPTIME' }));
         },
@@ -17,7 +19,7 @@ const CameraView: React.FC = () => {
     });
 
     useEffect(() => {
-        if (lastMessage) {
+        if (lastMessage && connected) {
             let uptime = 0;
             try {
                 uptime = JSON.parse(lastMessage.data).data;
@@ -26,54 +28,42 @@ const CameraView: React.FC = () => {
             }
             setUpTime(uptime);
         }
-    }, [lastMessage]);
+    }, [lastMessage, connected]);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setUpTime(prevUptime => prevUptime + 1);
+            if (connected) {
+                setUpTime(prevUptime => prevUptime + 1);
+            }
         }, 1000);
 
         const syncInterval = setInterval(() => {
-            sendMessage(JSON.stringify({ type: 'UPTIME' }));
+            if (connected) {
+                sendMessage(JSON.stringify({ type: 'UPTIME' }));
+            }
         }, 5000);
 
         return () => {
             clearInterval(interval);
             clearInterval(syncInterval);
         };
-    }, [sendMessage]);
+    }, [sendMessage, connected]);
 
-    useEffect(() => {
-        const checkVideoFeeds = async () => {
-            if (config.EVA_IP_ADDRESSES.length === 0) {
-                setVideoError(true);
-                return;
-            }
+    const handleVideoError = (index: number) => {
+        setVideoErrors(prevErrors => {
+            const newErrors = [...prevErrors];
+            newErrors[index] = true;
+            return newErrors;
+        });
+    };
 
-            setVideoError(false);
-        };
-
-        checkVideoFeeds();
-    }, []);
-
-    useEffect(() => {
-        const playVideos = () => {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                if (video.paused) {
-                    video.play().catch(error => console.error('Error playing video:', error));
-                }
-            });
-        };
-
-        playVideos();
-
-        const interval = setInterval(() => {
-            playVideos();
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
+    const handleVideoLoaded = (index: number) => {
+        setLoading(prevLoading => {
+            const newLoading = [...prevLoading];
+            newLoading[index] = false;
+            return newLoading;
+        });
+    };
 
     const formatUptime = (uptime: number) => {
         const hours = Math.floor(uptime / 3600);
@@ -86,22 +76,25 @@ const CameraView: React.FC = () => {
     return (
         <div className='camera-view-container'>
             <div className='top-bar'>
-                <div className='blue-dot'></div>
+                <div className={connected ? 'blue-dot' : 'red-dot'}></div>
                 {formatUptime(uptime)}
             </div>
             <div className="content camera-content">
-                {videoError ? (
-                    <>
-                        <div className='top-image camera'>
-                            <img src={CameraView1} alt='camera' className='image' />
-                        </div>
-                        <div className='bottom-image camera'>
-                            <img src={CameraView2} alt='camera' className='image' />
-                        </div>
-                    </>
-                ) : (
-                    config.EVA_IP_ADDRESSES.map((ip, index) => (
-                        <div key={index} className='camera'>
+                {config.EVA_IP_ADDRESSES.map((ip, index) => (
+                    <div key={index} className='camera'>
+                        {loading[index] || videoErrors[index] ? (
+                            <div className="loader-container">
+                                {loading[index] ?
+                                    <div className="loading-container">
+                                        <div className='mock-image camera'>
+                                            <img src={CameraView1} alt='camera' className='image' />
+                                        </div>
+                                        <Spinner className="spinner" size='large' />
+                                    </div> : (
+                                    <img src={index === 0 ? CameraView1 : CameraView2} alt='camera' className='image' />
+                                )}
+                            </div>
+                        ) : (
                             <video 
                                 src={`http://${ip}/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=false&loopback=true&RenderFromCamera=true`} 
                                 autoPlay 
@@ -109,10 +102,12 @@ const CameraView: React.FC = () => {
                                 controls={false}
                                 className='video' 
                                 muted
+                                onError={() => handleVideoError(index)}
+                                onLoadedData={() => handleVideoLoaded(index)}
                             />
-                        </div>
-                    ))
-                )}
+                        )}
+                    </div>
+                ))}
             </div>
         </div>
     );

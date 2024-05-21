@@ -35,7 +35,6 @@ export default class Vitals extends Base {
 
     async handleVitalsUpdate(data: VitalsMessage) {
         const alerts = handleAlerts(data.data);
-        this.logger.info('Handling vitals update', data);
         if (!data?.data) {
             return;
         }
@@ -67,7 +66,6 @@ export default class Vitals extends Base {
     }
 
     async handleDCUUpdate(data) {
-        console.log({dcu: data["dcu"]})
         const dcu_data = data["dcu"][CURRENT_EVA];
 
         this.logger.info('Handling TSS DCU update', dcu_data);
