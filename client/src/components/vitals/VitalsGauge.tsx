@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React from "react";
 import Chart from "react-apexcharts";
 
-// Define the props type with text as a string
 type VitalsGaugeProps = {
     id: string;
     text: string;
@@ -9,19 +8,18 @@ type VitalsGaugeProps = {
     value: number;
 };
 
-// Define the component using the function component syntax with the VitalsGaugeProps type
 const VitalsGauge: React.FC<VitalsGaugeProps> = ({ id, text, name, value }) => {
     name = Math.round(name || 0);
     value = Math.round(value || 0);
     text = text || 'N/A';
     
-    var nameVal = name.toString();
+    let nameVal = name.toString();
     if (name > 9999) {
-        var tens = (name / 1000).toFixed(2);
+        const tens = (name / 1000).toFixed(2);
         nameVal = tens.toString() + "K";
     }
 
-    const options = {
+    const options: ApexCharts.ApexOptions = {
         colors: ["#FFFFFF"],
         plotOptions: {
             radialBar: {
@@ -37,17 +35,17 @@ const VitalsGauge: React.FC<VitalsGaugeProps> = ({ id, text, name, value }) => {
                         show: true,
                         fontSize: "18.5px",
                         fontWeight: "400",
-                        offsetY: "6.5"
+                        offsetY: 6.5
                     },
                     value: {
                         fontSize: "11.5px",
-                        offsetY: "10",
+                        offsetY: 10,
                         color: "#FFFFFF",
                         show: true,
                         formatter: function (val: any) {
-                            return text
+                            return text;
                         }
-                            }
+                    }
                 }
             }
         },
@@ -60,7 +58,7 @@ const VitalsGauge: React.FC<VitalsGaugeProps> = ({ id, text, name, value }) => {
         labels: [nameVal]
     };
 
-    const series = [value]
+    const series: number[] = [value];
 
     return (
         <div style={{ width: '80px', height: '80px', overflow: 'hidden', position: 'relative' }}>
@@ -71,10 +69,10 @@ const VitalsGauge: React.FC<VitalsGaugeProps> = ({ id, text, name, value }) => {
                     type="radialBar"
                     height="125"
                     width="125"
-                    />
+                />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default VitalsGauge;
