@@ -45,9 +45,6 @@ export default class Base {
     public async dispatch(target: 'AR' | 'FRONTEND' | 'VEGA', data: Message) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
         const dispatchLogger = new Logger('DISPATCH');
-        if (!IGNORED_TYPES.includes(data.type)) {
-            dispatchLogger.info(`Dispatching message ${data.type} to ${target}`);
-        }
 
         if (target == 'AR') {
             data.type = data.type.toUpperCase();
@@ -74,6 +71,10 @@ export default class Base {
                 console.error(`WebSocket connection for client is not open`);
             }
         }));
+
+        if (!IGNORED_TYPES.includes(data.type)) {
+            dispatchLogger.info(`Dispatched message ${data.type} to ${target}`);
+        }
     }
 
     private getTargetClients(target: 'AR' | 'FRONTEND' | 'VEGA'): Set<WebSocket> {
