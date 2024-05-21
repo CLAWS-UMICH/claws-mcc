@@ -1,0 +1,21 @@
+.dropdown-popover {
+  width: 162px !important;
+  position: absolute !important;
+  left: 6px !important; /* Adjust the position slightly to the right */
+  border-left: 1.5px solid #444444 !important;
+  border-right: 1.5px solid #444444 !important;
+  border-bottom: 1.5px solid #444444 !important;
+  border-radius: 5px !important;
+  background-color: #111111 !important;
+}
+
+.dropdown-text {
+  font-size: 15px;
+  background-color: #111111 !important;
+}
+
+.dropdown-send {
+  font-size: 15px;
+  background-color: #111111 !important;
+}
+  
