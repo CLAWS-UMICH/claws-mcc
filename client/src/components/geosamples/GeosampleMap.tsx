@@ -152,10 +152,10 @@ const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch,
             return (
                 <div key={marker.geosample_id}> 
                     <Marker
-                        key={marker.id}
+                        key={marker._id}
                         position={{ lat: marker.location.latitude, lng: marker.location.longitude }}
                         clickable={true}
-                        label={{ text: getMarkerLabel(marker.zone_id, marker.id), color: "white", fontWeight: "bold", fontSize: "26px" }}
+                        label={{ text: getMarkerLabel(marker.zone_id, marker._id), color: "white", fontWeight: "bold", fontSize: "26px" }}
                         icon={{url: marker.starred ? starredImage : sampleImage, labelOrigin: origin, scaledSize: scaleSize}}                        
                         zIndex={zIndices[marker.geosample_id]}
                         onRightClick={(e) => handleRightClick(e, marker)}
