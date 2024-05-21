@@ -18,13 +18,16 @@ const VitalsScreen: React.FC<VitalsScreenProps> = ({vitals}) => {
         if (!seconds) {
             return "N/A";
         }
-        var hours = seconds / 3600;
-        var minutes = Math.trunc(hours) * 60;
-        var timeString = (hours < 1) ? ("") : (hours.toString() + " hr ") 
-        timeString += (minutes.toString() + " min") 
-        return timeString;
-    }
 
+        const hours = Math.floor(seconds / 3600);
+        const remainingSeconds = seconds % 3600;
+        const minutes = Math.floor(remainingSeconds / 60);
+        let timeString = (hours > 0) ? (hours.toString() + " hr ") : "";
+        timeString += (minutes > 0) ? (minutes.toString() + " min") : "";
+
+        return timeString || "0 min";
+    }
+    
     return (
         <div>
         <div className="root">
