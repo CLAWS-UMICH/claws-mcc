@@ -32,69 +32,69 @@ interface ScreenInfo {
 const IMG_ASPECT_RATIO = 1 / 1;
 
 const presetScreens: ScreenInfo[] = [
-    {
-        title: 'connection_instr_1.png',
-        img_binary: readImageFile('./assets/connection_instr_1.png'),
-        id: 'aB2cD',
-        height: 614,
-        width: 614
-    },
-    {
-        title: 'pressure_instr_2.png',
-        img_binary: readImageFile('./assets/pressure_instr_2.png'),
-        id: 'eFgHi',
-        height: 768,
-        width: 768
-    },
-    {
-        title: 'suit_instr_1.png',
-        img_binary: readImageFile('./assets/suit_instr_1.png'),
-        id: 'kLmNo',
-        height: 768,
-        width: 768
-    },
-    {
-        title: 'hardware_instr_1.png',
-        img_binary: readImageFile('./assets/hardware_instr_1.png'),
-        id: 'pQrSt',
-        height: 614,
-        width: 614
-    },
-    {
-        title: 'rover_instr_1.png',
-        img_binary: readImageFile('./assets/rover_instr_1.png'),
-        id: 'uVwXy',
-        height: 614,
-        width: 614
-    },
-    {
-        title: 'terrain_visual_1.png',
-        img_binary: readImageFile('./assets/terrain_visual_1.png'),
-        id: 'z12a3',
-        height: 768,
-        width: 768
-    },
-    {
-        title: 'mars_instr_1.png',
-        img_binary: readImageFile('./assets/mars_instr_1.png'),
-        id: '45abc',
-        height: 614,
-        width: 614
-    },
-    {
-        title: 'rover_instr_2.png',
-        img_binary: readImageFile('./assets/rover_instr_2.png'),
-        id: 'd1e2f',
-        height: 768,
-        width: 768
-    },
-    {
-        title: 'terrain_visual_2.png',
-        img_binary: readImageFile('./assets/terrain_visual_2.png'),
-        id: 'ghi12',
-        height: 768,
-        width: 768
-    },
+    // {
+    //     title: 'connection_instr_1.png',
+    //     img_binary: readImageFile('./assets/connection_instr_1.png'),
+    //     id: 'aB2cD',
+    //     height: 614,
+    //     width: 614
+    // },
+    // {
+    //     title: 'pressure_instr_2.png',
+    //     img_binary: readImageFile('./assets/pressure_instr_2.png'),
+    //     id: 'eFgHi',
+    //     height: 768,
+    //     width: 768
+    // },
+    // {
+    //     title: 'suit_instr_1.png',
+    //     img_binary: readImageFile('./assets/suit_instr_1.png'),
+    //     id: 'kLmNo',
+    //     height: 768,
+    //     width: 768
+    // },
+    // {
+    //     title: 'hardware_instr_1.png',
+    //     img_binary: readImageFile('./assets/hardware_instr_1.png'),
+    //     id: 'pQrSt',
+    //     height: 614,
+    //     width: 614
+    // },
+    // {
+    //     title: 'rover_instr_1.png',
+    //     img_binary: readImageFile('./assets/rover_instr_1.png'),
+    //     id: 'uVwXy',
+    //     height: 614,
+    //     width: 614
+    // },
+    // {
+    //     title: 'terrain_visual_1.png',
+    //     img_binary: readImageFile('./assets/terrain_visual_1.png'),
+    //     id: 'z12a3',
+    //     height: 768,
+    //     width: 768
+    // },
+    // {
+    //     title: 'mars_instr_1.png',
+    //     img_binary: readImageFile('./assets/mars_instr_1.png'),
+    //     id: '45abc',
+    //     height: 614,
+    //     width: 614
+    // },
+    // {
+    //     title: 'rover_instr_2.png',
+    //     img_binary: readImageFile('./assets/rover_instr_2.png'),
+    //     id: 'd1e2f',
+    //     height: 768,
+    //     width: 768
+    // },
+    // {
+    //     title: 'terrain_visual_2.png',
+    //     img_binary: readImageFile('./assets/terrain_visual_2.png'),
+    //     id: 'ghi12',
+    //     height: 768,
+    //     width: 768
+    // },
 ];
 
 //----------
