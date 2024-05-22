@@ -104,6 +104,12 @@ export default class Geosamples extends Base {
                 if (!samples[i].starred) {
                     samples[i].starred = this.determineSignificance(samples[i].eva_data);
                 }
+                if (!samples[i].eva_data.name || samples[i].eva_data.name === "") {
+                    samples[i].eva_data.name = "Geo Sample " + samples[i].geosample_id.toString();
+                }
+                if (!samples[i].rock_type || samples[i].rock_type === "") {
+                    samples[i].eva_data.name = "Unknown";
+                }
                 // samples[i].id = Geosamples.incrementSampleId(samples[i]);
             }
         }
