@@ -217,7 +217,7 @@ async function setupTSSWatchers(tssRegistry: TSSRegistry) {
             }
         }
 
-        setTimeout(checkTSSData, 1000);
+        setTimeout(checkTSSData, 10000000);
     }
 
     checkTSSData();

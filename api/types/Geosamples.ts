@@ -1,6 +1,6 @@
 import Message from './message';
 
-type ARLocation = {
+export type ARLocation = {
     latitude: number;
     longitude: number;
 }
@@ -41,7 +41,7 @@ export type BaseZone = {
     _id?: number;
     zone_id: string;
     ZoneGeosamplesIds: number[];
-    location: Location;
+    location: ARLocation;
     radius: number;
 }
 

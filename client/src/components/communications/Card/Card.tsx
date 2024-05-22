@@ -87,6 +87,7 @@ const ImageCard = ({ onClick, image, ...props }) => {
 };
 
 export const CardSelectable = ({onCardClick, images, searchInput}) => {
+  console.log(images)
   const filteredImages = images.filter(image =>
     image.title.toLowerCase().includes(searchInput.toLowerCase())
   );

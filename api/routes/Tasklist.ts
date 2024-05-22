@@ -178,6 +178,12 @@ export default class Tasklist extends Base {
 		// TODO: add code to assign values to undefined properties 
 		const count = await this.db.collection('tasks').countDocuments();
 		newTask.id = count + 1;
+		newTask.astronauts = [
+			{
+				astronaut_id: 0,
+				ready: true
+			}
+		];
 		this.tasks.push(newTask);
 
 		//what is this doing??

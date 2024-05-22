@@ -58,42 +58,42 @@ export const dummyTasks: Task[] = [
       },
     ],
   },
-  {
-    id: 2,
-    subtask: true,
-    title: "Apple Bottom Jeans",
-    description: "Gather necessary tools and equipment for the upcoming spacewalk mission. Ensure proper suit functionality and oxygen levels.",
-    status: TaskStatus.TODO,
-    astronauts: [{ astronaut_id: 0, ready: true }], // Update astronauts here
-    subtasks: [
-      {
-        id: 21,
-        subtask: true,
-        title: "Check suit integrity",
-        description: "Run diagnostic tests on the spacesuit to ensure no leaks or malfunctions.",
-        status: TaskStatus.TODO,
-        astronauts: [],
-      },
-    ],
-  },
-  {
-    id: 3,
-    subtask: true,
-    title: "Apple Bottom Jeans",
-    description: "Gather necessary tools and equipment for the upcoming spacewalk mission. Ensure proper suit functionality and oxygen levels.",
-    status: TaskStatus.TODO,
-    astronauts: [{ astronaut_id: 0, ready: true }], // Update astronauts here
-    subtasks: [
-      {
-        id: 31,
-        subtask: true,
-        title: "Check suit integrity",
-        description: "Run diagnostic tests on the spacesuit to ensure no leaks or malfunctions.",
-        status: TaskStatus.TODO,
-        astronauts: [],
-      },
-    ],
-  },
+  // {
+  //   id: 2,
+  //   subtask: true,
+  //   title: "Apple Bottom Jeans",
+  //   description: "Gather necessary tools and equipment for the upcoming spacewalk mission. Ensure proper suit functionality and oxygen levels.",
+  //   status: TaskStatus.TODO,
+  //   astronauts: [{ astronaut_id: 0, ready: true }], // Update astronauts here
+  //   subtasks: [
+  //     {
+  //       id: 21,
+  //       subtask: true,
+  //       title: "Check suit integrity",
+  //       description: "Run diagnostic tests on the spacesuit to ensure no leaks or malfunctions.",
+  //       status: TaskStatus.TODO,
+  //       astronauts: [],
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: 3,
+  //   subtask: true,
+  //   title: "Apple Bottom Jeans",
+  //   description: "Gather necessary tools and equipment for the upcoming spacewalk mission. Ensure proper suit functionality and oxygen levels.",
+  //   status: TaskStatus.TODO,
+  //   astronauts: [{ astronaut_id: 0, ready: true }], // Update astronauts here
+  //   subtasks: [
+  //     {
+  //       id: 31,
+  //       subtask: true,
+  //       title: "Check suit integrity",
+  //       description: "Run diagnostic tests on the spacesuit to ensure no leaks or malfunctions.",
+  //       status: TaskStatus.TODO,
+  //       astronauts: [],
+  //     },
+  //   ],
+  // },
 ];
 
 // const tasksInProgress = [ 

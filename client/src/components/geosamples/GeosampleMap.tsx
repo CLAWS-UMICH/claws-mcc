@@ -46,8 +46,8 @@ interface GeosampleMapProps {
     selected?: BaseGeosample
 };
 
-const API_KEY = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
-// const API_KEY = "AIzaSyDUzQIxpe2PuzxQdQLtW7NZ3X9mftd6bYE"; this is april's google maps key 
+// const API_KEY = "AIzaSyBKoEACDcmaJYjODh0KpkisTk1MPva76s8";
+const API_KEY = "AIzaSyDUzQIxpe2PuzxQdQLtW7NZ3X9mftd6bYE";
 
 const GeosampleMap: React.FC<GeosampleMapProps> = ({geosamples, zones, dispatch, ready, selected}) => {
     const styles = useStyles();

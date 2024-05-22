@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
 import {Collection, Db,  WithId} from "mongodb";
-import { BaseGeosample, BaseZone, EvaData, SampleMessage, isGeosample, isZone } from "../types/Geosamples";
+import { ARLocation, BaseGeosample, BaseZone, EvaData, SampleMessage, isGeosample, isZone } from "../types/Geosamples";
 import Logger from "../core/logger";
 
 export interface ResponseBody {
@@ -86,7 +86,7 @@ export default class Geosamples extends Base {
     async addGeosamples(message: SampleMessage) : Promise<{}> {
         this.logger.info("Received samples from Hololens, sending samples to frontend");
         const samples = message.data.AllGeosamples;
-        const zones = message.zones.AllGeosampleZones;
+        let zones = message.zones.AllGeosampleZones;
 
         this.logger.info("orig samples", samples);
         this.logger.info("orig zones", zones);
@@ -95,12 +95,24 @@ export default class Geosamples extends Base {
             this.logger.error("No samples/zones received");
             return "Error";
         }
+
         if (zones.length > 0) {
             for (let i = 0; i < zones.length; i++) {
                 if (!zones[i] || !isZone(zones[i])) {
                     this.logger.error("Geosample zones in incorrect format.");
                     return "Error";
                 }
+                if (zones[i].ZoneGeosamplesIds) {
+                    for (let i = 0; i < zones[i].ZoneGeosamplesIds.length; i++) {
+                        for (let j = i + 1; j < zones[i].ZoneGeosamplesIds.length; j++) {
+                            if (zones[i].ZoneGeosamplesIds[i] === zones[i].ZoneGeosamplesIds[j]) {
+                            zones[i].ZoneGeosamplesIds.splice(j, 1);
+                            j--; // Adjust index after removal
+                            }
+                        }
+                    }
+                }
+
                 // Geosamples.sampleIds[zones[i].zone_id] = 1;
             }
             for (let i = 0; i < samples.length; i++) {
