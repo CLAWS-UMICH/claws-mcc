@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import CameraView1 from '../../assets/cameraview1.jpeg';
-import CameraView2 from '../../assets/cameraview2.jpeg';
 import './cameraView.css';
 import useDynamicWebSocket from "../../hooks/useWebSocket";
 import config from "../../config";
-import { Spinner } from "@fluentui/react-components";
-import audioOnIcon from '../../assets/audio-on.svg';
-import audioOffIcon from '../../assets/audio-off.svg';
-import videoOnIcon from '../../assets/video-on.svg';
-import videoOffIcon from '../../assets/video-off.svg';
+import audioOnIcon from '../../assets/audio-on.png';
+import audioOffIcon from '../../assets/audio-off.png';
+import videoOnIcon from '../../assets/video-on.png';
+import videoOffIcon from '../../assets/video-off.png';
 
 const CameraView: React.FC = () => {
     const [uptime, setUpTime] = useState<number>(0);
