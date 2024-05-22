@@ -26,7 +26,7 @@ interface ProcessedSpeechMessage {
     };
 }
 
-export default class Speech extends Base {
+export default class VEGA extends Base {
     private logger = new Logger('Speech');
 
     public events = [
@@ -38,6 +38,14 @@ export default class Speech extends Base {
             type: 'AUDIO_PROCESSED',
             handler: this.handleProcessedSpeechMessage.bind(this),
         },
+        {
+            type: 'UIAIMAGE',
+            handler: this.handleUIAIMAGE.bind(this),
+        },
+        {
+            type: 'UIAIMAGE_PROCESSED',
+            handler: this.handleUIAIMAGE.bind(this),
+        }
     ];
 
     constructor(db: Db) {
@@ -72,6 +80,38 @@ export default class Speech extends Base {
                 text_from_VEGA: data.data.text_from_VEGA,
                 command: data.data.command,
                 classify: data.data.classify,
+            },
+        });
+    }
+
+    async handleUIAIMAGE(data: any) {
+        this.logger.info(`Received UIAIMAGE message, dispatching to AR for use`);
+
+        this.dispatch('AR', {
+            id: data.id,
+            type: 'UIAIMAGE',
+            use: 'PUT',
+            data: {
+                base_64_image: data.data.base_64_image,
+                points: data.data.points,
+                position: data.data.position,
+                rotation: data.data.rotation,
+            },
+        });
+    }
+
+    async handleUIAIMAGE_PROCESSED(data: any) {
+        this.logger.info(`Received UIAIMAGE_PROCESSED message, dispatching to AR for use`);
+
+        this.dispatch('AR', {
+            id: data.id,
+            type: 'UIAIMAGE_PROCESSED',
+            use: 'PUT',
+            data: {
+                base_64_image: data.data.base_64_image,
+                points: data.data.points,
+                position: data.data.position,
+                rotation: data.data.rotation,
             },
         });
     }
