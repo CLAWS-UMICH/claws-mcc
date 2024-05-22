@@ -67,6 +67,7 @@ export const DropDown = ({ open, onOpenChange, positioningRef, activeObjectId, i
   };
 
   const handleSendClick = () => {
+    console.log({ selectedAstronauts, activeObjectId, isButton })
     if (isButton){
       selectedAstronauts.forEach(astronautId => {
         sendButtonHighlightRequest(activeObjectId, astronautId);

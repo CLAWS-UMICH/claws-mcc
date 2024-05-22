@@ -7,7 +7,7 @@ const DEFAULT_ASTRONAUT_NAME = 'April';
 const DEFAULT_ASTRONAUT_COLOR = '#87CEEB';
 
 interface AstronautInitializationRequest {
-    id: number;
+    id: string;
     name: string;
     color: string;
 }
@@ -47,7 +47,7 @@ export default class Core extends Base {
         }
 
         const astronaut = {
-            id: data.id,
+            id: parseInt(data.id),
             name: data.name,
             color: data.color,
         };

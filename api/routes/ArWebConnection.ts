@@ -3,6 +3,7 @@ import Base, {RouteEvent} from "../Base";
 import { Db } from 'mongodb';
 import { readdirSync, readFileSync } from 'fs';
 import express, { Request, Response } from 'express';
+import Logger from "../core/logger";
 
 /*
  TODO:
@@ -109,6 +110,8 @@ export function readImageFile(filePath: string): Buffer {
 // CLASS DEFN.
 //-----------
 export default class ARWebConnection extends Base {
+    logger = new Logger('ARWebConnection');
+
     public events: RouteEvent[] = [
         {
             type: 'SEND_SCREEN_TO_AR',
@@ -184,9 +187,12 @@ export default class ARWebConnection extends Base {
             const screensCollection = this.db.collection('screens'); // Get collection of ScreenInfo objects
             const screen = await screensCollection.findOne({ id: imageID }); // Find the screen by ID
 
+            console.log({screen})
+
             // Additional checks to validate astronautID
             if (astronautID < 0 || astronautID > 10) {
-                throw new Error('Invalid astronaut ID. Astronaut ID must be between 0 and 10.');
+                this.logger.error('Invalid astronaut ID. Astronaut ID must be between 0 and 10.');
+                return;
             }
         
             if (screen) {
@@ -229,10 +235,12 @@ export default class ARWebConnection extends Base {
         try {
             // Additional checks to validate buttonID and astronautID
             if (buttonID < 0 || buttonID > 5) {
-                throw new Error('Invalid button ID. Button ID must be between 0 and 5.');
+                this.logger.error('Invalid button ID. Button ID must be between 0 and 5.');
+                return;
             }
             if (astronautID < 0 || astronautID > 10) {
-                throw new Error('Invalid astronaut ID. Astronaut ID must be between 0 and 10.');
+                this.logger.error('Invalid astronaut ID. Astronaut ID must be between 0 and 10.');
+                return;
             }
     
             // Send information about the highlighted button to the AR WebSocket target

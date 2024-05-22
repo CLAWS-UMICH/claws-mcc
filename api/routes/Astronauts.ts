@@ -35,6 +35,10 @@ export default class Astronauts extends Base {
         {
             type: 'GET_ASTRONAUT',
             handler: this.fetchAstronaut.bind(this),
+        },
+        {
+            type: 'GET_ASTRONAUTS',
+            handler: this.fetchAstronauts.bind(this),
         }
     ]
 
@@ -50,8 +54,8 @@ export default class Astronauts extends Base {
         if (data.name) {
             const result = this.collection.find({ name: data.name });
             const resultArray = await result.toArray();
-            if (resultArray.length > 1) throw new Error('More than one astronaut found, please specify id');
-            if (resultArray.length === 0) throw new Error('Astronaut not found');
+            if (resultArray.length > 1) return this.logger.error('More than one astronaut found, please specify id');
+            if (resultArray.length === 0) return this.logger.error('Astronaut not found');
 
             this.dispatch('FRONTEND', {
                 id: resultArray[0].id,
@@ -63,7 +67,7 @@ export default class Astronauts extends Base {
             return resultArray[0];
         } else {
             const result: WithId<Astronaut> | null = await this.collection.findOne({ id: data.id });
-            if (!result) throw new Error('Astronaut not found');
+            if (!result) return this.logger.error('Astronaut not found');
     
             this.dispatch('FRONTEND', {
                 id: result.id,
@@ -74,6 +78,21 @@ export default class Astronauts extends Base {
 
             return result;
         }
+    }
+
+    async fetchAstronauts(): Promise<Astronaut[]> {
+        const result: FindCursor<Astronaut> = this.collection.find({ id: { $gte: 0 } });
+        const resultArray = await result.toArray();
+        if (resultArray.length === 0) return this.logger.error('No astronauts found');
+
+        this.dispatch('FRONTEND', {
+            id: -1,
+            type: 'ASTRONAUTS',
+            use: 'GET',
+            data: resultArray,
+        });
+
+        return resultArray;
     }
 
     async getAstronaut(req: Request, res: Response) {
