@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import Logger from "./core/logger";
 import { IGNORED_TYPES } from "./Base";
-import * as axios from 'axios';
+import axios from 'axios';
 
 dotenv.config();
 
@@ -198,11 +198,11 @@ async function setupTSSWatchers(tssRegistry: TSSRegistry) {
             const url = `${TSS_URI}/json_data${path}`;
 
             try {
-                const res = await fetch(url);
-                if (!res.ok) {
+                const res = await axios.get(url);
+                if (res.status !== 200) {
                     throw new Error(`Failed to fetch TSS data for ${url}: ${res.statusText}`);
                 }
-                const tssData = await res.json();
+                const tssData = res.data;
                 if (JSON.stringify(tssData) !== JSON.stringify(prevTSSData[path])) {
                     // tssLogger.info(`TSS data for ${url} has changed, calling all handlers`);
                     handlers.forEach((handler) => handler({ ...tssData }));

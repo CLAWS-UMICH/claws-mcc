@@ -26,6 +26,30 @@ interface ProcessedSpeechMessage {
     };
 }
 
+interface UIAIMAGE {
+    id: number;
+    type: string;
+    use: 'PUT';
+    data: {
+        base_64_image: string;
+        points: number[];
+        position: number[];
+        rotation: number[];
+    };
+}
+
+interface UIAIMAGE_PROCESSED {
+    id: number;
+    type: string;
+    use: 'PUT';
+    data: {
+        base_64_image: string;
+        points: number[];
+        position: number[];
+        rotation: number[];
+    };
+}
+
 export default class VEGA extends Base {
     private logger = new Logger('Speech');
 
@@ -44,7 +68,7 @@ export default class VEGA extends Base {
         },
         {
             type: 'UIAIMAGE_PROCESSED',
-            handler: this.handleUIAIMAGE.bind(this),
+            handler: this.handleUIAIMAGE_PROCESSED.bind(this),
         }
     ];
 
@@ -84,10 +108,10 @@ export default class VEGA extends Base {
         });
     }
 
-    async handleUIAIMAGE(data: any) {
-        this.logger.info(`Received UIAIMAGE message, dispatching to AR for use`);
+    async handleUIAIMAGE(data: UIAIMAGE) {
+        this.logger.info(`Received UIAIMAGE message, dispatching to VEGA for use`);
 
-        this.dispatch('AR', {
+        this.dispatch('VEGA', {
             id: data.id,
             type: 'UIAIMAGE',
             use: 'PUT',
@@ -100,7 +124,7 @@ export default class VEGA extends Base {
         });
     }
 
-    async handleUIAIMAGE_PROCESSED(data: any) {
+    async handleUIAIMAGE_PROCESSED(data: UIAIMAGE_PROCESSED) {
         this.logger.info(`Received UIAIMAGE_PROCESSED message, dispatching to AR for use`);
 
         this.dispatch('AR', {
