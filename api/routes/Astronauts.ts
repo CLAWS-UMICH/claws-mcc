@@ -46,7 +46,7 @@ export default class Astronauts extends Base {
         this.collection = db.collection('astronauts');
     }
 
-    async fetchAstronaut(data: { id?: number, name?: string }): Promise<void> {
+    async fetchAstronaut(data: { id?: number, name?: string }): Promise<Astronaut> {
         if (data.name) {
             const result = this.collection.find({ name: data.name });
             const resultArray = await result.toArray();
@@ -59,6 +59,8 @@ export default class Astronauts extends Base {
                 use: 'GET',
                 data: resultArray[0],
             });
+
+            return resultArray[0];
         } else {
             const result: WithId<Astronaut> | null = await this.collection.findOne({ id: data.id });
             if (!result) throw new Error('Astronaut not found');
@@ -69,14 +71,16 @@ export default class Astronauts extends Base {
                 use: 'GET',
                 data: result,
             });
+
+            return result;
         }
     }
 
     async getAstronaut(req: Request, res: Response) {
         // key is either astronaut name or id
-        const key = req.params.astronaut;
+        const key = req.params.astronaut as unknown as number;
         try {
-            const astronaut: Astronaut = await this.fetchAstronaut(key);
+            const astronaut: Astronaut = await this.fetchAstronaut({ id: key });
             res.status(200).send(astronaut);
             return astronaut;
         } catch (e) {
@@ -87,9 +91,9 @@ export default class Astronauts extends Base {
 
     async deleteAstronaut(req: Request, res: Response): Promise<string> {
         // key is either astronaut name or id
-        const key = req.params.astronaut;
+        const key = req.params.astronaut as unknown as number;
         try {
-            const astronaut: Astronaut = await this.fetchAstronaut(key);
+            const astronaut: Astronaut = await this.fetchAstronaut({ id: key });
             await this.collection.deleteOne({id: astronaut.id});
             const status = 200;
             const msg = 'Deleted astronaut';
