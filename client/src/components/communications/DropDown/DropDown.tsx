@@ -10,6 +10,13 @@ import {
 } from "@fluentui/react-components";
 import { Send20Regular } from "@fluentui/react-icons";
 import "./DropDown.css";
+import useDynamicWebSocket from "../../../hooks/useWebSocket";
+
+interface Astronaut {
+  id: number;
+  name: string;
+  color: string;
+}
 
 const sendButtonHighlightRequest = (buttonId, astronautId) => {
   fetch('/api/highlightbutton', {
@@ -57,6 +64,35 @@ const sendSendImageRequest = (imageId, astronautId) => {
 
 export const DropDown = ({ open, onOpenChange, positioningRef, activeObjectId, isButton }) => {
   const [selectedAstronauts, setSelectedAstronauts] = React.useState<string[]>([]);
+  const [astronauts, setAstronauts] = React.useState<Astronaut[]>([])
+
+  const { sendMessage, lastMessage } = useDynamicWebSocket({
+    onOpen: () => {
+      sendMessage(JSON.stringify({ type: 'GET_ASTRONAUTS' }));
+    },
+    type: 'ASTRONAUTS'
+  });
+
+  React.useEffect(() => {
+    if (lastMessage) {
+      let astronautData: Astronaut[] = [];
+      try {
+        astronautData = JSON.parse(lastMessage.data).data;
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (astronautData) {
+        astronautData = astronautData.filter((astronaut, index, self) =>
+          index === self.findIndex((t) => (
+            t.id === astronaut.id
+          ))
+        );
+      }
+
+      setAstronauts(astronautData);
+    }
+  }, [lastMessage]);
 
   const handleAstronautSelection = (value) => {
     if (selectedAstronauts.includes(value)) {
@@ -92,21 +128,11 @@ export const DropDown = ({ open, onOpenChange, positioningRef, activeObjectId, i
 
       <MenuPopover className="dropdown-popover">
         <MenuList>
-          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="0" onClick={() => handleAstronautSelection('0')}>
-            Akira
-          </MenuItemCheckbox>
-          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="1" onClick={() => handleAstronautSelection('1')}>
-            Emma
-          </MenuItemCheckbox>
-          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="2" onClick={() => handleAstronautSelection('2')}>
-            Jamie
-          </MenuItemCheckbox>
-          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="3" onClick={() => handleAstronautSelection('3')}>
-            Jenny
-          </MenuItemCheckbox>
-          <MenuItemCheckbox className="dropdown-text" name="Astronaut" value="4" onClick={() => handleAstronautSelection('4')}>
-            Sohavni
-          </MenuItemCheckbox>
+          {astronauts.map((astronaut) => (
+            <MenuItemCheckbox className="dropdown-text" name="Astronaut" value={astronaut.id.toString()} onClick={() => handleAstronautSelection(astronaut.id.toString())}>
+              {astronaut.name}
+            </MenuItemCheckbox>
+          ))}
           <MenuDivider />
           <MenuItem className="dropdown-send" icon={<Send20Regular />} onClick={() => handleSendClick()} >Send</MenuItem>
         </MenuList>

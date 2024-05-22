@@ -203,7 +203,7 @@ export default class ARWebConnection extends Base {
                     use: 'PUT',
                     data: {
                         title: screen.title,
-                        img_binary: screen.img_binary                    
+                        binary_img: screen.img_binary                    
                     },
                 });
                 
