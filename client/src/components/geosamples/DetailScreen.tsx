@@ -23,7 +23,7 @@ import {
   Star16Filled,
   Circle16Regular, 
   Square16Regular, 
-  Hexagon16Regular, 
+  PentagonRegular, 
   Triangle16Regular, 
   Question16Regular,
   Location16Regular,
@@ -31,7 +31,12 @@ import {
   Clock16Regular,
   Dismiss16Regular,
   Save16Regular,
-  Tag16Regular
+  Tag16Regular,
+  Oval16Regular,
+  Cone16Regular,
+  ColumnSingle16Regular,
+  Diamond16Regular,
+  Cloud16Regular
 } from "@fluentui/react-icons";
 import './Geosamples.css';
 import { BaseGeosample, EvaData, ManagerAction } from "./GeosampleTypes.tsx";
@@ -69,6 +74,16 @@ const useStyles = makeStyles({
     justifyContent:"space-between",
     ...shorthands.gap("15px"),
   },
+  circle: {
+    width: "25px",
+    height: "25px",
+    fontSize: "12.5px",
+    color: "#fff",
+    lineHeight: "25px",
+    textAlign: "center",
+    backgroundColor: "#006FD7",
+    ...shorthands.borderRadius("50px"),
+  }
 });
 
 interface CompositionValuesProps {
@@ -225,8 +240,8 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
     )
   }
 
-  const color_options = [ "Brown", "Copper Red", "Black", "Multi-color" ];
-  const location_string = geosample.location.latitude + "˚ " + geosample.location.longitude + "˚";
+  const color_options = [ ["Grey", "#7F7F7F"], ["Red", "#FF6060"], ["Blue", "#6091FF"], ["Green", "#76FF60"], ["Yellow", "#FCFF60"], ["Orange", "#FFA360"], ["Brown", "#804005"], ["Other", "Other"] ];
+  const location_string = geosample.location.latitude.toFixed(6) + "˚ " + geosample.location.longitude.toFixed(6) + "˚";
 
   // TODO: make this send message to hololens if clicked
   const handleFavoriting = async (dispatch: React.Dispatch<ManagerAction>, geosample?: BaseGeosample) => {
@@ -435,17 +450,29 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
                   value={edit ? editedSample?.shape : currentSample?.shape || "Unknown"}
                   onOptionSelect={(e, data) => handleOption('shape', data.optionText)}
               >
-                  <Option text="Circle">
-                      <Circle16Regular/> Circle 
+                  <Option text="Polygon">
+                      <PentagonRegular/> Polygon 
                   </Option>
-                  <Option text="Square">
-                      <Square16Regular/> Square 
+                  <Option text="Cube">
+                      <Square16Regular/> Cube 
                   </Option>
-                  <Option text="Hexagon">
-                      <Hexagon16Regular/> Hexagon 
+                  <Option text="Sphere">
+                      <Circle16Regular/> Sphere 
                   </Option>
-                  <Option text="Triangle">
-                      <Triangle16Regular/> Triangle
+                  <Option text="Ellipsoid">
+                      <Oval16Regular/> Ellipsoid 
+                  </Option>
+                  <Option text="Cylinder">
+                    <ColumnSingle16Regular/> Cylinder
+                  </Option>
+                  <Option text="Cone">
+                      <Cone16Regular/> Cone
+                  </Option>
+                  <Option text="Crystalline">
+                    <Diamond16Regular/> Crystalline
+                  </Option>
+                  <Option text="Irregular">
+                    <Cloud16Regular/> Irregular
                   </Option>
                   <Option text="Unknown">
                       <Question16Regular/> Unknown
@@ -459,12 +486,12 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
                   className={styles.dropdown}
                   aria-labelledby="color_dropdown"
                   id="color_dropdown"
-                  value={edit ? editedSample?.color : currentSample?.color || "Multicolor"}
+                  value={edit ? editedSample?.color : currentSample?.color || "Other"}
                   onOptionSelect={(e, data) => handleOption('color', data.optionText)}
                 >
                   {color_options.map((option) => (
-                    <Option key={option}>
-                        {option}
+                    <Option text={option[1]}>
+                      {option[0]}
                     </Option>
                   ))}
                 </Dropdown>) : <Input style={{background: "black"}} appearance="outline" id="color_dropdown" readOnly={true} value={currentSample ? currentSample?.color.charAt(0).toUpperCase() + currentSample?.color.slice(1) : ""} /> }

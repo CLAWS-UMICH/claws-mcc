@@ -25,7 +25,7 @@ const StarredImage : React.FC<StarredImageProps> = ({sample}) => {
                     <circle cx="16" cy="16" r="13.5" fill="#835B00" stroke="#F2C661"/>
                 </g>
             </svg>
-        <div className={styles.imageText}><b>{String.fromCharCode(Number(sample.zone_id))}{sample.geosample_id+1}</b></div>
+        <div className={styles.imageText}><b>{String.fromCharCode(Number(sample.zone_id))}{sample.geosample_id}</b></div>
         </div>
     );
 };

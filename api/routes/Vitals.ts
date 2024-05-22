@@ -7,7 +7,7 @@ interface Alert {
     message: string;
 }
 
-const CURRENT_EVA = process.env.CURRENT_EVA || 'eva2';
+const CURRENT_EVA = process.env.CURRENT_EVA || 'eva1';
 
 export default class Vitals extends Base {
     private vitals: any = {
@@ -64,7 +64,7 @@ export default class Vitals extends Base {
     async handleTSSVitalsUpdate(data: VitalsMessage) {
         const eva_data = data["telemetry"][CURRENT_EVA];
 
-        this.logger.info('Handling TSS vitals update', eva_data);
+        this.logger.info('Handling TSS vitals update');
 
         await this.handleVitalsUpdate({
             id: -1,
@@ -77,7 +77,7 @@ export default class Vitals extends Base {
     async handleDCUUpdate(data) {
         const dcu_data = data["dcu"][CURRENT_EVA];
 
-        this.logger.info('Handling TSS DCU update', dcu_data);
+        this.logger.info('Handling TSS DCU update');
 
         await this.handleVitalsUpdate({
             id: -1,
@@ -94,7 +94,7 @@ export default class Vitals extends Base {
     }
 
     async sendVitalsMessage() {
-        this.logger.info("Sending vitals to frontend" + JSON.stringify(this.vitals));
+        this.logger.info("Sending vitals to frontend");
         const vitalsData = this.vitals;
         const messageId = 0;
 

@@ -38,6 +38,7 @@ export type BaseGeosample = {
 }
 
 export type BaseZone = {
+    _id?: number;
     zone_id: string;
     ZoneGeosamplesIds: number[];
     location: Location;

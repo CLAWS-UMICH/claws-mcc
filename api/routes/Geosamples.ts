@@ -47,15 +47,16 @@ export default class Geosamples extends Base {
     };
 
     private static incrementMessageId(): number {
-        return this.messageId++;
+        return -1;
+        // return this.messageId++;
     }
 
-    private static incrementSampleId(sample: BaseGeosample): number {
-        if (!this.sampleIds || !this.sampleIds.hasOwnProperty(sample.zone_id)) {
-            this.sampleIds[sample.zone_id] = 1;
-        }
-        return this.sampleIds[sample.zone_id]++;
-    }
+    // private static incrementSampleId(sample: BaseGeosample): number {
+    //     if (!this.sampleIds || !this.sampleIds.hasOwnProperty(sample.zone_id)) {
+    //         this.sampleIds[sample.zone_id] = 1;
+    //     }
+    //     return this.sampleIds[sample.zone_id]++;
+    // }
 
     async sendSamples(payload: any) {
         const { platform = 'AR' } = payload;
@@ -87,6 +88,9 @@ export default class Geosamples extends Base {
         const samples = message.data.AllGeosamples;
         const zones = message.zones.AllGeosampleZones;
 
+        this.logger.info("orig samples", samples);
+        this.logger.info("orig zones", zones);
+
         if (!zones || !samples) {
             this.logger.error("No samples/zones received");
             return "Error";
@@ -97,7 +101,7 @@ export default class Geosamples extends Base {
                     this.logger.error("Geosample zones in incorrect format.");
                     return "Error";
                 }
-                Geosamples.sampleIds[zones[i].zone_id] = 1;
+                // Geosamples.sampleIds[zones[i].zone_id] = 1;
             }
             for (let i = 0; i < samples.length; i++) {
                 if (!isGeosample(samples[i])) {
@@ -107,22 +111,32 @@ export default class Geosamples extends Base {
 
                 if (!samples[i].starred) {
                     samples[i].starred = this.determineSignificance(samples[i].eva_data);
+                    this.logger.info(samples[i].starred)
+                    this.updateARSamples(-1, { samples: samples, zones: zones });
                 }
                 if (!samples[i].eva_data.name || samples[i].eva_data.name === "") {
                     samples[i].eva_data.name = "Geo Sample " + samples[i].geosample_id.toString();
                 }
                 if (!samples[i].rock_type || samples[i].rock_type === "") {
-                    samples[i].eva_data.name = "Unknown";
+                    samples[i].rock_type = "Unknown";
                 }
                 // samples[i].id = Geosamples.incrementSampleId(samples[i]);
             }
         }
 
+        this.logger.info("samples", samples);
+        this.logger.info("zones", zones);
+
         try {
-            await this.samplesCollection.deleteMany({});
-            await this.samplesCollection.insertMany(samples);
-            await this.zonesCollection.deleteMany({});
-            await this.zonesCollection.insertMany(zones);
+            if (samples) {
+                await this.samplesCollection.deleteMany({});
+                await this.samplesCollection.insertMany(samples);
+            }
+            if (zones) {
+                await this.zonesCollection.deleteMany({});
+                await this.zonesCollection.insertMany(zones);
+            }
+            this.logger.info("or here  no ?")
             const allSamples = this.samplesCollection.find();
             const allZones = this.zonesCollection.find();
             const sampleData = await allSamples.toArray();
@@ -134,7 +148,6 @@ export default class Geosamples extends Base {
                 data: { samples: sampleData, zones: zoneData }
             });
             this.logger.info({ samples: samples, zones: zones });
-            // this.updateARSamples(Geosamples.incrementMessageId(), { samples: samples, zones: zones });
             return "Received geosamples";
         } catch (e) {
             this.logger.error(e.message);
@@ -176,11 +189,12 @@ export default class Geosamples extends Base {
 
     async editGeosample(req: Request, res: Response) : Promise<string> {
         const sample = req.body.data;
+        this.logger.info(sample);
         try {
             if (sample.hasOwnProperty("_id")) {
                 delete sample._id;
             }
-            const replaceResult = await this.samplesCollection.replaceOne({geosample_id: sample.geosample_id, zone_id: sample.zone_id}, sample, {upsert: true});
+            const replaceResult = await this.samplesCollection.replaceOne({geosample_id: sample.geosample_id, zone_id: sample.zone_id}, sample, {upsert: false});
             if (replaceResult.modifiedCount !== 1) {
                 res.status(400).send("Error updating sample")
             }
@@ -211,18 +225,18 @@ export default class Geosamples extends Base {
     }
 
     private determineSignificance(eva_data: EvaData): boolean{
-        var significant = true;
+        this.logger.info(eva_data)
         const total = eva_data.data.SiO2 + eva_data.data.TiO2 + eva_data.data.Al2O3 + eva_data.data.FeO + eva_data.data.MnO + eva_data.data.MgO + eva_data.data.CaO + eva_data.data.K2O + eva_data.data.P2O3;
-        if (eva_data.data.SiO2 >= .10) significant = false;
-        if (eva_data.data.TiO2 <= .01) significant = false;
-        if (eva_data.data.Al2O3 <= .10) significant = false;
-        if (eva_data.data.FeO <= .29) significant = false;
-        if (eva_data.data.MnO <= .01) significant = false;
-        if (eva_data.data.MgO <= .20) significant = false;
-        if (eva_data.data.CaO <= .10) significant = false;
-        if (eva_data.data.K2O <= .01) significant = false;
-        if (eva_data.data.P2O3 <= 0.015) significant = false;
-        if (1-total <= 0.50) significant = false;
-        return significant;
+        if (eva_data.data.SiO2 > 0 && eva_data.data.SiO2 < 10) return true;
+        if (eva_data.data.TiO2 > 1) return true;
+        if (eva_data.data.Al2O3 > 10) return true;
+        if (eva_data.data.FeO > 29) return true;
+        if (eva_data.data.MnO > 1) return true;
+        if (eva_data.data.MgO > 20) return true;
+        if (eva_data.data.CaO > 10) return true;
+        if (eva_data.data.K2O > 1) return true;
+        if (eva_data.data.P2O3 > 1.5) return true;
+        if (1-total > 50) return true;
+        return false;
     }
 }
