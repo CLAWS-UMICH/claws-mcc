@@ -6,12 +6,10 @@ import axios from "axios";
 export type BaseMessage = {
     message_id: number;
     use: 'PUT' | 'GET'; // these are the only two methods AR expects
-    data?: {
-        from: number
-        sent_to: number
-        message: string
-        timestamp: string
-    };
+    from: number
+    sent_to: number
+    message: string
+    timestamp: string
 }
 
 async function addMessageHandler(setAllMessages, allMessages: BaseMessage[], new_message_data: string, activeConversation: number, setMessageData) {
@@ -29,12 +27,10 @@ async function addMessageHandler(setAllMessages, allMessages: BaseMessage[], new
     const new_message = {
         message_id: allMessages.length,
         use: 'PUT',
-        data: {
-            from: -1,
-            sent_to: activeConversation,
-            message: new_message_data,
-            timestamp: getCurrentTime()
-        }
+        from: -1,
+        sent_to: activeConversation,
+        message: new_message_data,
+        timestamp: getCurrentTime()
     };
     // Update then send messages
     const new_messages = [...allMessages, new_message];
@@ -123,10 +119,10 @@ function ContactImage({ astro }) {
 }
 
 function MessageBubble({ message }: { message: BaseMessage }) {
-    const timestamp = message.data?.timestamp;
-    const from = message.data?.from;
-    const sent_to = message.data?.sent_to;
-    const message_text = message.data?.message;
+    const timestamp = message?.timestamp;
+    const from = message?.from;
+    const sent_to = message?.sent_to;
+    const message_text = message?.message;
 
     // Convert timestamp to AM/PM Format
     let timestamp_text = "";

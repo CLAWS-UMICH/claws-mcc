@@ -13,7 +13,7 @@ import EmptyComponent from './components/common/EmptyComponent.tsx';
 import { TaskList } from './components/features/task-list.tsx';
 import Vitals from './components/vitals/Vitals.tsx';
 import RoverView from './components/rover_view/RoverView.tsx';
-
+import Map from './components/map/Map.tsx';
 interface AstronautData {
   heartrate: number;
 }
@@ -32,26 +32,27 @@ function App() {
 
   return (
     <FluentProvider theme={theme}>
-        <BrowserRouter>
-            <div className='debug'>
-                <CameraView />
-                <div className='content-container'>
-                    <NavBar />
-                    <div>
-                      <Routes>
-                          <Route path="/" element={<Vitals />} />
-                          <Route path="/tasks" element={<TaskList />} />
-                          <Route path="/vitals" element={<Vitals/>} />
-                          <Route path="/samples" element={<GeosampleManager />} />
-                          <Route path="/navigation" element={<WaypointManager />} />
-                          <Route path="/rover" element={<RoverView />} />
-                          <Route path="/messages" element={<Messages />} />
-                          <Route path="/connect" element={<Communication />} />
-                      </Routes>
-                    </div>
-                </div>
+      <BrowserRouter>
+        <div className='debug'>
+          <CameraView />
+          <div className='content-container'>
+            <NavBar />
+            <div>
+              <Routes>
+                <Route path="/" element={<Vitals />} />
+                <Route path="/tasks" element={<TaskList />} />
+                <Route path="/vitals" element={<Vitals />} />
+                <Route path="/samples" element={<GeosampleManager />} />
+                <Route path="/navigation" element={<WaypointManager />} />
+                <Route path="/rover" element={<RoverView />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/connect" element={<Communication />} />
+                <Route path="/map" element={<Map />} />
+              </Routes>
             </div>
-        </BrowserRouter>
+          </div>
+        </div>
+      </BrowserRouter>
     </FluentProvider>
   );
 }

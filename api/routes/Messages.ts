@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Base, { RouteEvent } from "../Base";
-import {BaseMessage, MessagingMessage} from "../types/Messages";
+import { BaseMessage, MessagingMessage } from "../types/Messages";
 import Message from "../types/message";
 import { Collection, Db, Document, InsertManyResult, WithId } from "mongodb";
 import Logger from "../core/logger";
@@ -59,7 +59,7 @@ export default class Messages extends Base {
         });
         // insert the diff into the collection
         const result = await this.collection.insertMany(diff);
-        if(result.acknowledged === false) {
+        if (result.acknowledged === false) {
             const response: ResponseBody = { error: true, message: 'error adding message', data: new_messages }
             res.send(response);
             return response;
@@ -86,7 +86,7 @@ export default class Messages extends Base {
     // Requests waypoints from AR
     // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
     private updateARMessages(messageId: number, data: BaseMessage[]): void {
-        const newMessage: MessagingMessage =  {
+        const newMessage: MessagingMessage = {
             id: messageId,
             type: 'MESSAGING',
             use: 'PUT',
@@ -96,5 +96,4 @@ export default class Messages extends Base {
         }
         this.dispatch("AR", newMessage)
     }
-
 }

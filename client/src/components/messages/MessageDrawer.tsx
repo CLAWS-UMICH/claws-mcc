@@ -7,12 +7,10 @@ import { makeStyles } from '@fluentui/react-components';
 export type BaseMessage = {
     message_id: number;
     use: 'PUT' | 'GET'; // these are the only two methods AR expects
-    data?: {
-        from: number
-        sent_to: number
-        message: string
-        timestamp: string
-    };
+    from: number
+    sent_to: number
+    message: string
+    timestamp: string
 }
 
 const useStyles = makeStyles({
@@ -62,7 +60,7 @@ function MessageDrawer({ messages, conversations, setActiveConversation, activeC
             {Array.from(conversations.keys()).map((key, index) => {
                 const astro = key as number;
 
-                let recent_message = conversations.get(astro)[conversations.get(astro).length - 1].data.message;
+                let recent_message = conversations.get(astro)[conversations.get(astro).length - 1].message;
                 let preview_length = 25;
                 if (recent_message.length > preview_length) {
                     recent_message = recent_message.substring(0, (preview_length - 3)) + "...";

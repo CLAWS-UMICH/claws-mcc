@@ -91,6 +91,9 @@ const NavBar: React.FC = () => {
         <Tab onClick={handleTabSelect} icon={<Document />} value='/connect'>
           <span>Connect</span>
         </Tab>
+        <Tab onClick={handleTabSelect} icon={<Accessibility />} value='/map'>
+          <span>Map</span>
+        </Tab>
       </TabList>
       <Divider />
     </div>

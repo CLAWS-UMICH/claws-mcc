@@ -122,6 +122,13 @@ export default class Waypoints extends Base {
         });
     }
 
+    async sendRoute(req: Request, res: Response) {
+        // Send one waypoint to an astronuat
+        const data = req.body;
+        const messageId = data.id;
+
+    }
+
     async addWaypoint(req: Request, res: Response<ResponseBody>): Promise<ResponseBody> {
         let insertResult: InsertManyResult<BaseWaypoint>;
         let message: string;

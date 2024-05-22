@@ -13,12 +13,10 @@ import { Backpack12Filled } from "@fluentui/react-icons";
 export type BaseMessage = {
     message_id: number;
     use: 'PUT' | 'GET'; // these are the only two methods AR expects
-    data?: {
-        from: number
-        sent_to: number
-        message: string
-        timestamp: string
-    };
+    from: number
+    sent_to: number
+    message: string
+    timestamp: string
 }
 
 export type MessageAction =
@@ -26,12 +24,14 @@ export type MessageAction =
     { type: 'add', payload: BaseMessage }
 
 function createConversations(setConversations, messages: BaseMessage[]) {
+    console.log("creating conversations")
+    console.log(messages)
     if (!messages || messages.length === 0) return;
     // Map from astronaut ID to messages
     const conversations = new Map();
     for (const message of messages) {
-        const from = message.data?.from;
-        const sent_to = message.data?.sent_to;
+        const from = message?.from;
+        const sent_to = message?.sent_to;
 
         // Only include messages including LMCC (-1)
         if (from !== -1 && sent_to !== -1) {
