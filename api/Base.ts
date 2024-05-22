@@ -45,7 +45,7 @@ export default class Base {
     public async dispatch(target: 'AR' | 'FRONTEND' | 'VEGA', data: Message) {
         if (!this.wsFrontend || !this.wsHoloLens) throw new Error(`WebSocket instances not set`);
         const dispatchLogger = new Logger('DISPATCH');
-        // dispatchLogger.info(`Dispatching message ${data.type} to ${target} with data ${JSON.stringify(data)}`);
+        dispatchLogger.info(`Dispatching message ${data.type} to ${target} with data ${JSON.stringify(data)}`);
 
         if (target == 'AR') {
             data.type = data.type.toUpperCase();
@@ -54,7 +54,7 @@ export default class Base {
         const clients = this.getTargetClients(target);
         if (!clients.size) {
             return setTimeout(() => {
-                this.dispatch(target, data); 
+                this.dispatch(target, data);
             }, 2000);
         }
 

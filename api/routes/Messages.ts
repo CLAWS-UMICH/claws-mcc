@@ -23,6 +23,10 @@ export default class Messages extends Base {
         {
             type: 'GET_MESSAGES',
             handler: this.sendMessages.bind(this),
+        },
+        {
+            type: 'MESSAGING',
+            handler: this.handleReceiveMessaging.bind(this),
         }
     ]
     private collection: Collection<BaseMessage>
@@ -32,6 +36,27 @@ export default class Messages extends Base {
         super(db);
         // If no collection is passed in, use the default one
         this.collection = collection || db.collection<BaseMessage>('messages');
+    }
+
+    async handleReceiveMessaging(data: MessagingMessage) {
+        const new_messages = data.data?.AllMessages;
+        if (!new_messages.length) {
+            this.logger.error('No messages received');
+            return;
+        }
+
+        // just delete all the messages and insert the new ones
+        await this.collection.deleteMany({});
+        await this.collection.insertMany(new_messages);
+        this.logger.info('Received new messages');
+
+        const messageId = -1;
+        this.dispatch('FRONTEND', {
+            id: messageId,
+            type: 'MESSAGING',
+            use: 'GET',
+            data: new_messages,
+        });
     }
 
     async sendMessages(payload: any) {
@@ -88,7 +113,7 @@ export default class Messages extends Base {
     // Requests waypoints from AR
     // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
     private updateARMessages(messageId: number, data: BaseMessage[], platform?: string): void {
-        const newMessage: MessagingMessage =  {
+        const newMessage: MessagingMessage = {
             id: messageId,
             type: 'MESSAGING',
             use: 'PUT',

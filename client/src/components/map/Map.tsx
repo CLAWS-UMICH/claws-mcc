@@ -4,7 +4,10 @@ import rockyardMap from './rockyardMap.png';
 import useDynamicWebSocket from '../../hooks/useWebSocket';
 import WaypointMarkers from './WaypointMarkers';
 import EVAMarkers from './EVAMarkers';
+import RoverMarker from './RoverMarker';
+import ImageWithTextOverlay from './ImageWithTextOverlay';
 import { toLatLon } from 'utm';
+
 
 export enum WaypointType {
     // Blue
@@ -24,33 +27,7 @@ export type BaseWaypoint = {
     description: string;
     author: number; //-1 if mission control created
 }
-const ImageWithTextOverlay = ({ src, alt, text, point }) => {
-    const containerStyle: React.CSSProperties = {
-        position: 'absolute',
-        top: point.y,
-        left: point.x,
-        zIndex: 4,
-        width: '18px',
-        height: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    };
 
-    const textStyle: React.CSSProperties = {
-        position: 'absolute',
-        color: 'white', // You can change this to your desired text color
-        fontSize: '10px', // Adjust font size as needed
-        textAlign: 'center',
-    };
-
-    return (
-        <div style={containerStyle}>
-            <img src={src} alt={alt} style={{ width: '100%', height: '100%' }} />
-            <div style={textStyle}>{text}</div>
-        </div>
-    );
-};
 
 export default function Map() {
     const SCALE = 0.16;
@@ -80,14 +57,14 @@ export default function Map() {
     const latPerGrid = latRange / gridRows;
     const longPerGrid = longRange / gridCols;
 
-    console.log("latRange")
-    console.log(latRange)
-    console.log("longRange")
-    console.log(longRange)
-    console.log("latPerGrid")
-    console.log(latPerGrid)
-    console.log("longPerGrid")
-    console.log(longPerGrid)
+    // console.log("latRange")
+    // console.log(latRange)
+    // console.log("longRange")
+    // console.log(longRange)
+    // console.log("latPerGrid")
+    // console.log(latPerGrid)
+    // console.log("longPerGrid")
+    // console.log(longPerGrid)
 
 
     const containerStyle = {
@@ -116,17 +93,17 @@ export default function Map() {
     const top_right_square = plotPoint(topRightSquare.lat, topRightSquare.long, MAP_WIDTH, MAP_HEIGHT);
 
 
-    console.log("Top left point (pixels):", top_left_point);
-    console.log("Bottom right point (pixels):", bottom_right_point);
+    // console.log("Top left point (pixels):", top_left_point);
+    // console.log("Bottom right point (pixels):", bottom_right_point);
 
     function latLongToGrid(lat, long) {
-        console.log({ lat, long, topLeft: topLeft.long })
+        // console.log({ lat, long, topLeft: topLeft.long })
         const latdiff = Math.abs(Math.abs(topLeft.lat) - Math.abs(lat));
         const longdiff = Math.abs(Math.abs(long) - Math.abs(topLeft.long));
-        console.log({ latdiff, longdiff, latPerGrid, longPerGrid })
+        // console.log({ latdiff, longdiff, latPerGrid, longPerGrid })
         const row = latdiff / latPerGrid;
         const col = longdiff / longPerGrid;
-        console.log({ row, col })
+        // console.log({ row, col })
         return { row, col };
     }
 
@@ -138,25 +115,56 @@ export default function Map() {
 
     function plotPoint(lat, long, imageWidth, imageHeight) {
         const gridPos = latLongToGrid(lat, long);
-        console.log("Grid position:", gridPos);
+        // console.log("Grid position:", gridPos);
         return gridToPixel(gridPos.row, gridPos.col, imageWidth, imageHeight);
     }
 
     const [waypoints, setWaypoints] = useState<Array<BaseWaypoint>>([]);
     const [EVALocations, setEVALocations] = useState<Array<object>>([
-        { name: "EVA1", posx: 0, posy: 0 },
-        { name: "EVA2", posx: 0, posy: 0 }
+        { name: "EVA1", lat: 0, long: 0 },
+        { name: "EVA2", lat: 0, long: 0 }
     ]);
+    const [RoverLocation, setRoverLocation] = useState<Object>(
+        { lat: 0, long: 0, qr_id: 0 }
+    );
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const { sendMessage, lastMessage, readyState } = useDynamicWebSocket({
-        onOpen: () => sendMessage(JSON.stringify({ type: 'GET_WAYPOINTS' })),
+        onOpen: () => sendMessage(JSON.stringify({ type: 'GET_WAYPOINTS', platform: 'FRONTEND' })),
         type: 'WAYPOINTS'
     });
+    const { sendMessage: sendMessageRover, lastMessage: lastMessageRover, readyState: readyStateRover } = useDynamicWebSocket({
+        // onOpen: () => sendMessageRover(JSON.stringify({ type: 'GET_ROVER', platform: 'FRONTEND' })),
+        type: 'ROVER'
+    });
+
+    function UTMtoLatLong(posx, posy) {
+        let zoneNum = 15;
+        let zoneLetter = `R`;
+        let northern = undefined;
+        let strict = true;
+        let latLong = {
+            latitude: 0,
+            longitude: 0
+        };
+        try {
+            latLong = toLatLon(posx, posy, zoneNum, zoneLetter, northern, strict);
+        } catch (e) {
+            console.error(e)
+        }
+        return latLong;
+    }
+
+    function getRoverLocation() {
+
+    }
 
     function getWaypointsAndAstros() {
+        console.log("getting waypoints and astros for map!")
+        console.log(lastMessage)
         if (lastMessage !== null) {
             const data = JSON.parse(lastMessage.data);
             if (data?.data?.data?.isLocation) {
+                console.log("eva data found")
                 // convert posx and posy from UTM to lat long
                 let eva1_posx = data?.data?.imu.eva1.posx;
                 let eva1_posy = data?.data?.imu.eva1.posy;
@@ -164,28 +172,23 @@ export default function Map() {
                 let eva2_posx = data?.data?.imu.eva2.posx;
                 let eva2_posy = data?.data?.imu.eva2.posy;
 
-                let zoneNum = 15;
-                let zoneLetter = `R`;
-                let northern = true;
-                let strict = true;
-
-                let eva_location_1 = toLatLon(eva1_posx, eva1_posy, zoneNum, zoneLetter, undefined, strict);
-                let eva_location_2 = toLatLon(eva2_posx, eva2_posy, zoneNum, zoneLetter, undefined, strict);
+                let eva_location_1 = UTMtoLatLong(eva1_posx, eva1_posy);
+                let eva_location_2 = UTMtoLatLong(eva2_posx, eva2_posy);
 
                 let eva1_lat = eva_location_1.latitude;
                 let eva1_long = eva_location_1.longitude;
 
                 let eva2_lat = eva_location_2.latitude;
                 let eva2_long = eva_location_2.longitude;
-                console.log("EVA1 posx: ", eva1_posx)
-                console.log("EVA1 posy: ", eva1_posy)
-                console.log("EVA1 Lat: ", eva1_lat)
-                console.log("EVA1 Long: ", eva1_long)
+                // console.log("EVA1 posx: ", eva1_posx)
+                // console.log("EVA1 posy: ", eva1_posy)
+                // console.log("EVA1 Lat: ", eva1_lat)
+                // console.log("EVA1 Long: ", eva1_long)
 
-                console.log("EVA2 posx: ", eva2_posx)
-                console.log("EVA2 posy: ", eva2_posy)
-                console.log("EVA2 Lat: ", eva2_lat)
-                console.log("EVA2 Long: ", eva2_long)
+                // console.log("EVA2 posx: ", eva2_posx)
+                // console.log("EVA2 posy: ", eva2_posy)
+                // console.log("EVA2 Lat: ", eva2_lat)
+                // console.log("EVA2 Long: ", eva2_long)
                 setEVALocations([
                     {
                         name: "EVA1",
@@ -199,6 +202,7 @@ export default function Map() {
                     }
                 ])
             } else {
+                console.log("waypoint data found")
                 setMessageHistory((prev) => prev.concat(lastMessage.data));
                 let data = JSON.parse(lastMessage.data).data;
                 setWaypoints(data);
@@ -206,17 +210,31 @@ export default function Map() {
         }
     }
 
-
-
     useEffect(() => {
         getWaypointsAndAstros();
-    }, [lastMessage, setMessageHistory]);
-    // From TSS
-    // teal always
-    function AstroMarkers() { }
-    // From TSS
-    // Orange
-    function RoverMarker() { }
+    }, [lastMessage]);
+
+    useEffect(() => {
+        console.log("getting rover locations for map!")
+        console.log(lastMessageRover)
+        if (lastMessageRover) {
+            setMessageHistory((prev) => prev.concat(lastMessageRover.data));
+            let data = JSON.parse(lastMessageRover.data);
+
+            let rover_posx = data?.rover?.posx;
+            let rover_posy = data?.rover?.posy;
+
+            let location = UTMtoLatLong(rover_posx, rover_posy);
+
+            let rover_location = {
+                lat: location.latitude,
+                long: location.longitude,
+                qr_id: data?.data?.rover?.qr_id
+            }
+
+            setRoverLocation(rover_location);
+        }
+    }, [lastMessageRover]);
 
     return (
         <div style={containerStyle}>
@@ -236,8 +254,9 @@ export default function Map() {
                     style={{ ...absoluteImageStyle, top: (LARGE_HEIGHT - MAP_HEIGHT) / 2, left: (LARGE_WIDTH - MAP_WIDTH) / 2, zIndex: 2 }}
                 />
                 <div style={{ ...absoluteImageStyle, top: (LARGE_HEIGHT - MAP_HEIGHT) / 2, left: (LARGE_WIDTH - MAP_WIDTH) / 2, width: MAP_WIDTH, height: MAP_HEIGHT, zIndex: 3 }}>
-                    <WaypointMarkers waypoints={waypoints} MAP_WIDTH={MAP_WIDTH} MAP_HEIGHT={MAP_HEIGHT} plotPoint={plotPoint} ImageWithTextOverlay={ImageWithTextOverlay} />
-                    <EVAMarkers EVALocations={EVALocations} MAP_WIDTH={MAP_WIDTH} MAP_HEIGHT={MAP_HEIGHT} plotPoint={plotPoint} ImageWithTextOverlay={ImageWithTextOverlay} />
+                    <WaypointMarkers waypoints={waypoints} MAP_WIDTH={MAP_WIDTH} MAP_HEIGHT={MAP_HEIGHT} plotPoint={plotPoint} />
+                    <EVAMarkers EVALocations={EVALocations} MAP_WIDTH={MAP_WIDTH} MAP_HEIGHT={MAP_HEIGHT} plotPoint={plotPoint} />
+                    <RoverMarker RoverLocation={RoverLocation} MAP_WIDTH={MAP_WIDTH} MAP_HEIGHT={MAP_HEIGHT} plotPoint={plotPoint} />
                 </div>
             </div>
         </div >

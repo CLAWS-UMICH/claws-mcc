@@ -185,6 +185,7 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                     props.EVALocations.map((location: any) => {
                         return (
                             <Marker
+                                key={location.name}
                                 label={{ text: location.name, color: "white", fontWeight: "bold" }}
                                 position={{ lat: location.posx, lng: location.posy }}
                                 icon={waypointImage}

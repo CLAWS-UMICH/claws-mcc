@@ -5,7 +5,7 @@ import greenwaypoint from '../../assets/greenwaypoint.png';
 import redwaypoint from '../../assets/redwaypoint.png';
 import pinkwaypoint from '../../assets/pinkwaypoint.png';
 import rovermarker from '../../assets/rovermarker.png';
-import astronautmarker from '../../assets/astronautmarker.png';
+import ImageWithTextOverlay from './ImageWithTextOverlay';
 
 export enum WaypointType {
     // Blue
@@ -27,10 +27,8 @@ export type BaseWaypoint = {
     author: number; //-1 if mission control created
 }
 
-
-
 // TODO: right click add waypoint
-export default function WaypointMarkers({ waypoints, MAP_WIDTH, MAP_HEIGHT, plotPoint, ImageWithTextOverlay }) {
+export default function WaypointMarkers({ waypoints, MAP_WIDTH, MAP_HEIGHT, plotPoint }) {
     return (
         <>
             {waypoints.map((waypoint, index) => {
@@ -46,7 +44,7 @@ export default function WaypointMarkers({ waypoints, MAP_WIDTH, MAP_HEIGHT, plot
                 else if (type === WaypointType.DANGER)
                     src_path = redwaypoint;
                 return (
-                    <div>
+                    <div key={index}>
                         <ImageWithTextOverlay
                             src={src_path}
                             alt="Waypoint"
