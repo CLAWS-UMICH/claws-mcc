@@ -20,7 +20,7 @@ enum GroupKey {
 
 type DrawerSubItemProps = { waypoint: BaseWaypoint, selected: boolean, dispatch: React.Dispatch<ManagerAction> }
 
-function SampleImage({ astro }: { astro: number }) {
+function SampleImage({ astro }: { astro: string }) {
     const intToChar = (i: number): string => {
         // If i > 26, add another letter.
         if (i > 26) return String.fromCharCode((i - 1) / 26 + 65) + String.fromCharCode(i % 26 + 65);
@@ -31,7 +31,7 @@ function SampleImage({ astro }: { astro: number }) {
             <img style={{ alignSelf: "center" }} width={27} height={31} src={waypointImage}
                 alt={"Waypoint Icon"} />
             <div className={'waypoint-image-text'}>
-                {intToChar(astro)}
+                {astro}
             </div>
         </div>
     );
@@ -69,7 +69,7 @@ const DrawerSubItem: React.FC<DrawerSubItemProps> = ({ waypoint, selected, dispa
             }}
             shape='circular'
             secondaryContent={<span style={{ display: "inline-block", width: "150px" }}>{details}</span>}
-            icon={<SampleImage astro={waypoint.waypoint_id} />}
+            icon={<SampleImage astro={waypoint.waypoint_letter} />}
         >
             Waypoint {waypoint.waypoint_id}
         </CompoundButton>

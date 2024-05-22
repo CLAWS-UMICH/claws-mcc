@@ -40,6 +40,7 @@ export type BaseWaypoint = {
     type: WaypointType;
     description: string;
     author: number; //-1 if mission control created
+    waypoint_letter: string;
 }
 
 export interface Astronaut {
