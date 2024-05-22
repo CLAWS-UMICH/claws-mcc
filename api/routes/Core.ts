@@ -52,7 +52,7 @@ export default class Core extends Base {
             color: data.color,
         };
 
-        await this.collection.insertOne(astronaut);
+        await this.collection.updateOne({ id: astronaut.id }, { $set: astronaut }, { upsert: true });
 
         this.logger.info(`Initialized astronaut ${astronaut.name}, dispatching waypoints and tasks`);
 
@@ -73,8 +73,8 @@ export default class Core extends Base {
             return;
         }
 
-        await this.collection.deleteMany({ id: data.id });
-        this.logger.info(`Killed astronaut ${astronaut.name} (and any other astronauts with the same id ${data.id})`);
+        // await this.collection.deleteMany({ id: data.id });
+        // this.logger.info(`Killed astronaut ${astronaut.name} (and any other astronauts with the same id ${data.id})`);
 
         // What else do we need to do when an astronaut disconnects? Alert maybe?
     }
