@@ -33,68 +33,117 @@ const IMG_ASPECT_RATIO = 1 / 1;
 
 const presetScreens: ScreenInfo[] = [
     {
-        title: 'connection_instr_1.png',
-        img_binary: readImageFile('./api/routes/assets/connection_instr_1.png'),
+        title: 'Antenna_Alignment_and_Calibration.png',
+        img_binary: readImageFile('./api/routes/assets/Antenna_Alignment_and_Calibration.png'),
         id: 'aB2cD',
         height: 614,
         width: 614
     },
     {
-        title: 'pressure_instr_2.png',
-        img_binary: readImageFile('./api/routes/assets/pressure_instr_2.png'),
+        title: 'Power_System_Troubleshooting_and_Repair.png',
+        img_binary: readImageFile('./api/routes/assets/Power_System_Troubleshooting_and_Repair.png'),
         id: 'eFgHi',
         height: 768,
         width: 768
     },
     {
-        title: 'suit_instr_1.png',
-        img_binary: readImageFile('./api/routes/assets/suit_instr_1.png'),
+        title: 'Structural_Damage_Repair.png',
+        img_binary: readImageFile('./api/routes/assets/Structural_Damage_Repair.png'),
         id: 'kLmNo',
         height: 768,
         width: 768
     },
     {
-        title: 'hardware_instr_1.png',
-        img_binary: readImageFile('./api/routes/assets/hardware_instr_1.png'),
+        title: 'Transceiver_Module_Replacement.png',
+        img_binary: readImageFile('./api/routes/assets/Transceiver_Module_Replacement.png'),
         id: 'pQrSt',
         height: 614,
         width: 614
     },
     {
-        title: 'rover_instr_1.png',
-        img_binary: readImageFile('./api/routes/assets/rover_instr_1.png'),
+        title: 'Battery_Local.png',
+        img_binary: readImageFile('./api/routes/assets/Battery_Local.png'),
         id: 'uVwXy',
         height: 614,
         width: 614
     },
     {
-        title: 'terrain_visual_1.png',
-        img_binary: readImageFile('./api/routes/assets/terrain_visual_1.png'),
+        title: 'Battery_Umbilical.png',
+        img_binary: readImageFile('./api/routes/assets/Battery_Umbilical.png'),
         id: 'z12a3',
         height: 768,
         width: 768
     },
     {
-        title: 'mars_instr_1.png',
-        img_binary: readImageFile('./api/routes/assets/mars_instr_1.png'),
+        title: 'CO2_A.png',
+        img_binary: readImageFile('./api/routes/assets/CO2_A.png'),
         id: '45abc',
         height: 614,
         width: 614
     },
     {
-        title: 'rover_instr_2.png',
-        img_binary: readImageFile('./api/routes/assets/rover_instr_2.png'),
+        title: 'CO2_B.png',
+        img_binary: readImageFile('./api/routes/assets/CO2_B.png'),
         id: 'd1e2f',
         height: 768,
         width: 768
     },
     {
-        title: 'terrain_visual_2.png',
-        img_binary: readImageFile('./api/routes/assets/terrain_visual_2.png'),
+        title: 'Communication_A.png',
+        img_binary: readImageFile('./api/routes/assets/Communication_A.png'),
         id: 'ghi12',
         height: 768,
         width: 768
     },
+    {
+        title: 'Communication_B.png',
+        img_binary: readImageFile('./api/routes/assets/Communication_B.png'),
+        id: 'wiu18',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Fan_Primary.png',
+        img_binary: readImageFile('./api/routes/assets/Fan_Primary.png'),
+        id: 'pof90',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Fan_Secondary.png',
+        img_binary: readImageFile('./api/routes/assets/Fan_Secondary.png'),
+        id: 'mjc87',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Oxygen_Primary.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        id: 'ung02',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Oxygen_Secondary.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        id: 'uih03',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Pump_Open.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        id: 'lfb31',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Pump_Close.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        id: 'ohv58',
+        height: 768,
+        width: 768
+    }
 ];
 
 //----------

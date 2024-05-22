@@ -6,8 +6,7 @@ import DropDown from "./DropDown/DropDown.tsx";
 import Header from "./Header/Header.tsx";
 import SearchBar from "./SearchBar/SearchBar.tsx";
 import axios from "axios";
-// import { readFileSync } from "fs";
-// import { readdirSync, readFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
  
 
 interface ScreenInfo {
@@ -18,124 +17,124 @@ interface ScreenInfo {
     width: number;
 }
 
-// export function readImageFile(filePath: string): Buffer {
-//     return readFileSync(filePath);
-// }
+export function readImageFile(filePath: string): Buffer {
+    return readFileSync(filePath);
+}
 
-// const presetScreens: ScreenInfo[] = [
-//     {
-//         title: 'Antenna_Alignment_and_Calibration.png',
-//         img_binary: readImageFile('./api/routes/assets/Antenna_Alignment_and_Calibration.png'),
-//         id: 'aB2cD',
-//         height: 614,
-//         width: 614
-//     },
-//     {
-//         title: 'Power_System_Troubleshooting_and_Repair.png',
-//         img_binary: readImageFile('./api/routes/assets/Power_System_Troubleshooting_and_Repair.png'),
-//         id: 'eFgHi',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Structural_Damage_Repair.png',
-//         img_binary: readImageFile('./api/routes/assets/Structural_Damage_Repair.png'),
-//         id: 'kLmNo',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Transceiver_Module_Replacement.png',
-//         img_binary: readImageFile('./api/routes/assets/Transceiver_Module_Replacement.png'),
-//         id: 'pQrSt',
-//         height: 614,
-//         width: 614
-//     },
-//     {
-//         title: 'Battery_Local.png',
-//         img_binary: readImageFile('./api/routes/assets/Battery_Local.png'),
-//         id: 'uVwXy',
-//         height: 614,
-//         width: 614
-//     },
-//     {
-//         title: 'Battery_Umbilical.png',
-//         img_binary: readImageFile('./api/routes/assets/Battery_Umbilical.png'),
-//         id: 'z12a3',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'CO2_A.png',
-//         img_binary: readImageFile('./api/routes/assets/CO2_A.png'),
-//         id: '45abc',
-//         height: 614,
-//         width: 614
-//     },
-//     {
-//         title: 'CO2_B.png',
-//         img_binary: readImageFile('./api/routes/assets/CO2_B.png'),
-//         id: 'd1e2f',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Communication_A.png',
-//         img_binary: readImageFile('./api/routes/assets/Communication_A.png'),
-//         id: 'ghi12',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Communication_B.png',
-//         img_binary: readImageFile('./api/routes/assets/Communication_B.png'),
-//         id: 'wiu18',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Fan_Primary.png',
-//         img_binary: readImageFile('./api/routes/assets/Fan_Primary.png'),
-//         id: 'pof90',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Fan_Secondary.png',
-//         img_binary: readImageFile('./api/routes/assets/Fan_Secondary.png'),
-//         id: 'mjc87',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Oxygen_Primary.png',
-//         img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
-//         id: 'ung02',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Oxygen_Secondary.png',
-//         img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
-//         id: 'uih03',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Pump_Open.png',
-//         img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
-//         id: 'lfb31',
-//         height: 768,
-//         width: 768
-//     },
-//     {
-//         title: 'Pump_Close.png',
-//         img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
-//         id: 'ohv58',
-//         height: 768,
-//         width: 768
-//     }
-// ];
+const presetScreens: ScreenInfo[] = [
+    {
+        title: 'Antenna_Alignment_and_Calibration.png',
+        img_binary: readImageFile('./api/routes/assets/Antenna_Alignment_and_Calibration.png'),
+        id: 'aB2cD',
+        height: 614,
+        width: 614
+    },
+    {
+        title: 'Power_System_Troubleshooting_and_Repair.png',
+        img_binary: readImageFile('./api/routes/assets/Power_System_Troubleshooting_and_Repair.png'),
+        id: 'eFgHi',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Structural_Damage_Repair.png',
+        img_binary: readImageFile('./api/routes/assets/Structural_Damage_Repair.png'),
+        id: 'kLmNo',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Transceiver_Module_Replacement.png',
+        img_binary: readImageFile('./api/routes/assets/Transceiver_Module_Replacement.png'),
+        id: 'pQrSt',
+        height: 614,
+        width: 614
+    },
+    {
+        title: 'Battery_Local.png',
+        img_binary: readImageFile('./api/routes/assets/Battery_Local.png'),
+        id: 'uVwXy',
+        height: 614,
+        width: 614
+    },
+    {
+        title: 'Battery_Umbilical.png',
+        img_binary: readImageFile('./api/routes/assets/Battery_Umbilical.png'),
+        id: 'z12a3',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'CO2_A.png',
+        img_binary: readImageFile('./api/routes/assets/CO2_A.png'),
+        id: '45abc',
+        height: 614,
+        width: 614
+    },
+    {
+        title: 'CO2_B.png',
+        img_binary: readImageFile('./api/routes/assets/CO2_B.png'),
+        id: 'd1e2f',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Communication_A.png',
+        img_binary: readImageFile('./api/routes/assets/Communication_A.png'),
+        id: 'ghi12',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Communication_B.png',
+        img_binary: readImageFile('./api/routes/assets/Communication_B.png'),
+        id: 'wiu18',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Fan_Primary.png',
+        img_binary: readImageFile('./api/routes/assets/Fan_Primary.png'),
+        id: 'pof90',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Fan_Secondary.png',
+        img_binary: readImageFile('./api/routes/assets/Fan_Secondary.png'),
+        id: 'mjc87',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Oxygen_Primary.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        id: 'ung02',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Oxygen_Secondary.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        id: 'uih03',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Pump_Open.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        id: 'lfb31',
+        height: 768,
+        width: 768
+    },
+    {
+        title: 'Pump_Close.png',
+        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        id: 'ohv58',
+        height: 768,
+        width: 768
+    }
+];
 
 export const Communication = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -185,7 +184,7 @@ export const Communication = () => {
                     <SearchBar searchInput={searchInput} setSearchInput={setSearchInput}/>
                 </div>
                 <DropDown open={dropdownVisible} onOpenChange={handleDropdownChange} positioningRef={positioningRef} activeObjectId={activeObjectId} isButton={isButton}/>
-                <CardSelectable onCardClick={handleCardClick} images={imageArray} searchInput={searchInput}/>
+                <CardSelectable onCardClick={handleCardClick} images={presetScreens} searchInput={searchInput}/>
             </div>
         </div>
     )

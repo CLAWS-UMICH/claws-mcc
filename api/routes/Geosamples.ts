@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import Base, {RouteEvent} from "../Base";
 import {Collection, Db,  WithId} from "mongodb";
-import { BaseGeosample, BaseZone, EvaData, SampleMessage, isGeosample, isZone } from "../types/Geosamples";
+import { ARLocation, BaseGeosample, BaseZone, EvaData, SampleMessage, isGeosample, isZone } from "../types/Geosamples";
 import Logger from "../core/logger";
 
 export interface ResponseBody {
@@ -86,7 +86,7 @@ export default class Geosamples extends Base {
     async addGeosamples(message: SampleMessage) : Promise<{}> {
         this.logger.info("Received samples from Hololens, sending samples to frontend");
         const samples = message.data.AllGeosamples;
-        const zones = message.zones.AllGeosampleZones;
+        let zones = message.zones.AllGeosampleZones;
 
         this.logger.info("orig samples", samples);
         this.logger.info("orig zones", zones);
@@ -97,25 +97,34 @@ export default class Geosamples extends Base {
         }
 
         if (zones.length > 0) {
-            if (zones) zones[0].zone_id = 65;
-            // for (let i = 0; i < zones.length; i++) {
-            //     if (!zones[i] || !isZone(zones[i])) {
-            //         this.logger.error("Geosample zones in incorrect format.");
-            //         return "Error";
-            //     }
-            //     // Geosamples.sampleIds[zones[i].zone_id] = 1;
-            // }
+            for (let i = 0; i < zones.length; i++) {
+                if (!zones[i] || !isZone(zones[i])) {
+                    this.logger.error("Geosample zones in incorrect format.");
+                    return "Error";
+                }
+                if (zones[i].ZoneGeosamplesIds) {
+                    for (let i = 0; i < zones[i].ZoneGeosamplesIds.length; i++) {
+                        for (let j = i + 1; j < zones[i].ZoneGeosamplesIds.length; j++) {
+                            if (zones[i].ZoneGeosamplesIds[i] === zones[i].ZoneGeosamplesIds[j]) {
+                            zones[i].ZoneGeosamplesIds.splice(j, 1);
+                            j--; // Adjust index after removal
+                            }
+                        }
+                    }
+                }
+
+                // Geosamples.sampleIds[zones[i].zone_id] = 1;
+            }
             for (let i = 0; i < samples.length; i++) {
                 if (!isGeosample(samples[i])) {
                     this.logger.error("Geosample in incorrect format.");
                     return "Error";
                 }
-                samples[i].zone_id = 65;
 
                 if (!samples[i].starred) {
                     samples[i].starred = this.determineSignificance(samples[i].eva_data);
                     this.logger.info(samples[i].starred)
-                    if (samples[i].starred) this.updateARSamples(-1, { samples: samples, zones: zones });
+                    this.updateARSamples(-1, { samples: samples, zones: zones });
                 }
                 if (!samples[i].eva_data.name || samples[i].eva_data.name === "") {
                     samples[i].eva_data.name = "Geo Sample " + samples[i].geosample_id.toString();
@@ -162,7 +171,6 @@ export default class Geosamples extends Base {
         const sample = req.body.data;
         if (!isGeosample(sample)) {
             res.status(400).send("Invalid request");
-            return "Invalid";
         }
 
         try {
@@ -176,8 +184,7 @@ export default class Geosamples extends Base {
             );
 
             if (updateResult.modifiedCount !== 1) {
-                res.status(400).send("Error deleting sample");
-                return "Error deleting"
+                res.status(400).send("Error deleting sample")
             }
             const allSamples = this.samplesCollection.find();
             const allZones = this.zonesCollection.find();
@@ -202,7 +209,6 @@ export default class Geosamples extends Base {
             const replaceResult = await this.samplesCollection.replaceOne({geosample_id: sample.geosample_id, zone_id: sample.zone_id}, sample, {upsert: false});
             if (replaceResult.modifiedCount !== 1) {
                 res.status(400).send("Error updating sample")
-                return "Error editing sample"
             }
             const sampleData = await this.samplesCollection.find().toArray();
             const zoneData = await this.zonesCollection.find().toArray();
@@ -231,7 +237,7 @@ export default class Geosamples extends Base {
     }
 
     private determineSignificance(eva_data: EvaData): boolean{
-        this.logger.info("EVA_DATA", eva_data)
+        this.logger.info(eva_data)
         const total = eva_data.data.SiO2 + eva_data.data.TiO2 + eva_data.data.Al2O3 + eva_data.data.FeO + eva_data.data.MnO + eva_data.data.MgO + eva_data.data.CaO + eva_data.data.K2O + eva_data.data.P2O3;
         if (eva_data.data.SiO2 > 0 && eva_data.data.SiO2 < 10) return true;
         if (eva_data.data.TiO2 > 1) return true;

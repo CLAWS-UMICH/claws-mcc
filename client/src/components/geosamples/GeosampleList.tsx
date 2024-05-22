@@ -89,13 +89,14 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
     }
 
     return (
-        <Accordion className={styles.container} defaultOpenItems={sample_zones[0].zone_id} onToggle={handleToggle} openItems={openItems} multiple collapsible>          
-                {sample_zones[0].ZoneGeosamplesIds.length > 0 && (
-                    <AccordionItem key={sample_zones[0].zone_id} value={sample_zones[0].zone_id}>
-                        <AccordionHeader className={styles.header} size="large" expandIcon={openItems.includes(sample_zones[0].zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
-                            <b style={{fontSize:"15px"}}>Zone {String.fromCharCode(Number(sample_zones[0].zone_id))}</b>
+        <Accordion className={styles.container} defaultOpenItems={sample_zones.map(zone => zone.zone_id)} onToggle={handleToggle} openItems={openItems} multiple collapsible>
+            {sample_zones.map((zone) =>             
+                zone.ZoneGeosamplesIds.length > 0 && (
+                    <AccordionItem key={zone.zone_id} value={zone.zone_id}>
+                        <AccordionHeader className={styles.header} size="large" expandIcon={openItems.includes(zone.zone_id) ? <ChevronDown16Regular /> : <ChevronUp16Regular />} expandIconPosition="end">
+                            <b style={{fontSize:"15px"}}>Zone {String.fromCharCode(Number(zone.zone_id))}</b>
                         </AccordionHeader>
-                        {sample_zones[0].ZoneGeosamplesIds.map((id) => (
+                        {zone.ZoneGeosamplesIds.map((id) => (
                             <AccordionPanel className={styles.sampleContainer} key={id}>
                                 {geosampleMap.has(Number(id)) && (
                                     <CompoundButton
@@ -111,7 +112,8 @@ const GeosampleList: React.FC<SampleListProps> = ({geosamples, sample_zones, dis
                             </AccordionPanel>
                         ))}
                     </AccordionItem>
-                )}
+                )
+            )}
         </Accordion>
     );
 }

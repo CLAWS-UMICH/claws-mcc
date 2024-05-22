@@ -24,7 +24,7 @@ export type EvaData = {
 export type BaseGeosample = {
     _id?: number;
     geosample_id: number;
-    zone_id: any;
+    zone_id: string;
     starred: boolean;
     eva_data: EvaData;
     time: string; 
@@ -39,7 +39,7 @@ export type BaseGeosample = {
 
 export type BaseZone = {
     _id?: number;
-    zone_id: any;
+    zone_id: string;
     ZoneGeosamplesIds: number[];
     location: ARLocation;
     radius: number;
