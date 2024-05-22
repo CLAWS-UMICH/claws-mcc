@@ -16,7 +16,7 @@ const SearchBar = ({searchInput, setSearchInput}) => {
         <Search20Regular className="search-icon" />
         <input
           type="search"
-          placeholder="Search"
+          placeholder="Search Instructions"
           onChange={handleChange}
           value={searchInput}
           className="search-input"

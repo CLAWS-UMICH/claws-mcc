@@ -6,7 +6,7 @@ import {
   Hexagon24Regular,
   Chat24Regular,
   Location24Regular,
-  GridCircles24Regular,
+  BranchFork24Regular,
 } from "@fluentui/react-icons";
 
 const ButtonRow = ({ onButtonClick }) => {
@@ -17,7 +17,7 @@ const ButtonRow = ({ onButtonClick }) => {
     samples: useRef(null),
     messages: useRef(null),
     navigation: useRef(null),
-    modes: useRef(null),
+    uia: useRef(null),
   };
 
   return (
@@ -42,9 +42,9 @@ const ButtonRow = ({ onButtonClick }) => {
         <Location24Regular />
         Navigation
       </button>
-      <button className="row-button" ref={refs.modes} onClick={() => onButtonClick('5', refs.modes)}>
-        <GridCircles24Regular />
-        Modes
+      <button className="row-button" ref={refs.uia} onClick={() => onButtonClick('5', refs.uia)}>
+        <BranchFork24Regular />
+        UIA
       </button>
     </div>
   );

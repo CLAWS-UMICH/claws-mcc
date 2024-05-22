@@ -47,18 +47,8 @@ export const Communication = () => {
     };
 
     return(
-        <div style={{ backgroundColor: '#000000' }}>
-            <div id="myPopup">
-                <style>
-                    {`
-                        #myPopup {
-                            top: 0px !important;
-                            max-height: 100vh !important;
-                            max-width: 120vh !important;
-                            overflow-y: scroll !important;
-                        }
-                    `}
-                </style>
+        <div style={{ backgroundColor: '#000000', height: '100vh', overflow: 'hidden' }}>
+            <div id="myPopup" style={{ height: '100%', overflowY: 'auto' }}>
                 <Header/>
                 <ButtonRow onButtonClick={handleButtonClick}/>
                 <div style ={{margin: "32px 0 32px 20px"}}>
