@@ -149,7 +149,7 @@ export const WaypointManager: React.FC = () => {
     }, [lastMessage, setMessageHistory]);
     return (
         <div style={{ display: "flex", height: "100vh", backgroundColor: "#000000", width: "100%" }}>
-            <InlineDrawer style={{ backgroundColor: "#0F0F0F", width: "250px" }} className={'drawer'} separator open>
+            <InlineDrawer style={{ backgroundColor: "#0F0F0F", width: "250px" }} className={'drawer'} open>
 
                 <DrawerHeader style={{ backgroundColor: "#141414", borderBottom: "1px solid #333333" }}>
                     <DrawerHeaderTitle
@@ -176,7 +176,7 @@ export const WaypointManager: React.FC = () => {
                                         }
                                     });
 
-                                }}>New Waypoint</Button>}>
+                                }}>New</Button>}>
                         Navigation
                     </DrawerHeaderTitle>
                 </DrawerHeader>
@@ -185,7 +185,6 @@ export const WaypointManager: React.FC = () => {
             </InlineDrawer>
             <div className={"waypoints-container"}>
                 <WaypointView {...state} dispatch={dispatch} />
-                <Divider className="waypoints-container-divider" />
                 <WaypointMap waypoints={state.waypoints}
                     selected={state.selected}
                     dispatch={dispatch}

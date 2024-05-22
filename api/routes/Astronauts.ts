@@ -80,8 +80,13 @@ export default class Astronauts extends Base {
         }
     }
 
-    async fetchAstronauts(): Promise<Astronaut[]> {
-        const result: FindCursor<Astronaut> = this.collection.find({ id: { $gte: 0 } });
+    async fetchAstronauts({ lmcc }): Promise<Astronaut[]> {
+        let result: FindCursor<Astronaut>;
+        if (lmcc) {
+            result = this.collection.find({ });
+        } else {
+            result = this.collection.find({ id: { $gte: 0 } });
+        }
         const resultArray = await result.toArray();
         if (resultArray.length === 0) return this.logger.error('No astronauts found');
 

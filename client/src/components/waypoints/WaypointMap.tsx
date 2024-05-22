@@ -162,20 +162,21 @@ export const WaypointMap: React.FC<WaypointMapProps> = props => {
                     icon={<ComposeFilled />}
 
                 >
-                    New Waypoint
+                    New
                 </Button>
             </div>
         </InfoWindow>
         );
     }
     return isLoaded ? (
-        <div style={{ gridColumn: "1" }}>
+        <div style={{ gridColumn: "1", padding: '1rem', borderRadius: '15px' }}>
             <GoogleMap
                 mapContainerClassName={"map"}
                 center={{ lat: 42.27697713747799, lng: -83.73820501490505 }}
                 zoom={10}
                 onLoad={addMarsMapTypes}
                 onRightClick={handleRightClick}
+                mapContainerStyle={{ borderRadius: '15px' }}
                 options={{
                     streetViewControl: false,
                     mapTypeControlOptions: { mapTypeIds: ['elevation', 'visible', 'infrared'] }

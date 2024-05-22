@@ -25,8 +25,8 @@
 
 .waypoint-image-text {
     position: absolute;
-    top: 32%;
-    left: 33%;
+    top: 40%;
+    left: 50%;
     transform: translate(-50%, -50%);
     color: white;
     font-size: 1rem;

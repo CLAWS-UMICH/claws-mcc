@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
-import { BaseWaypoint, ManagerAction, useAstronaut } from "./WaypointManager.tsx";
+import React, { useCallback, useEffect } from 'react';
+import { Astronaut, BaseWaypoint, ManagerAction, useAstronaut } from "./WaypointManager.tsx";
 import { DrawerBody, Body1, Body1Stronger, Skeleton, CompoundButton } from "@fluentui/react-components";
 import { isEqual } from "lodash";
 // @ts-ignore
 import waypointImage from '../../assets/waypoint.png';
+import useDynamicWebSocket from '../../hooks/useWebSocket.tsx';
 
 interface WaypointsDrawerProps {
     waypoints: BaseWaypoint[];
@@ -27,7 +28,7 @@ function SampleImage({ astro }: { astro: number }) {
     };
     return (
         <div className={"waypoint-image"}>
-            <img style={{ alignSelf: "center", padding: "0 15px 0 0" }} width={27} height={31} src={waypointImage}
+            <img style={{ alignSelf: "center" }} width={27} height={31} src={waypointImage}
                 alt={"Waypoint Icon"} />
             <div className={'waypoint-image-text'}>
                 {intToChar(astro)}
@@ -76,13 +77,13 @@ const DrawerSubItem: React.FC<DrawerSubItemProps> = ({ waypoint, selected, dispa
 }
 
 const DrawerItem: React.FC<{
-    astronaut: number,
+    astronaut?: Astronaut,
     waypoints: BaseWaypoint[],
     selected?: BaseWaypoint,
     dispatch: React.Dispatch<ManagerAction>
 }> = props => {
-    const name = useAstronaut(props.astronaut)?.name ?? `Astronaut ${props.astronaut}`;
-    return <div key={props.astronaut}>
+    const name = `${props.astronaut?.name || props.astronaut?.id}` || '0';
+    return <div key={props.astronaut?.id}>
         <h3 style={{ paddingLeft: "10px" }}>{name}</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {props.waypoints.map((waypoint) => <DrawerSubItem key={waypoint._id} dispatch={props.dispatch} waypoint={waypoint}
@@ -95,6 +96,30 @@ const DrawerItem: React.FC<{
 export const WaypointDrawer: React.FC<WaypointsDrawerProps> = props => {
     // Key by which to group waypoints.
     const [key, setKey] = React.useState<GroupKey>(GroupKey.Astronaut);
+    const [astronautObjs, setAstronauts] = React.useState<Map<number, { id: number, name: string, color: string }>>(new Map());
+
+    const { sendMessage, lastMessage } = useDynamicWebSocket({
+        onOpen: () => {
+            sendMessage(JSON.stringify({ type: 'GET_ASTRONAUTS', lmcc: true }));
+        },
+        type: 'ASTRONAUTS'
+    });
+
+    useEffect(() => {
+        if (lastMessage) {
+            let astronautData: Astronaut[] = [];
+            try {
+                astronautData = JSON.parse(lastMessage.data).data;
+            } catch (error) {
+                console.error(error);
+            }
+            let newAstronauts = new Map();
+            astronautData.forEach((astro) => {
+                newAstronauts.set(astro.id, astro);
+            });
+            setAstronauts(newAstronauts);
+        }
+    }, [lastMessage]);
 
     const grouper = useCallback((waypoints: BaseWaypoint[]) => {
         if (waypoints.length === 0) return <Body1>No waypoints found</Body1>;
@@ -107,7 +132,7 @@ export const WaypointDrawer: React.FC<WaypointsDrawerProps> = props => {
         });
         const astronautList: React.ReactNode[] = [];
         astronauts?.forEach((waypoints, astronaut) =>
-            astronautList.push(<DrawerItem dispatch={props.dispatch} astronaut={astronaut} waypoints={waypoints}
+            astronautList.push(<DrawerItem dispatch={props.dispatch} astronaut={astronautObjs.get(astronaut)} waypoints={waypoints}
                                            selected={props.selected}/>));
         return astronautList;
     }, [key, props.selected, props.waypoints])
