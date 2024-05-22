@@ -30,6 +30,7 @@ export type Task = {
   astronauts: Astronaut[];
   subtasks?: Task[];
 }
+
 export const dummyTasks: Task[] = [
   {
     id: 1,
@@ -128,6 +129,7 @@ export function TaskList() {
   const [nextId, setNextId] = useState(100); // Initial counter value
 
   const { sendMessage, lastMessage } = useDynamicWebSocket({
+    onOpen: () => sendMessage(JSON.stringify({type: 'TASKLIST'})),
     type: 'TASKLIST'
   });
 
@@ -340,7 +342,7 @@ export function TaskList() {
   // ------------------------------------------------------------------------
   //                              Add Task Handler
   // ------------------------------------------------------------------------
-  function handleNewTask(event) {
+  async function handleNewTask(event) {
     // add task to array
     const task = {
       id: generateUniqueId(),
@@ -352,6 +354,21 @@ export function TaskList() {
       subtasks: [],
     };
     setTasksToDo([...tasksToDo, task]);
+
+    const res = await fetch("/api/addTask/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        data: task
+      })
+    });
+    if (res.status > 200) {
+      alert("Failed adding task");
+      return;
+    }
 
     sendToAR();
   }
