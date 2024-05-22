@@ -46,19 +46,30 @@ export default class Astronauts extends Base {
         this.collection = db.collection('astronauts');
     }
 
-    async fetchAstronaut(idOrName: string): Promise<WithId<Astronaut>> {
-        const id = parseInt(idOrName);
-        // if id is NaN, it's not a number, so it's a name
-        if (isNaN(id)) {
-            const result = this.collection.find({name: idOrName});
+    async fetchAstronaut(data: { id?: number, name?: string }): Promise<void> {
+        if (data.name) {
+            const result = this.collection.find({ name: data.name });
             const resultArray = await result.toArray();
             if (resultArray.length > 1) throw new Error('More than one astronaut found, please specify id');
             if (resultArray.length === 0) throw new Error('Astronaut not found');
-            return resultArray[0];
+
+            this.dispatch('FRONTEND', {
+                id: resultArray[0].id,
+                type: 'ASTRONAUT',
+                use: 'GET',
+                data: resultArray[0],
+            });
+        } else {
+            const result: WithId<Astronaut> | null = await this.collection.findOne({ id: data.id });
+            if (!result) throw new Error('Astronaut not found');
+    
+            this.dispatch('FRONTEND', {
+                id: result.id,
+                type: 'ASTRONAUT',
+                use: 'GET',
+                data: result,
+            });
         }
-        const result: WithId<Astronaut> | null = await this.collection.findOne({id: id});
-        if (!result) throw new Error('Astronaut not found');
-        return result;
     }
 
     async getAstronaut(req: Request, res: Response) {

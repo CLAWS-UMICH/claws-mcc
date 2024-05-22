@@ -10,6 +10,8 @@
     align-items: center;
     background: rgb(0 0 0);
     border-bottom: 1px solid #5e5b5b;
+    border-right: 1px solid #5e5b5b;
+    width: 100%;
 }
 
 .blue-dot, .red-dot {
@@ -29,21 +31,23 @@
 }
 
 .image {
-    width: 400px;
+    height: 337px;
+    width: 600px;
     border-radius: 8px;
 }
 
-video {
-    width: 400px;
+video, .hololens {
+    width: 600px;
     border-radius: 8px;
 }
 
 .camera-content {
-    margin-top: 15px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 0.5rem;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .camera {
@@ -52,6 +56,8 @@ video {
 
 .camera-view-container {
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .loading-container {
@@ -72,4 +78,46 @@ video {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.astronaut-camera-title {
+    margin-bottom: 15px;
+    align-items: center;
+    display: flex;
+    gap: 15px;
+}
+
+.astronaut-letter {
+    width: 44px;
+    height: 44px;
+    border-radius: 50px;
+    font-size: 24px;
+    color: #fff;
+    line-height: 42px;
+    text-align: center;
+}
+
+.astronaut-name {
+    font-weight: bold;
+    font-size: 23px;
+}
+
+.camera-control {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #666666;
+    border-radius: 50%;
+    background: #292929;
+    padding: 0.8rem;
+}
+
+.astronaut-camera-controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.astronaut-camera-controls > button {
+    background: transparent;
+    border: none;
 }
