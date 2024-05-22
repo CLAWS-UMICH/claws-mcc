@@ -346,7 +346,8 @@ export default class Waypoints extends Base {
                     },
                     type: editedWaypoint.type,
                     description: editedWaypoint.description,
-                    author: editedWaypoint.author
+                    author: editedWaypoint.author,
+                    waypoint_letter: this.generateWaypointLetter(editedWaypoint.waypoint_id)
                 }
             }
             const updateResult = await this.collection.updateOne(filter, update);
