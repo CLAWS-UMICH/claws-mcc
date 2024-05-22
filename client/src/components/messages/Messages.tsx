@@ -67,6 +67,7 @@ export const Messages: React.FC = () => {
     const [conversations, setConversations] = useState<Map<number, BaseMessage[]>>(new Map());
     const [activeConversation, setActiveConversation] = useState<number>(-1);
 
+    // recieving new message from AR
     useEffect(() => {
         if (lastMessage !== null) {
             setMessageHistory((prev) => prev.concat(lastMessage.data));
