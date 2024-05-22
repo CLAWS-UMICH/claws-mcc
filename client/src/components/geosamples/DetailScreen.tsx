@@ -487,7 +487,7 @@ const DetailScreen : React.FC<DetailScreenProps> = ({dispatch, ready, geosample}
                   aria-labelledby="color_dropdown"
                   id="color_dropdown"
                   value={edit ? editedSample?.color : currentSample?.color || "Other"}
-                  onOptionSelect={(e, data) => handleOption('color', data.optionText)}
+                  onOptionSelect={(e, data) => handleOption('color', data.optionValue)}
                 >
                   {color_options.map((option) => (
                     <Option text={option[1]}>
