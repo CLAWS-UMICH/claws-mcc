@@ -128,8 +128,8 @@ export function TaskList() {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [nextId, setNextId] = useState(100); // Initial counter value
 
-  const { sendMessage, lastMessage } = useDynamicWebSocket({
-    onOpen: () => sendMessage(JSON.stringify({type: 'TASKLIST'})),
+  const { lastMessage, sendMessage } = useDynamicWebSocket({
+    onOpen: () => sendMessage(JSON.stringify({ type: 'TASKLIST' })),
     type: 'TASKLIST'
   });
 
@@ -138,16 +138,34 @@ export function TaskList() {
     return nextId;
   };
 
+  useEffect(() => {
+    if (lastMessage) {
+      const data = JSON.parse(lastMessage.data).data;
+      const tasks = convertFromTargetTypes(data);
+      console.log({tasks})
+      setTasksEmergency(tasks.filter((t) => t.status === TaskStatus.EMERGENCY));
+      setTasksCompleted(tasks.filter((t) => t.status === TaskStatus.COMPLETED));
+      setTasksInProgress(tasks.filter((t) => t.status === TaskStatus.INPROGRESS));
+      setTasksToDo(tasks.filter((t) => t.status === TaskStatus.TODO));
+
+      console.log({tasksEmergency: tasks.filter((t) => t.status === TaskStatus.EMERGENCY)})
+      console.log({tasksCompleted: tasks.filter((t) => t.status === TaskStatus.COMPLETED)})
+      console.log({tasksInProgress: tasks.filter((t) => t.status === TaskStatus.INPROGRESS)})
+      console.log({tasksToDo: tasks.filter((t) => t.status === TaskStatus.TODO)})
+    }
+  }, [lastMessage]);
+
 
   // ------------------------------------------------------------------------
   //                      Initalize tasks (todo: status??)
   // ------------------------------------------------------------------------
   useEffect(() => {
     // Declare a boolean flag that we can use to cancel the API request.
-    console.log("initializing tasks");
-    setTasksToDo(dummyTasks);
-    setSelectedTask(dummyTasks[0]);
-    setSelectedTaskId(dummyTasks[0].id.toString());
+    // console.log("initializing tasks");
+    // setTasksToDo(dummyTasks);
+    // console.log({dummyTasks})
+    // setSelectedTask(dummyTasks[0]);
+    // setSelectedTaskId(dummyTasks[0].id.toString());
     // let ignoreStaleRequest = false;
 
     // // Call api to get initial list of all tasks
@@ -259,15 +277,36 @@ export function TaskList() {
   // ------------------------------------------------------------------------
   //                              Edit Task Handler
   // ------------------------------------------------------------------------
-  function handleTaskEdit(event, taskID, taskStatus, task) {
+  async function handleTaskEdit(event, taskID, taskStatus, task) {
 
     // split taskID into task and subtask IDs
     let [task_id, subtask_id] = String(taskID).split('-');
 
-    console.log(`Editing task ${task_id} with subtask ${subtask_id}`, task)
+    console.log(`Editing task ${taskID} with subtask ${subtask_id}`, task)
 
     // set bool if subtask
     let subtask = Boolean(subtask_id ? true : false);
+
+    // make api request to update task
+    try {
+      const res = await fetch(`/api/updateTask/${task_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          data: task
+        })
+      });
+
+      if (res.status != 200 && res.status != 201) {
+        alert("Failed updating task");
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+    }
 
     try {
       // find task in array and update it
@@ -365,10 +404,12 @@ export function TaskList() {
         data: task
       })
     });
-    if (res.status > 200) {
+    if (res.status != 200 && res.status != 201) {
       alert("Failed adding task");
       return;
     }
+
+    sendMessage(JSON.stringify({ type: 'TASKLIST' }))
 
     sendToAR();
   }
@@ -376,7 +417,27 @@ export function TaskList() {
   // ------------------------------------------------------------------------
   //                          Make Emergency Handler
   // ------------------------------------------------------------------------
-  function handleEmergencyTask(event, taskID, taskStatus) {
+  async function handleEmergencyTask(event, taskID, taskStatus) {
+    try {
+      const res = await fetch(`/api/updateTask/${taskID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          data: { id: taskID, status: TaskStatus.EMERGENCY }
+        })
+      });
+
+      if (res.status != 200 && res.status != 201) {
+        alert("Failed updating task");
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
     // find task in array and update it
     if (taskStatus == TaskStatus.COMPLETED) {
       const taskIndex = tasksCompleted.findIndex((t) => t.id === taskID);
@@ -408,7 +469,27 @@ export function TaskList() {
   // ------------------------------------------------------------------------
   //                          Handle In-Progress Handler
   // ------------------------------------------------------------------------
-  function handleInProgressTask(event, taskID, taskStatus) {
+  async function handleInProgressTask(event, taskID, taskStatus) {
+    try {
+      const res = await fetch(`/api/updateTask/${taskID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          data: { id: taskID, status: TaskStatus.INPROGRESS }
+        })
+      });
+
+      if (res.status != 200 && res.status != 201) {
+        alert("Failed updating task");
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
     // find task in array and update it
     if (taskStatus == TaskStatus.COMPLETED) {
       const taskIndex = tasksCompleted.findIndex((t) => t.id === taskID);
@@ -581,20 +662,20 @@ export function TaskList() {
     }
 
     // Helper function to convert tasks from C# to JavaScript
-    function convertTasks(tasks: any[]): Task[] {
+    function convertTasks(tasks: any[], subtask = false): Task[] {
       return tasks.map(task => ({
-        id: task.task_id,
-        subtask: task.subtask.length > 0,
+        id: task.id,
+        subtask: subtask || task.subtasks?.length,
         title: task.title,
         description: task.description,
         status: convertStatus(task.status),
-        astronauts: [],
-        subtasks: task.subtasks ? convertTasks(task.subtasks) : []
+        astronauts: task.astronauts ?? [],
+        subtasks: task.subtasks ? convertTasks(task.subtasks, true) : [],
       }));
     }
 
     // Convert the main task list data
-    const convertedTasks = convertTasks(data.AllTasks);
+    const convertedTasks = convertTasks(data);
 
     return convertedTasks;
   }
@@ -635,7 +716,7 @@ export function TaskList() {
                       <p className="task-description">{task.description}</p>
                     </div>
                   </div>
-                  {task.subtasks && task.subtask && ( // Check if subtasks exist
+                  {(!!task.subtasks && !!task.subtask) && ( // Check if subtasks exist
                     <div className="emergency-subtasks-container"> {/* Wrap subtasks */}
                       {task.subtasks.map((subtask) => (
                         <div
@@ -672,7 +753,7 @@ export function TaskList() {
                   <p className="task-description">{task.description}</p>
                 </div>
               </div>
-              {task.subtasks && task.subtask && ( // Check if subtasks exist
+              {(!!task.subtasks && !!task.subtask) && ( // Check if subtasks exist
                 <div className="subtasks-container"> {/* Wrap subtasks */}
                   {task.subtasks.map((subtask) => (
                     <div
@@ -707,7 +788,7 @@ export function TaskList() {
                   <p className="task-description">{task.description}</p>
                 </div>
               </div>
-              {task.subtasks && task.subtask && ( // Check if subtasks exist
+              {(!!task.subtasks && !!task.subtask) && ( // Check if subtasks exist
                 <div className="subtasks-container"> {/* Wrap subtasks */}
                   {task.subtasks.map((subtask) => (
                     <div
@@ -742,7 +823,7 @@ export function TaskList() {
                   <p className="task-description">{task.description}</p>
                 </div>
               </div>
-              {task.subtasks && task.subtask && ( // Check if subtasks exist
+              {(!!task.subtasks && !!task.subtask) && ( // Check if subtasks exist
                 <div className="subtasks-container"> {/* Wrap subtasks */}
                   {task.subtasks.map((subtask) => (
                     <div

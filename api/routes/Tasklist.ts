@@ -145,11 +145,14 @@ export default class Tasklist extends Base {
 		
 
 	// GET for web frontend
-	getTasks() {
+	async getTasks() {
+		const tasks = await this.db.collection('tasks').find().toArray();
+		this.tasks = tasks as unknown as Task[];
+
 		this.dispatch("FRONTEND", {
 			id: -1,
 			use: 'PUT',
-			data: this.tasks,
+			data: tasks,
 			type: 'TASKLIST',
 		});
 	}
@@ -170,13 +173,11 @@ export default class Tasklist extends Base {
 	// TODO: add emergency property
 	// TODO: add code to send to AR frontend 
 	async addTask(req: Request, res: Response) {
-		const newTask = req.body as Task;
-		this.logger.info("i tried")
-		this.logger.info(newTask)
+		const { data: newTask } = req.body;
 
 		// TODO: add code to assign values to undefined properties 
-		newTask.id = this.idgen;
-		this.idgen +=1;
+		const count = await this.db.collection('tasks').countDocuments();
+		newTask.id = count + 1;
 		this.tasks.push(newTask);
 
 		//what is this doing??
@@ -187,12 +188,12 @@ export default class Tasklist extends Base {
 			data: {
 				AllTasks: this.tasks
 			}
-		})
+		});
 
 		// update mongo 
 		try {
-			this.db.collection('tasks').insertOne(newTask);
-			res.status(201).send('Task created successfully');
+			await this.db.collection('tasks').insertOne(newTask);
+			return res.status(201).send('Task created successfully');
 		} catch (error) {
 			console.error(`Failed to insert new task: ${error.message}`);
 			res.status(500).send('Failed to insert new task');
@@ -209,13 +210,13 @@ export default class Tasklist extends Base {
 			return;
 		}
 
-		const newTask = req.body as Task;
+		const { data: newTask } = req.body;
 
 		// update mongoDB
 		try {
 			const result = await this.db.collection('tasks').updateOne({ id: newTask.id }, { $set: newTask });
 			if (result.matchedCount === 0) {
-				res.status(404).send('Task not found');
+				return res.status(404).send('Task not found');
 			} 
 		} catch (err) {
 			console.error(`Failed to update task: ${err.message}`);
@@ -231,12 +232,14 @@ export default class Tasklist extends Base {
 			await this.refreshTasks();
 		}
 
+		const tasks = await this.db.collection('tasks').find().toArray();
+
 		this.dispatch('AR', { 
 			id: -1,
 			use: 'PUT',
 			type: "TaskList",
 			data: {
-				"AllTasks": this.tasks
+				"AllTasks": tasks
 			}
 		})
 		
