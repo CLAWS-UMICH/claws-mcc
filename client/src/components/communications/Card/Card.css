@@ -35,14 +35,14 @@
     /* {Show enlarge only when CardPreview is hovered}
     /* FIXME - positioning. and should it be top: '0' with quotes? */
     /* width: '100px', height: '150px' -- why did adding this change the location of the image? */
-  
+    
   .card {
-    width: 285px; /* FIXME bad to have px hardcoded? */
+    /* width: 285px; FIXME bad to have px hardcoded? */
     /* height: "180px",
     maxWidth: "100%", */
     height: fit-content;
     font-size: 22px;
-    background-color: #000000 !important;
+    background-color: #000000;
     align-items: center;
     display: flex;
   }

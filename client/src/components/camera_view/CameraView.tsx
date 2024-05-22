@@ -82,7 +82,7 @@ const CameraView: React.FC = () => {
             <div className="content camera-content">
                 {config.EVA_IP_ADDRESSES.map((ip, index) => (
                     <div key={index} className='camera'>
-                        {loading[index] || videoErrors[index] ? (
+                        {/* {loading[index] || videoErrors[index] ? (
                             <div className="loader-container">
                                 {loading[index] ?
                                     <div className="loading-container">
@@ -94,9 +94,9 @@ const CameraView: React.FC = () => {
                                     <img src={index === 0 ? CameraView1 : CameraView2} alt='camera' className='image' />
                                 )}
                             </div>
-                        ) : (
+                        ) : ( */}
                             <video 
-                                src={`http://${ip}/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=false&loopback=true&RenderFromCamera=true`} 
+                                src={`https://${ip}/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=false&loopback=true&RenderFromCamera=true`} 
                                 autoPlay 
                                 loop 
                                 controls={false}
@@ -105,7 +105,7 @@ const CameraView: React.FC = () => {
                                 onError={() => handleVideoError(index)}
                                 onLoadedData={() => handleVideoLoaded(index)}
                             />
-                        )}
+                        {/* )} */}
                     </div>
                 ))}
             </div>

@@ -10,6 +10,7 @@ interface SpeechMessage {
         base_64_audio: string;
         text_from_VEGA: string;
         command: string[];
+        classify: boolean;
     };
 }
 
@@ -21,6 +22,7 @@ interface ProcessedSpeechMessage {
         base_64_audio: string;
         text_from_VEGA: string;
         command: string[];
+        classify: boolean;
     };
 }
 
@@ -53,6 +55,7 @@ export default class Speech extends Base {
                 base_64_audio: data.data.base_64_audio,
                 text_from_VEGA: data.data.text_from_VEGA,
                 command: data.data.command,
+                classify: data.data.classify,
             },
         });
     }
@@ -68,6 +71,7 @@ export default class Speech extends Base {
                 base_64_audio: data.data.base_64_audio,
                 text_from_VEGA: data.data.text_from_VEGA,
                 command: data.data.command,
+                classify: data.data.classify,
             },
         });
     }

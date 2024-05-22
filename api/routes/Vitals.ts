@@ -75,7 +75,7 @@ export default class Vitals extends Base {
     }
 
     async handleDCUUpdate(data) {
-        const dcu_data = data["dcu"];
+        const dcu_data = data["dcu"][CURRENT_EVA];
 
         this.logger.info('Handling TSS DCU update', dcu_data);
 
@@ -98,11 +98,15 @@ export default class Vitals extends Base {
         const vitalsData = this.vitals;
         const messageId = 0;
 
+        const vitals = { ...this.vitals };
+        const dcu = { ...vitals.dcu };
+        delete vitals.dcu;
+
         this.dispatch('FRONTEND', {
             id: messageId,
             type: 'VITALS',
             use: 'PUT',
-            data: { tss_data: this.vitals },
+            data: { tss_data: vitals, dcu: dcu },
         });
     }
 }
