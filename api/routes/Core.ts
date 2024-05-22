@@ -94,9 +94,9 @@ export default class Core extends Base {
     async dispatchWaypoints() {
         const [waypoints, currentIndex] = await Promise.all([
             this.db.collection('waypoints').find().toArray(),
-            this.db.collection('waypoint_current_index').findOne()
+            this.db.collection('waypoint_config').findOne()
             .then((doc) => {
-                if (doc) return doc.index;
+                if (doc) return doc.current_index;
                 else return 0;
             })
         ]);

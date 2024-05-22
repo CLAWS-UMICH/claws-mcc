@@ -76,7 +76,9 @@ export default class Waypoints extends Base {
         })
     }
 
-    async sendWaypoints() {
+    async sendWaypoints(payload: any) {
+        const { platform = 'AR' } = payload;
+
         const config_collection = this.db.collection('waypoint_config');
         var current_index = await config_collection.findOne()
             .then((doc) => {
@@ -87,13 +89,15 @@ export default class Waypoints extends Base {
         const allWaypoints = this.collection.find();
         const data = await allWaypoints.toArray();
         const messageId = -1; //TODO: do we send the new waypoints to all the astronauts?
-        this.dispatch('FRONTEND', {
-            id: messageId,
-            type: 'WAYPOINTS',
-            use: 'GET',
-            data: data,
-        })
-        this.updateARWaypoints(messageId, data, current_index);
+        if (platform == 'FRONTEND') {
+            this.dispatch('FRONTEND', {
+                id: messageId,
+                type: 'WAYPOINTS',
+                use: 'GET',
+                data: data,
+            })
+        }
+        this.updateARWaypoints(messageId, data, current_index, platform);
     }
 
     async handleReceiveWaypoints(data: WaypointsMessage) {
@@ -397,14 +401,14 @@ export default class Waypoints extends Base {
 
     // Requests waypoints from AR
     // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
-    private updateARWaypoints(messageId: number, data: WithId<Document>[], current_index: number): void {
+    private updateARWaypoints(messageId: number, data: WithId<Document>[], current_index: number, platform?: string): void {
         const waypoints = data.map(waypoint => ({
             waypoint_id: waypoint.waypoint_id,
             location: waypoint.location,
             type: waypoint.type,
             description: waypoint.description,
             author: waypoint.author,
-            waypoint_letter: waypoint.waypointLetter
+            waypoint_letter: waypoint.waypoint_letter
         }));
         const newWaypointsMessage: WaypointsMessage = {
             id: -1, // all astronauts
@@ -415,7 +419,10 @@ export default class Waypoints extends Base {
                 currentIndex: current_index,
             }
         }
-        this.dispatch("AR", newWaypointsMessage)
+
+        if (!platform || platform == 'AR') {
+            this.dispatch("AR", newWaypointsMessage)
+        }
     }
 
     private generateWaypointLetter(index: number): string {

@@ -122,7 +122,7 @@ export const WaypointManager: React.FC = () => {
     const [state, dispatch] = useReducer(waypointsReducer, initialState)
     const [messageHistory, setMessageHistory] = useState<string[]>([]);
     const { sendMessage, lastMessage, readyState } = useDynamicWebSocket({
-        onOpen: () => sendMessage(JSON.stringify({ type: 'GET_WAYPOINTS' })),
+        onOpen: () => sendMessage(JSON.stringify({ type: 'GET_WAYPOINTS', platform: 'FRONTEND' })),
         type: 'WAYPOINTS'
     });
     useEffect(() => {

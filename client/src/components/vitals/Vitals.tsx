@@ -57,7 +57,7 @@ const VitalsManager: React.FC = () => {
   const [messageHistory, setMessageHistory] = useState<VitalsData[]>([]);
 
   const {sendMessage, lastMessage, readyState} = useDynamicWebSocket({
-    onOpen: () => sendMessage(JSON.stringify({type: 'GET_VITALS'})),
+    onOpen: () => sendMessage(JSON.stringify({type: 'GET_VITALS', platform: 'FRONTEND' })),
     type: 'VITALS'
   });
 

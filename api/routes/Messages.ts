@@ -34,7 +34,9 @@ export default class Messages extends Base {
         this.collection = collection || db.collection<BaseMessage>('messages');
     }
 
-    async sendMessages() {
+    async sendMessages(payload: any) {
+        const { platform = 'AR' } = payload;
+
         this.logger.info('receiving messages request')
         const allMessages = this.collection.find();
         const data = await allMessages.toArray();
@@ -45,7 +47,7 @@ export default class Messages extends Base {
             use: 'GET',
             data: data,
         })
-        this.updateARMessages(message_id, data);
+        this.updateARMessages(message_id, data, platform);
     }
 
     async addMessage(req: Request, res: Response<ResponseBody>) {
@@ -85,8 +87,8 @@ export default class Messages extends Base {
 
     // Requests waypoints from AR
     // Updates AR with the most recent waypoints. Assumes that the input data is the most up-to-date
-    private updateARMessages(messageId: number, data: BaseMessage[]): void {
-        const newMessage: MessagingMessage = {
+    private updateARMessages(messageId: number, data: BaseMessage[], platform?: string): void {
+        const newMessage: MessagingMessage =  {
             id: messageId,
             type: 'MESSAGING',
             use: 'PUT',
@@ -94,6 +96,9 @@ export default class Messages extends Base {
                 AllMessages: data
             }
         }
-        this.dispatch("AR", newMessage)
+
+        if (!platform || platform === 'AR') {
+            this.dispatch("AR", newMessage)
+        }
     }
 }

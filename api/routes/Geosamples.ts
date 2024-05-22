@@ -57,7 +57,9 @@ export default class Geosamples extends Base {
         return this.sampleIds[sample.zone_id]++;
     }
 
-    async sendSamples() {
+    async sendSamples(payload: any) {
+        const { platform = 'AR' } = payload;
+
         this.logger.info("GEOSAMPLES: sending samples to frontend");
 
         // Retrieve all samples and zones from database
@@ -66,16 +68,18 @@ export default class Geosamples extends Base {
         const sampleData = await allSamples.toArray();
         const zoneData = await allZones.toArray();
         const messageId = Geosamples.incrementMessageId();
-        this.dispatch('FRONTEND', {
-            id: messageId,
-            type: 'SEND_SAMPLES',
-            use: 'PUT',
-            data: {
-                samples: sampleData,
-                zones: zoneData
-            },
-        });
-        this.updateARSamples(messageId, { samples: sampleData, zones: zoneData });
+        if (platform == 'FRONTEND') {
+            this.dispatch('FRONTEND', {
+                id: messageId,
+                type: 'SEND_SAMPLES',
+                use: 'PUT',
+                data: {
+                    samples: sampleData,
+                    zones: zoneData
+                },
+            });
+        }
+        this.updateARSamples(messageId, { samples: sampleData, zones: zoneData }, platform);
     }
 
     async addGeosamples(message: SampleMessage) : Promise<{}> {
@@ -192,7 +196,7 @@ export default class Geosamples extends Base {
         }
     }
 
-    private updateARSamples(messageId: number, data: {samples: BaseGeosample[], zones: BaseZone[]}) : void {
+    private updateARSamples(messageId: number, data: {samples: BaseGeosample[], zones: BaseZone[]}, platform?: string) : void {
         const newGeosampleMessage: SampleMessage = {
             id: messageId,
             type: 'GEOSAMPLES',
@@ -200,7 +204,10 @@ export default class Geosamples extends Base {
             data: {AllGeosamples: data.samples},
             zones: {AllGeosampleZones: data.zones},
         }
-        this.dispatch("AR", newGeosampleMessage);
+
+        if (!platform || platform === 'AR') {
+            this.dispatch("AR", newGeosampleMessage);
+        }
     }
 
     private determineSignificance(eva_data: EvaData): boolean{
