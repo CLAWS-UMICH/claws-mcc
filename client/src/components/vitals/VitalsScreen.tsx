@@ -71,14 +71,14 @@ const VitalsScreen: React.FC<VitalsScreenProps> = ({ vitals }) => {
                     <div className="time-block" style={{ justifyContent: "space-around" }}>
                         <div className="ring">
                             <Caption1Strong>O<sub>2</sub>  Oxygen</Caption1Strong>
-                            <div className="card"><Body1Strong>{secondsToHours(vitals.tss_data.oxy_time_left)}</Body1Strong></div>
+                            <div className="card mini-card"><Body1Strong>{secondsToHours(vitals.tss_data.oxy_time_left)}</Body1Strong></div>
                         </div>
                         <div className="ring">
                             <div style={{ display: "flex", gap: "3.5px" }}>
                                 <Battery10Regular></Battery10Regular>
                                 <Caption1Strong><sub></sub>Battery</Caption1Strong>
                             </div>
-                            <div className="card"><Body1Strong>{secondsToHours(vitals.tss_data.batt_time_left)}</Body1Strong></div>
+                            <div className="card mini-card"><Body1Strong>{secondsToHours(vitals.tss_data.batt_time_left)}</Body1Strong></div>
                         </div>
                     </div>
                 </div>

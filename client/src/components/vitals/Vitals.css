@@ -76,6 +76,11 @@
     padding: 6px 13px;
 }
 
+.mini-card {
+    background-color: #303030 !important;
+    width: unset !important;
+}
+
 .switch {
     background-color: #313131;
     border-radius: 5px;
