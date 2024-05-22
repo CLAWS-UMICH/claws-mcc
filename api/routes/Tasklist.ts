@@ -181,14 +181,7 @@ export default class Tasklist extends Base {
 		this.tasks.push(newTask);
 
 		//what is this doing??
-		this.dispatch('AR', { 
-			id: -1,
-			use: 'PUT',
-			type: "TaskList",
-			data: {
-				AllTasks: this.tasks
-			}
-		});
+		this.shipToAR(this.tasks);
 
 		// update mongo 
 		try {
@@ -200,6 +193,19 @@ export default class Tasklist extends Base {
 		}
 	}
 
+
+	shipToAR(tasks: any) {
+		// 
+
+		// this.dispatch('AR', { 
+		// 	id: -1,
+		// 	use: 'PUT',
+		// 	type: "TaskList",
+		// 	data: {
+		// 		AllTasks: this.tasks
+		// 	}
+		// });
+	}
 	
 	async updateTask(req:Request, res:Response){
 		//key = convert task id to a number (id stays consistent)
@@ -233,16 +239,8 @@ export default class Tasklist extends Base {
 		}
 
 		const tasks = await this.db.collection('tasks').find().toArray();
+		this.shipToAR(tasks);
 
-		this.dispatch('AR', { 
-			id: -1,
-			use: 'PUT',
-			type: "TaskList",
-			data: {
-				"AllTasks": tasks
-			}
-		})
-		
 		// NOTE: do we need to send the newTask back?
 		return res.status(200).json(newTask);
 	}

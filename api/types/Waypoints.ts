@@ -18,7 +18,7 @@ export class BaseWaypoint {
     type: WaypointType;
     description: string;
     author: number; //-1 if mission control created
-    waypoint_letter: string;
+    waypoint_letter?: string;
 
     constructor(waypoint_id: number, location: ARLocation, type: WaypointType, description: string, author: number) {
         this.waypoint_id = waypoint_id;
