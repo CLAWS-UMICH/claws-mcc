@@ -1,0 +1,36 @@
+.button-row {
+  display: flex;
+  justify-content: start;
+  /* width: 1240px; */
+  height: 40px;
+  align-items: center;
+  background-color: #000;
+  padding: 20px;
+  gap: 10px;
+  border-top: 1px solid #666666;
+  border-bottom: 1px solid #666666;
+}
+
+.row-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 198.3333333px;
+  background-color: #292929;
+  color: #d6d6d6;
+  border: 1px solid #666666;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  gap: 8px;
+}
+
+.row-button svg {
+  display: block;
+}
+
+.row-button:hover {
+  background-color: #666666;
+}

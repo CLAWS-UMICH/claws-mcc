@@ -63,7 +63,7 @@ const ImageCard = ({ onClick, image, ...props }) => {
                 </DialogTitle>
                 <DialogContent>
                   <img
-                    src={`data:image/gif;base64,${image.img_binary}`}
+                    src={image.img_binary}
                     className="imageContent"
                     alt="alt"
                   />
@@ -76,7 +76,7 @@ const ImageCard = ({ onClick, image, ...props }) => {
         <img
           style={{ aspectRatio: 1, objectFit: "cover" }}
           className="reviewImage"
-          src={`data:image/gif;base64,${image.img_binary}`}
+          src={image.img_binary}
         />
       </CardPreview>
       <CardHeader

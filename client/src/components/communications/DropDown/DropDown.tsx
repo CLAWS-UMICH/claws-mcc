@@ -41,7 +41,7 @@ const sendButtonHighlightRequest = (buttonId, astronautId) => {
 };
 
 const sendSendImageRequest = (imageId, astronautId) => {
-  fetch('/api/sendimage', {
+  fetch('/api/sendImage', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

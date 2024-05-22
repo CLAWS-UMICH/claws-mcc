@@ -19,7 +19,7 @@ import Logger from "../core/logger";
 // Defines the structure for each string to be sent to the HUD (img-- converted to binary)
 interface ScreenInfo {
     title: string; // Format: type_descriptor_enumeration
-    img_binary: Buffer; // Good for handling binary data in Node.js!
+    img_binary: string; // Good for handling binary data in Node.js!
     id: string; // ID representing the image
     height: number;
     width: number;
@@ -34,112 +34,112 @@ const IMG_ASPECT_RATIO = 1 / 1;
 const presetScreens: ScreenInfo[] = [
     {
         title: 'Antenna_Alignment_and_Calibration.png',
-        img_binary: readImageFile('./api/routes/assets/Antenna_Alignment_and_Calibration.png'),
+        img_binary: readImageFile('./assets/Antenna_Alignment_and_Calibration.png'),
         id: 'aB2cD',
         height: 614,
         width: 614
     },
     {
         title: 'Power_System_Troubleshooting_and_Repair.png',
-        img_binary: readImageFile('./api/routes/assets/Power_System_Troubleshooting_and_Repair.png'),
+        img_binary: readImageFile('./assets/Power_System_Troubleshooting_and_Repair.png'),
         id: 'eFgHi',
         height: 768,
         width: 768
     },
     {
         title: 'Structural_Damage_Repair.png',
-        img_binary: readImageFile('./api/routes/assets/Structural_Damage_Repair.png'),
+        img_binary: readImageFile('./assets/Structural_Damage_Repair.png'),
         id: 'kLmNo',
         height: 768,
         width: 768
     },
     {
         title: 'Transceiver_Module_Replacement.png',
-        img_binary: readImageFile('./api/routes/assets/Transceiver_Module_Replacement.png'),
+        img_binary: readImageFile('./assets/Transceiver_Module_Replacement.png'),
         id: 'pQrSt',
         height: 614,
         width: 614
     },
     {
         title: 'Battery_Local.png',
-        img_binary: readImageFile('./api/routes/assets/Battery_Local.png'),
+        img_binary: readImageFile('./assets/Battery_Local.png'),
         id: 'uVwXy',
         height: 614,
         width: 614
     },
     {
         title: 'Battery_Umbilical.png',
-        img_binary: readImageFile('./api/routes/assets/Battery_Umbilical.png'),
+        img_binary: readImageFile('./assets/Battery_Umbilical.png'),
         id: 'z12a3',
         height: 768,
         width: 768
     },
     {
         title: 'CO2_A.png',
-        img_binary: readImageFile('./api/routes/assets/CO2_A.png'),
+        img_binary: readImageFile('./assets/CO2_A.png'),
         id: '45abc',
         height: 614,
         width: 614
     },
     {
         title: 'CO2_B.png',
-        img_binary: readImageFile('./api/routes/assets/CO2_B.png'),
+        img_binary: readImageFile('./assets/CO2_B.png'),
         id: 'd1e2f',
         height: 768,
         width: 768
     },
     {
         title: 'Communication_A.png',
-        img_binary: readImageFile('./api/routes/assets/Communication_A.png'),
+        img_binary: readImageFile('./assets/Communication_A.png'),
         id: 'ghi12',
         height: 768,
         width: 768
     },
     {
         title: 'Communication_B.png',
-        img_binary: readImageFile('./api/routes/assets/Communication_B.png'),
+        img_binary: readImageFile('./assets/Communication_B.png'),
         id: 'wiu18',
         height: 768,
         width: 768
     },
     {
         title: 'Fan_Primary.png',
-        img_binary: readImageFile('./api/routes/assets/Fan_Primary.png'),
+        img_binary: readImageFile('./assets/Fan_Primary.png'),
         id: 'pof90',
         height: 768,
         width: 768
     },
     {
         title: 'Fan_Secondary.png',
-        img_binary: readImageFile('./api/routes/assets/Fan_Secondary.png'),
+        img_binary: readImageFile('./assets/Fan_Secondary.png'),
         id: 'mjc87',
         height: 768,
         width: 768
     },
     {
         title: 'Oxygen_Primary.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        img_binary: readImageFile('./assets/Oxygen_Primary.png'),
         id: 'ung02',
         height: 768,
         width: 768
     },
     {
         title: 'Oxygen_Secondary.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        img_binary: readImageFile('./assets/Oxygen_Secondary.png'),
         id: 'uih03',
         height: 768,
         width: 768
     },
     {
         title: 'Pump_Open.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        img_binary: readImageFile('./assets/Oxygen_Primary.png'),
         id: 'lfb31',
         height: 768,
         width: 768
     },
     {
         title: 'Pump_Close.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        img_binary: readImageFile('./assets/Oxygen_Secondary.png'),
         id: 'ohv58',
         height: 768,
         width: 768
@@ -150,9 +150,10 @@ const presetScreens: ScreenInfo[] = [
 // UTILITIES
 //-----------
 
-// FUNC: Reads image file and converts it to binary data to be sent to HUD
-export function readImageFile(filePath: string): Buffer {
-    return readFileSync(filePath);
+// FUNC: Reads image file and returns it in base64 format
+export function readImageFile(filePath: string): string {
+    const bitmap = readFileSync(filePath);
+    return new Buffer(bitmap).toString('base64');
 }
 
 //-----------
@@ -175,7 +176,7 @@ export default class ARWebConnection extends Base {
             handler: this.sendAllScreensToFrontend.bind(this)
         },
         {
-            path: '/api/sendimage',
+            path: '/api/sendImage',
             method: 'post',
             handler: this.sendScreenToAR.bind(this)
         },
@@ -233,10 +234,11 @@ export default class ARWebConnection extends Base {
         const astronautID = parseInt(req.body.data["astronautID"], 20);
 
         try {
-            const screensCollection = this.db.collection('screens'); // Get collection of ScreenInfo objects
-            const screen = await screensCollection.findOne({ id: imageID }); // Find the screen by ID
+            // const screensCollection = this.db.collection('screens'); // Get collection of ScreenInfo objects
+            // const screen = await screensCollection.findOne({ id: imageID }); // Find the screen by ID
+            const screen = presetScreens.find((screen) => screen.id === imageID); // Find the screen by ID
 
-            console.log({screen})
+
 
             // Additional checks to validate astronautID
             if (astronautID < 0 || astronautID > 10) {

@@ -6,130 +6,140 @@ import DropDown from "./DropDown/DropDown.tsx";
 import Header from "./Header/Header.tsx";
 import SearchBar from "./SearchBar/SearchBar.tsx";
 import axios from "axios";
-import { readdirSync, readFileSync } from 'fs';
- 
+import AntennaAlignment from './assets/Antenna_Alignment_and_Calibration .png';
+import PowerSystem from './assets/Power_System_Troubleshooting_and_Repair.png';
+import StructuralDamage from './assets/Structural_Damage_Repair .png';
+import Transceiver from './assets/Transceiver_Module_Replacement .png';
+import BatteryLocal from './assets/Battery_Local.png';
+import BatteryUmbilical from './assets/Battery_Umbilical.png';
+import CO2A from './assets/CO2_A.png';
+import CO2B from './assets/CO2_B.png';
+import CommunicationA from './assets/Communication_A.png';
+import CommunicationB from './assets/Communication_B.png';
+import FanPrimary from './assets/Fan_Primary.png';
+import FanSecondary from './assets/Fan_Secondary.png';
+import OxygenPrimary from './assets/Oxygen_Primary.png';
+import OxygenSecondary from './assets/Oxygen_Secondary.png';
+import PumpOpen from './assets/Pump_Open.png';
+import PumpClose from './assets/Pump_Close.png';
 
 interface ScreenInfo {
     title: string; // Format: type_descriptor_enumeration
-    img_binary: Buffer; // Good for handling binary data in Node.js!
+    img_binary: string; // Good for handling binary data in Node.js!
     id: string; // ID representing the image
     height: number;
     width: number;
 }
 
-export function readImageFile(filePath: string): Buffer {
-    return readFileSync(filePath);
-}
-
 const presetScreens: ScreenInfo[] = [
     {
         title: 'Antenna_Alignment_and_Calibration.png',
-        img_binary: readImageFile('./api/routes/assets/Antenna_Alignment_and_Calibration.png'),
+        img_binary: AntennaAlignment,
         id: 'aB2cD',
         height: 614,
         width: 614
     },
     {
         title: 'Power_System_Troubleshooting_and_Repair.png',
-        img_binary: readImageFile('./api/routes/assets/Power_System_Troubleshooting_and_Repair.png'),
+        img_binary: PowerSystem,
         id: 'eFgHi',
         height: 768,
         width: 768
     },
     {
         title: 'Structural_Damage_Repair.png',
-        img_binary: readImageFile('./api/routes/assets/Structural_Damage_Repair.png'),
+        img_binary: StructuralDamage,
         id: 'kLmNo',
         height: 768,
         width: 768
     },
     {
         title: 'Transceiver_Module_Replacement.png',
-        img_binary: readImageFile('./api/routes/assets/Transceiver_Module_Replacement.png'),
+        img_binary: Transceiver,
         id: 'pQrSt',
         height: 614,
         width: 614
     },
     {
         title: 'Battery_Local.png',
-        img_binary: readImageFile('./api/routes/assets/Battery_Local.png'),
+        img_binary: BatteryLocal,
         id: 'uVwXy',
         height: 614,
         width: 614
     },
     {
         title: 'Battery_Umbilical.png',
-        img_binary: readImageFile('./api/routes/assets/Battery_Umbilical.png'),
+        img_binary: BatteryUmbilical,
         id: 'z12a3',
         height: 768,
         width: 768
     },
     {
         title: 'CO2_A.png',
-        img_binary: readImageFile('./api/routes/assets/CO2_A.png'),
+        img_binary: CO2A,
         id: '45abc',
         height: 614,
         width: 614
     },
     {
         title: 'CO2_B.png',
-        img_binary: readImageFile('./api/routes/assets/CO2_B.png'),
+        img_binary: CO2B,
         id: 'd1e2f',
         height: 768,
         width: 768
     },
     {
         title: 'Communication_A.png',
-        img_binary: readImageFile('./api/routes/assets/Communication_A.png'),
+        img_binary: CommunicationA,
         id: 'ghi12',
         height: 768,
         width: 768
     },
     {
         title: 'Communication_B.png',
-        img_binary: readImageFile('./api/routes/assets/Communication_B.png'),
+        img_binary: CommunicationB,
         id: 'wiu18',
         height: 768,
         width: 768
     },
     {
         title: 'Fan_Primary.png',
-        img_binary: readImageFile('./api/routes/assets/Fan_Primary.png'),
+        img_binary: FanPrimary,
         id: 'pof90',
         height: 768,
         width: 768
     },
     {
         title: 'Fan_Secondary.png',
-        img_binary: readImageFile('./api/routes/assets/Fan_Secondary.png'),
+        img_binary: FanSecondary,
         id: 'mjc87',
         height: 768,
         width: 768
     },
     {
         title: 'Oxygen_Primary.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        img_binary: OxygenPrimary,
         id: 'ung02',
         height: 768,
         width: 768
     },
     {
         title: 'Oxygen_Secondary.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        img_binary: OxygenSecondary,
         id: 'uih03',
         height: 768,
         width: 768
     },
     {
         title: 'Pump_Open.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Primary.png'),
+        img_binary: PumpOpen,
         id: 'lfb31',
         height: 768,
         width: 768
     },
     {
         title: 'Pump_Close.png',
-        img_binary: readImageFile('./api/routes/assets/Oxygen_Secondary.png'),
+        img_binary: PumpClose,
         id: 'ohv58',
         height: 768,
         width: 768
