@@ -57,16 +57,6 @@ export default function Map() {
     const latPerGrid = latRange / gridRows;
     const longPerGrid = longRange / gridCols;
 
-    // console.log("latRange")
-    // console.log(latRange)
-    // console.log("longRange")
-    // console.log(longRange)
-    // console.log("latPerGrid")
-    // console.log(latPerGrid)
-    // console.log("longPerGrid")
-    // console.log(longPerGrid)
-
-
     const containerStyle = {
         display: 'flex',
         justifyContent: 'center',
@@ -93,17 +83,11 @@ export default function Map() {
     const top_right_square = plotPoint(topRightSquare.lat, topRightSquare.long, MAP_WIDTH, MAP_HEIGHT);
 
 
-    // console.log("Top left point (pixels):", top_left_point);
-    // console.log("Bottom right point (pixels):", bottom_right_point);
-
     function latLongToGrid(lat, long) {
-        // console.log({ lat, long, topLeft: topLeft.long })
         const latdiff = Math.abs(Math.abs(topLeft.lat) - Math.abs(lat));
         const longdiff = Math.abs(Math.abs(long) - Math.abs(topLeft.long));
-        // console.log({ latdiff, longdiff, latPerGrid, longPerGrid })
         const row = latdiff / latPerGrid;
         const col = longdiff / longPerGrid;
-        // console.log({ row, col })
         return { row, col };
     }
 
@@ -133,7 +117,6 @@ export default function Map() {
         type: 'WAYPOINTS'
     });
     const { sendMessage: sendMessageRover, lastMessage: lastMessageRover, readyState: readyStateRover } = useDynamicWebSocket({
-        // onOpen: () => sendMessageRover(JSON.stringify({ type: 'GET_ROVER', platform: 'FRONTEND' })),
         type: 'ROVER'
     });
 
@@ -154,13 +137,7 @@ export default function Map() {
         return latLong;
     }
 
-    function getRoverLocation() {
-
-    }
-
     function getWaypointsAndAstros() {
-        console.log("getting waypoints and astros for map!")
-        console.log(lastMessage)
         if (lastMessage !== null) {
             const data = JSON.parse(lastMessage.data);
             if (data?.data?.data?.isLocation) {
@@ -180,15 +157,7 @@ export default function Map() {
 
                 let eva2_lat = eva_location_2.latitude;
                 let eva2_long = eva_location_2.longitude;
-                // console.log("EVA1 posx: ", eva1_posx)
-                // console.log("EVA1 posy: ", eva1_posy)
-                // console.log("EVA1 Lat: ", eva1_lat)
-                // console.log("EVA1 Long: ", eva1_long)
 
-                // console.log("EVA2 posx: ", eva2_posx)
-                // console.log("EVA2 posy: ", eva2_posy)
-                // console.log("EVA2 Lat: ", eva2_lat)
-                // console.log("EVA2 Long: ", eva2_long)
                 setEVALocations([
                     {
                         name: "EVA1",
@@ -202,7 +171,6 @@ export default function Map() {
                     }
                 ])
             } else {
-                console.log("waypoint data found")
                 setMessageHistory((prev) => prev.concat(lastMessage.data));
                 let data = JSON.parse(lastMessage.data).data;
                 setWaypoints(data);
@@ -215,8 +183,6 @@ export default function Map() {
     }, [lastMessage]);
 
     useEffect(() => {
-        console.log("getting rover locations for map!")
-        console.log(lastMessageRover)
         if (lastMessageRover) {
             setMessageHistory((prev) => prev.concat(lastMessageRover.data));
             let data = JSON.parse(lastMessageRover.data);
